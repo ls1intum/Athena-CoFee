@@ -22,6 +22,7 @@ conllu==0.11
 cryptography==2.6.1
 cycler==0.10.0
 cymem==2.0.2
+Cython==0.29.7
 docker==3.7.2
 docker-pycreds==0.4.0
 docutils==0.14
@@ -37,12 +38,14 @@ gevent==1.4.0
 greenlet==0.4.15
 gunicorn==19.9.0
 h5py==2.9.0
+hdbscan==0.8.22
 idna==2.8
 imagesize==1.1.0
 isort==4.3.18
 itsdangerous==1.1.0
 Jinja2==2.10.1
 jmespath==0.9.4
+joblib==0.13.2
 jsondiff==1.1.2
 jsonnet==0.12.1
 jsonpatch==1.23
@@ -64,6 +67,7 @@ numpy==1.16.3
 numpydoc==0.9.1
 overrides==1.9
 packaging==19.0
+pandas==0.24.2
 parsimonious==0.8.1
 plac==0.9.6
 pluggy==0.9.0

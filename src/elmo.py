@@ -18,15 +18,17 @@ def split_sentence(sentence: Sentence) -> List[Word]:
     words = map(lambda word: word.strip(), words)
     return list(words)
 
-def embed_sentences(sentences: TwoSentences) -> Tuple[array, array]:
-    word_list_iterator = map(split_sentence, list(sentences))
+def embed_sentences(sentences: List[Sentence]) -> List[array]:
+    word_list_iterator = map(split_sentence, sentences)
     word_lists: List[List[str]] = list(word_list_iterator)
     vectors: List[ndarray] = elmo.embed_batch(word_lists)
-    return (vectors[0][2], vectors[1][2])
+    return list(map(lambda vector: vector[2].sum(axis=0), vectors))
+
+def embed_two_sentences(sentences: TwoSentences) -> Tuple[array, array]:
+    vectors = embed_sentences(list(sentences))
+    return (vectors[0], vectors[1])
     
 
 def distance(sentences: TwoSentences) -> float:
-    embeddings: Tuple[array. array] = embed_sentences(sentences)
-    sentence_vector_1: array = embeddings[0].sum(axis=0)
-    sentence_vector_2: array = embeddings[1].sum(axis=0)
+    sentence_vector_1, sentence_vector_2 = embed_two_sentences(sentences)
     return scipy.spatial.distance.cosine(sentence_vector_1, sentence_vector_2)
