@@ -1,11 +1,13 @@
 from typing import List, Tuple
 import json
 import falcon
-from .elmo import distance, Sentence, TwoSentences
+from .elmo import ELMo, Sentence, TwoSentences
 
-class SentenceSimilarityResource(object):
+class SentenceSimilarityResource:
 
-    def on_post(self, req, resp):
+    __elmo: ELMo = ELMo()
+
+    def on_post(self, req: falcon.Request, resp: falcon.Response) -> None:
         badRequest = falcon.HTTPBadRequest("Need two sentences", "Must provide exactly two sentences")
         if req.content_length == 0:
             raise badRequest
@@ -17,7 +19,7 @@ class SentenceSimilarityResource(object):
             raise badRequest
 
         sentences_to_compare: TwoSentences = tuple(sentences)
-        dist: float = distance(sentences_to_compare)
+        dist: float = self.__elmo.distance(sentences_to_compare)
         doc = {
             'sentences': sentences_to_compare,
             'distance': dist

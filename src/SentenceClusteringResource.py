@@ -1,19 +1,23 @@
 from typing import List, Tuple
 import json
 import falcon
-from .elmo import embed_sentences, Sentence, TwoSentences
-from .clustering import cluster
-import pandas as pd
-from numpy import int64
+from .elmo import ELMo, Sentence, TwoSentences
+from .clustering import Clustering
+from pandas import DataFrame
+from numpy import int64, ndarray
 
-class SentenceClusteringResource(object):
+class SentenceClusteringResource:
 
-        
-    def default(self, o):
-        if isinstance(o, int64): return int(o)  
+    __clustering: Clustering = Clustering()
+    __elmo: ELMo = ELMo()
+
+    def __default(self, o) -> int :
+        if isinstance(o, int64): return int(o)
+        if isinstance(o, ndarray): return o.tolist()
+        print(o)
         raise TypeError
 
-    def on_post(self, req, resp):
+    def on_post(self, req: falcon.Request, resp: falcon.Response) -> None:
         badRequest = falcon.HTTPBadRequest("Need many sentences", "Must provide at least two sentences")
         if req.content_length == 0:
             raise badRequest
@@ -24,20 +28,33 @@ class SentenceClusteringResource(object):
         if len(sentences) < 2:
             raise badRequest
 
-        embeddings = embed_sentences(sentences)
-        print("embeddings", pd.DataFrame(embeddings).head())
-        labels, probabilities = cluster(embeddings)
-        print("labels", pd.DataFrame(labels).head())
-        print("probabilities", pd.DataFrame(probabilities).head())
-        
+        embeddings = self.__elmo.embed_sentences(sentences)
+        print("embeddings", DataFrame(embeddings).head())
+        labels, probabilities = self.__clustering.cluster(embeddings)
+        print("labels", DataFrame(labels).head())
+        print("probabilities", DataFrame(probabilities).head())
+
+        clusterLabels = list(map(lambda i: int(i), set(labels)))
+        clusters = {}
+        for clusterLabel in clusterLabels:
+            indices = [ i for i, x in enumerate(labels) if x == clusterLabel ]
+            cluster = {}
+            cluster['sentences'] = [ sentences[i] for i in indices ]
+            cluster['probabilities'] = [ probabilities[i] for i in indices ]
+            clusterEmbeddings = [ embeddings[i] for i in indices ]
+            cluster['distanceMatrix'] = self.__clustering.distances_within_cluster(clusterEmbeddings)
+            clusters[clusterLabel] = cluster
+
+
         doc = {
             'sentences': sentences,
-            'labels': list(labels),
-            'probabilities': list(probabilities),
+            'labels': labels,
+            'probabilities': probabilities,
+            'clusters': clusters
         }
 
         # Create a JSON representation of the resource
-        resp.body = json.dumps(doc, ensure_ascii=False, default=self.default)
+        resp.body = json.dumps(doc, ensure_ascii=False, default=self.__default)
 
         # The following line can be omitted because 200 is the default
         # status returned by the framework, but it is included here to
