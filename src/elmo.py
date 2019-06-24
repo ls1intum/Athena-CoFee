@@ -1,6 +1,7 @@
 from typing import List, Tuple
 from allennlp.commands.elmo import ElmoEmbedder
 from numpy import array, ndarray
+from pathlib import Path
 import scipy
 
 Word = str
@@ -8,8 +9,9 @@ Sentence = str
 TwoSentences = Tuple[Sentence, Sentence]
 
 class ELMo:
-    __DEFAULT_OPTIONS_FILE = "https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_options.json" # pylint: disable=line-too-long
-    __DEFAULT_WEIGHT_FILE = "https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_weights.hdf5" # pylint: disable=line-too-long
+    __cwd = Path.cwd()
+    __DEFAULT_OPTIONS_FILE = (__cwd / "src/resources/elmo_2x4096_512_2048cnn_2xhighway_5.5B_options.json").resolve()
+    __DEFAULT_WEIGHT_FILE = (__cwd / "src/resources/elmo_2x4096_512_2048cnn_2xhighway_5.5B_weights.hdf5").resolve()
 
     __elmo = ElmoEmbedder(__DEFAULT_OPTIONS_FILE, __DEFAULT_WEIGHT_FILE)
 

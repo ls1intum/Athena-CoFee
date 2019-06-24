@@ -6,6 +6,14 @@ from .clustering import Clustering
 from pandas import DataFrame
 from numpy import int64, ndarray
 
+class TextBlock:
+    id: str
+    text: Sentence
+
+    def __init__(self, id: str, text: Sentence):
+        self.id = id
+        self.text = text
+
 class SentenceClusteringResource:
 
     __clustering: Clustering = Clustering()
@@ -14,7 +22,7 @@ class SentenceClusteringResource:
     def __default(self, o) -> int :
         if isinstance(o, int64): return int(o)
         if isinstance(o, ndarray): return o.tolist()
-        print(o)
+        if isinstance(o, TextBlock): return o.__dict__
         raise TypeError
 
     def on_post(self, req: falcon.Request, resp: falcon.Response) -> None:
@@ -23,7 +31,8 @@ class SentenceClusteringResource:
             raise badRequest
         
         doc = json.load(req.stream)
-        sentences: List[Sentence] = doc['sentences']
+        blocks: List[TextBlock] = list(map(lambda dict: TextBlock(dict['id'], dict['text']), doc['blocks']))
+        sentences: List[Sentence] = list(map(lambda b: b.text, blocks))
 
         if len(sentences) < 2:
             raise badRequest
@@ -39,19 +48,14 @@ class SentenceClusteringResource:
         for clusterLabel in clusterLabels:
             indices = [ i for i, x in enumerate(labels) if x == clusterLabel ]
             cluster = {}
-            cluster['sentences'] = [ sentences[i] for i in indices ]
+            cluster['blocks'] = [ blocks[i] for i in indices ]
             cluster['probabilities'] = [ probabilities[i] for i in indices ]
             clusterEmbeddings = [ embeddings[i] for i in indices ]
             cluster['distanceMatrix'] = self.__clustering.distances_within_cluster(clusterEmbeddings)
             clusters[clusterLabel] = cluster
 
 
-        doc = {
-            'sentences': sentences,
-            'labels': labels,
-            'probabilities': probabilities,
-            'clusters': clusters
-        }
+        doc = { 'clusters': clusters }
 
         # Create a JSON representation of the resource
         resp.body = json.dumps(doc, ensure_ascii=False, default=self.__default)
