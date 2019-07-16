@@ -12,5 +12,5 @@ RUN make -C src/resources
 RUN groupadd -r textsim && useradd --no-log-init -r -g textsim textsim
 USER textsim
 
-CMD gunicorn src.app
 EXPOSE 8000
+CMD gunicorn -b 0.0.0.0:8000 src.app
