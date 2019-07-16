@@ -1,10 +1,10 @@
-from typing import List, Tuple
+from typing import List, Tuple, Generator
 import json
 import falcon
 from .elmo import ELMo, Sentence, TwoSentences
 from .clustering import Clustering
 from pandas import DataFrame
-from numpy import int64, ndarray
+from numpy import int64, array, ndarray
 
 class TextBlock:
     id: str
@@ -37,7 +37,7 @@ class SentenceClusteringResource:
         if len(sentences) < 2:
             raise badRequest
 
-        embeddings = self.__elmo.embed_sentences(sentences)
+        embeddings = list(self.__batchEmbedding(sentences, 100))
         print("embeddings", DataFrame(embeddings).head())
         labels, probabilities = self.__clustering.cluster(embeddings)
         print("labels", DataFrame(labels).head())
@@ -64,3 +64,8 @@ class SentenceClusteringResource:
         # status returned by the framework, but it is included here to
         # illustrate how this may be overridden as needed.
         resp.status = falcon.HTTP_200
+
+    def __batchEmbedding(self, sentences: List[Sentence], n: int) -> Generator[List[array], None, None]:
+        for i in range(0, len(sentences), n):
+            batch = sentences[i:i + n]
+            yield self.__elmo.embed_sentences(sentences)
