@@ -26,6 +26,7 @@ class SentenceClusteringResource:
         raise TypeError
 
     def on_post(self, req: falcon.Request, resp: falcon.Response) -> None:
+        print("\n\n" + "-" * 80 + "\n[INFO] Start processing Clustering Request:")
         badRequest = falcon.HTTPBadRequest("Need many sentences", "Must provide at least two sentences")
         if req.content_length == 0:
             raise badRequest
@@ -34,14 +35,17 @@ class SentenceClusteringResource:
         blocks: List[TextBlock] = list(map(lambda dict: TextBlock(dict['id'], dict['text']), doc['blocks']))
         sentences: List[Sentence] = list(map(lambda b: b.text, blocks))
 
+        print("[INFO] Computing clusters of {} text blocks.".format(len(blocks)))
+
         if len(sentences) < 2:
             raise badRequest
 
-        embeddings = list(self.__batchEmbedding(sentences, 100))
-        print("embeddings", DataFrame(embeddings).head())
+        # embeddings = list(chain(list(self.__batchEmbedding(sentences, 10))))
+        embeddings = self.__elmo.embed_sentences(sentences)
+        print("[DEBUG] embeddings", DataFrame(embeddings).head())
         labels, probabilities = self.__clustering.cluster(embeddings)
-        print("labels", DataFrame(labels).head())
-        print("probabilities", DataFrame(probabilities).head())
+        print("[DEBUG] labels", DataFrame(labels).head())
+        print("[DEBUG] probabilities", DataFrame(probabilities).head())
 
         clusterLabels = list(map(lambda i: int(i), set(labels)))
         clusters = {}
@@ -64,8 +68,11 @@ class SentenceClusteringResource:
         # status returned by the framework, but it is included here to
         # illustrate how this may be overridden as needed.
         resp.status = falcon.HTTP_200
+        print("[INFO] Completed Clustering Request.\n" + "-" * 80 + "\n\n")
 
     def __batchEmbedding(self, sentences: List[Sentence], n: int) -> Generator[List[array], None, None]:
+        print("[INFO] Computing embeddings for {} text blocks, {} at a time.".format(len(sentences), n))
         for i in range(0, len(sentences), n):
+            print("[INFO] Embedding blocks {} to {}.".format(i, i + n))
             batch = sentences[i:i + n]
             yield self.__elmo.embed_sentences(sentences)

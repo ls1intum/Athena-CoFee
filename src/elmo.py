@@ -13,8 +13,6 @@ class ELMo:
     __DEFAULT_OPTIONS_FILE = (__cwd / "src/resources/elmo_2x4096_512_2048cnn_2xhighway_5.5B_options.json").resolve()
     __DEFAULT_WEIGHT_FILE = (__cwd / "src/resources/elmo_2x4096_512_2048cnn_2xhighway_5.5B_weights.hdf5").resolve()
 
-    __elmo = ElmoEmbedder(__DEFAULT_OPTIONS_FILE, __DEFAULT_WEIGHT_FILE)
-
     def __split_sentence(self, sentence: Sentence) -> List[Word]:
         sentence = sentence.lower().replace('\n', ' ').replace('\t', ' ').replace('\xa0',' ')
         words = sentence.split()
@@ -24,7 +22,8 @@ class ELMo:
     def embed_sentences(self, sentences: List[Sentence]) -> List[array]:
         word_list_iterator = map(self.__split_sentence, sentences)
         word_lists: List[List[str]] = list(word_list_iterator)
-        vectors: List[ndarray] = self.__elmo.embed_batch(word_lists)
+        elmo = ElmoEmbedder(self.__DEFAULT_OPTIONS_FILE, self.__DEFAULT_WEIGHT_FILE)
+        vectors: List[ndarray] = elmo.embed_batch(word_lists)
         return list(map(lambda vector: vector[2].sum(axis=0), vectors))
 
     def __embed_two_sentences(self, sentences: TwoSentences) -> Tuple[array, array]:
