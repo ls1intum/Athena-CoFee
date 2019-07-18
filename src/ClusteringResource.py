@@ -24,14 +24,17 @@ class ClusteringResource:
         self.__logger.debug("-" * 80)
         self.__logger.info("Start processing Clustering Request:")
         if req.content_length == 0:
+            self.__logger.error("{} ({})".format(emptyBody.title, emptyBody.description))
             raise emptyBody
         
         doc = json.load(req.stream)
         if "embeddings" not in  doc:
+            self.__logger.error("{} ({})".format(requireTwoEmbeddings.title, requireTwoEmbeddings.description))
             raise  requireTwoEmbeddings
 
         embeddings: List[Embedding] = list(map(lambda dict: Embedding.from_dict(dict), doc['embeddings']))
         if len(embeddings) < 2:
+            self.__logger.error("{} ({})".format(requireTwoEmbeddings.title, requireTwoEmbeddings.description))
             raise requireTwoEmbeddings
 
         self.__logger.info("Computing clusters of {} embeddings.".format(len(embeddings)))
