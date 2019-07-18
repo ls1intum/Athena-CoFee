@@ -3,17 +3,18 @@ from numpy import array
 from joblib import Memory
 import hdbscan
 from sklearn.metrics import pairwise_distances
+from .entities import ElmoVector
 
 class Clustering:
     
-    def cluster(self, vectors: List[array]) -> Tuple[array, array]:
+    def cluster(self, vectors: List[ElmoVector]) -> Tuple[array, array]:
         clusterer = hdbscan.HDBSCAN(algorithm='best', alpha=1.0, approx_min_span_tree=True,
         gen_min_span_tree=False, leaf_size=40, memory=Memory(cachedir=None),
         metric='braycurtis', min_cluster_size=2, min_samples=None, p=None)
         clusterer.fit(vectors)
         return (clusterer.labels_, clusterer.probabilities_)
     
-    def distances_within_cluster(self, vectors: List[array]) -> array:
+    def distances_within_cluster(self, vectors: List[ElmoVector]) -> array:
         """
         Returns
         -------

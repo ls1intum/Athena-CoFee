@@ -1,10 +1,8 @@
 import falcon
-from .SentenceSimilarityResource import SentenceSimilarityResource
-from .SentenceClusteringResource import SentenceClusteringResource
+from .EmbeddingResource import EmbeddingResource
+from .ClusteringResource import ClusteringResource
 
 api = application = falcon.API()
 
-sentenceSimilarity = SentenceSimilarityResource()
-sentenceClustering = SentenceClusteringResource()
-api.add_route('/sentences', sentenceSimilarity)
-api.add_route('/cluster', sentenceClustering)
+api.add_route('/embed', EmbeddingResource())
+api.add_route('/cluster', ClusteringResource())
