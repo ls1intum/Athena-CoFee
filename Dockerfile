@@ -5,6 +5,7 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -qr /tmp/requirements.txt
 
 WORKDIR /usr/src/app
+VOLUME ["/usr/src/app/logs"]
 COPY src/ src/
 RUN make -C src/resources
 

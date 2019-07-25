@@ -6,8 +6,7 @@ from .clustering import Clustering
 from numpy import int64, ndarray
 from .entities import TextBlock, ElmoVector, Embedding
 from .errors import emptyBody, requireTwoEmbeddings
-
-
+from datetime import datetime
 
 class ClusteringResource:
 
@@ -53,6 +52,9 @@ class ClusteringResource:
             }
 
         doc = { 'clusters': clusters }
+
+        with open("logs/clustering-{}.json".format(datetime.now()), 'w') as outfile:
+            json.dump(doc, outfile, ensure_ascii=False, default=self.__default)
 
         # Create a JSON representation of the resource
         resp.body = json.dumps(doc, ensure_ascii=False, default=self.__default)
