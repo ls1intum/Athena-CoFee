@@ -26,7 +26,7 @@ DateTime==4.3
 docker==4.0.2
 docker-pycreds==0.4.0
 docutils==0.15.2
-ecdsa==0.13.2
+ecdsa==0.13.3
 editdistance==0.5.3
 falcon==2.0.0
 flaky==3.6.1
