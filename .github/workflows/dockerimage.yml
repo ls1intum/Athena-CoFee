@@ -10,5 +10,7 @@ jobs:
  
     steps:
     - uses: actions/checkout@v1
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag text-assessment-clustering:$(date +%s)
+    - name: Build the text-assessment-clustering Docker image
+      run: cd Clustering; docker build . --file Dockerfile --tag text-assessment-clustering:$(date +%s)    
+    - name: Build the text-segmentation Docker image
+      run: cd Segmentation; docker build . --file Dockerfile --tag text-segmentation:$(date +%s)
