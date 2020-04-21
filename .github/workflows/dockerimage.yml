@@ -14,20 +14,7 @@ jobs:
         username: ${GITHUB_ACTOR}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build and Push the athene-segmentation Docker image
-      run: |
-        TAG=$(git rev-parse --short "$GITHUB_SHA")
-        REGISTRY=docker.pkg.github.com
-        IMAGE=${REGISTRY}/ls1intum/athene/athene-segmentation
-        cd Segmentation; docker build . --file Dockerfile --tag ${IMAGE}:${TAG}
-        docker push ${IMAGE}:${TAG}
-        docker tag ${IMAGE}:${TAG} ${IMAGE}:${GITHUB_REF##*/}
-        echo "Image additionally branch-tagged as ${IMAGE}:${GITHUB_REF##*/}"
-        docker push ${IMAGE}:${GITHUB_REF##*/}
-        if [ "${GITHUB_REF##*/}" = "master" ]; then \
-          docker tag ${IMAGE}:${TAG} ${IMAGE}:latest; \
-          echo "Image additionally tagged as ${IMAGE}:latest"; \
-          docker push ${IMAGE}:latest; \
-        fi
+      run: ./.github/workflows/scripts/dockerimage.sh "segmentation"
 
   athene-clustering:
     runs-on: ubuntu-latest
@@ -39,17 +26,4 @@ jobs:
         username: ${GITHUB_ACTOR}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build and Push the athene-clustering Docker image
-      run: |
-        REGISTRY=docker.pkg.github.com
-        IMAGE=${REGISTRY}/ls1intum/athene/athene-clustering
-        TAG=$(git rev-parse --short "$GITHUB_SHA")
-        cd Clustering; docker build . --file Dockerfile --tag ${IMAGE}:${TAG}
-        docker push ${IMAGE}
-        docker tag ${IMAGE}:${TAG} ${IMAGE}:${GITHUB_REF##*/}
-        echo "${IMAGE}:${TAG} additionally branch-tagged as ${IMAGE}:${GITHUB_REF##*/}"
-        docker push ${IMAGE}:${GITHUB_REF##*/}
-        if [ "${GITHUB_REF##*/}" = "master" ]; then \
-          docker tag ${IMAGE}:${TAG} ${IMAGE}:latest; \
-          echo "Image additionally tagged as ${IMAGE}:latest"; \
-          docker push ${IMAGE}:latest; \
-        fi
+      run: ./.github/workflows/scripts/dockerimage.sh "clustering"
