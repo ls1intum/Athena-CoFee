@@ -21,6 +21,7 @@ jobs:
         cd Segmentation; docker build . --file Dockerfile --tag ${IMAGE}:${TAG}
         docker push ${IMAGE}:${TAG}
         docker tag ${IMAGE}:${TAG} ${IMAGE}:${GITHUB_REF##*/}
+        echo "${IMAGE}:${TAG} additionally tagged as ${IMAGE}:${GITHUB_REF##*/}"
         docker push ${IMAGE}:${GITHUB_REF##*/}
     - name: Build and Push the athene-clustering Docker image
       run: |
@@ -30,4 +31,5 @@ jobs:
         cd Clustering; docker build . --file Dockerfile --tag ${IMAGE}:${TAG}
         docker push ${IMAGE}
         docker tag ${IMAGE}:${TAG} ${IMAGE}:${GITHUB_REF##*/}
+        echo "${IMAGE}:${TAG} additionally tagged as ${IMAGE}:${GITHUB_REF##*/}"
         docker push ${IMAGE}:${GITHUB_REF##*/}
