@@ -5,12 +5,24 @@ on: [push]
 jobs:
 
   build:
- 
     runs-on: ubuntu-latest
- 
     steps:
     - uses: actions/checkout@v1
-    - name: Build the text-assessment-clustering Docker image
-      run: cd Clustering; docker build . --file Dockerfile --tag text-assessment-clustering:$(date +%s)    
-    - name: Build the text-segmentation Docker image
-      run: cd Segmentation; docker build . --file Dockerfile --tag text-segmentation:$(date +%s)
+    - name: Build and Push the athene-clustering Docker image
+      run: |
+        VERSION=$(git rev-parse --short "$GITHUB_SHA")
+        echo $VERSION
+        REGISTRY=docker.pkg.github.com
+        IMAGE=${REGISTRY}/ls1intum/Athene/athene-clustering:${VERSION}
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ${REGISTRY} --username ${GITHUB_ACTOR}
+        cd Clustering; docker build . --file Dockerfile --tag ${IMAGE}
+        docker push ${IMAGE}
+    - name: Build and Push the athene-segmentation Docker image
+      run: |
+        VERSION=$(git rev-parse --short "$GITHUB_SHA")
+        echo $VERSION
+        REGISTRY=docker.pkg.github.com
+        IMAGE=${REGISTRY}/ls1intum/Athene/athene-segmentation:${VERSION}
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ${REGISTRY} --username ${GITHUB_ACTOR}
+        cd Segmentation; docker build . --file Dockerfile --tag ${IMAGE}
+        docker push ${IMAGE}
