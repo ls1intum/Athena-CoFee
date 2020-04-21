@@ -13,6 +13,7 @@ jobs:
         VERSION=$(git rev-parse --short "$GITHUB_SHA")
         REGISTRY=docker.pkg.github.com
         IMAGE=${REGISTRY}/ls1intum/athene/athene-clustering:${VERSION}
+        which docker
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ${REGISTRY} --username ${GITHUB_ACTOR} --password-stdin
         cd Clustering; docker build . --file Dockerfile --tag ${IMAGE}
         docker push ${IMAGE}
