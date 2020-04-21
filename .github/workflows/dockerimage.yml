@@ -4,13 +4,26 @@ on: [push]
 
 jobs:
 
-  build:
- 
+  athene-segmentation:
     runs-on: ubuntu-latest
- 
     steps:
     - uses: actions/checkout@v1
-    - name: Build the text-assessment-clustering Docker image
-      run: cd Clustering; docker build . --file Dockerfile --tag text-assessment-clustering:$(date +%s)    
-    - name: Build the text-segmentation Docker image
-      run: cd Segmentation; docker build . --file Dockerfile --tag text-segmentation:$(date +%s)
+    - uses: azure/docker-login@v1
+      with:
+        login-server: docker.pkg.github.com
+        username: ${GITHUB_ACTOR}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build and Push the athene-segmentation Docker image
+      run: ./.github/workflows/scripts/dockerimage.sh "segmentation"
+
+  athene-clustering:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: azure/docker-login@v1
+      with:
+        login-server: docker.pkg.github.com
+        username: ${GITHUB_ACTOR}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build and Push the athene-clustering Docker image
+      run: ./.github/workflows/scripts/dockerimage.sh "clustering"
