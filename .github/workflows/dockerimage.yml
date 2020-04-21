@@ -23,7 +23,7 @@ jobs:
         docker tag ${IMAGE}:${TAG} ${IMAGE}:${GITHUB_REF##*/}
         echo "Image additionally branch-tagged as ${IMAGE}:${GITHUB_REF##*/}"
         docker push ${IMAGE}:${GITHUB_REF##*/}
-        if [ "${GITHUB_REF##*/}" = "build-workflow" ]; then \
+        if [ "${GITHUB_REF##*/}" = "master" ]; then \
           docker tag ${IMAGE}:${TAG} ${IMAGE}:latest; \
           echo "Image additionally tagged as ${IMAGE}:latest"; \
           docker push ${IMAGE}:latest; \
@@ -48,7 +48,7 @@ jobs:
         docker tag ${IMAGE}:${TAG} ${IMAGE}:${GITHUB_REF##*/}
         echo "${IMAGE}:${TAG} additionally branch-tagged as ${IMAGE}:${GITHUB_REF##*/}"
         docker push ${IMAGE}:${GITHUB_REF##*/}
-        if [ "${GITHUB_REF##*/}" = "build-workflow" ]; then \
+        if [ "${GITHUB_REF##*/}" = "master" ]; then \
           docker tag ${IMAGE}:${TAG} ${IMAGE}:latest; \
           echo "Image additionally tagged as ${IMAGE}:latest"; \
           docker push ${IMAGE}:latest; \
