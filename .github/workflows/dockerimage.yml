@@ -12,7 +12,7 @@ jobs:
       run: |
         VERSION=$(git rev-parse --short "$GITHUB_SHA")
         REGISTRY=docker.pkg.github.com
-        IMAGE=${REGISTRY}/ls1intum/Athene/athene-clustering:${VERSION}
+        IMAGE=${REGISTRY}/ls1intum/athene/athene-clustering:${VERSION}
         docker login ${REGISTRY} --username $GITHUB_ACTOR --password ${{ secrets.GITHUB_TOKEN }}
         cd Clustering; docker build . --file Dockerfile --tag ${IMAGE}
         docker push ${IMAGE}
@@ -20,7 +20,7 @@ jobs:
       run: |
         VERSION=$(git rev-parse --short "$GITHUB_SHA")
         REGISTRY=docker.pkg.github.com
-        IMAGE=${REGISTRY}/ls1intum/Athene/athene-segmentation:${VERSION}
+        IMAGE=${REGISTRY}/ls1intum/athene/athene-segmentation:${VERSION}
         docker login ${REGISTRY} --username $GITHUB_ACTOR --password ${{ secrets.GITHUB_TOKEN }}
         cd Segmentation; docker build . --file Dockerfile --tag ${IMAGE}
         docker push ${IMAGE}
