@@ -13,7 +13,7 @@ jobs:
         VERSION=$(git rev-parse --short "$GITHUB_SHA")
         REGISTRY=docker.pkg.github.com
         IMAGE=${REGISTRY}/ls1intum/athene/athene-clustering:${VERSION}
-        docker login ${REGISTRY} --username $GITHUB_ACTOR --password ${{ secrets.GITHUB_TOKEN }}
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ${REGISTRY} --username ${GITHUB_ACTOR} --password-stdin
         cd Clustering; docker build . --file Dockerfile --tag ${IMAGE}
         docker push ${IMAGE}
     - name: Build and Push the athene-segmentation Docker image
@@ -21,6 +21,6 @@ jobs:
         VERSION=$(git rev-parse --short "$GITHUB_SHA")
         REGISTRY=docker.pkg.github.com
         IMAGE=${REGISTRY}/ls1intum/athene/athene-segmentation:${VERSION}
-        docker login ${REGISTRY} --username $GITHUB_ACTOR --password ${{ secrets.GITHUB_TOKEN }}
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ${REGISTRY} --username ${GITHUB_ACTOR} --password-stdin
         cd Segmentation; docker build . --file Dockerfile --tag ${IMAGE}
         docker push ${IMAGE}
