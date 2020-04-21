@@ -8,13 +8,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+    - uses: azure/docker-login@v1
+      with:
+        login-server: docker.pkg.github.com
+        username: ${GITHUB_ACTOR}
+        password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build and Push the athene-clustering Docker image
       run: |
         VERSION=$(git rev-parse --short "$GITHUB_SHA")
         REGISTRY=docker.pkg.github.com
         IMAGE=${REGISTRY}/ls1intum/athene/athene-clustering:${VERSION}
-        which docker
-        echo ${{ secrets.GITHUB_TOKEN }} | docker login ${REGISTRY} --username ${GITHUB_ACTOR} --password-stdin
         cd Clustering; docker build . --file Dockerfile --tag ${IMAGE}
         docker push ${IMAGE}
     - name: Build and Push the athene-segmentation Docker image
@@ -22,6 +25,5 @@ jobs:
         VERSION=$(git rev-parse --short "$GITHUB_SHA")
         REGISTRY=docker.pkg.github.com
         IMAGE=${REGISTRY}/ls1intum/athene/athene-segmentation:${VERSION}
-        echo ${{ secrets.GITHUB_TOKEN }} | docker login ${REGISTRY} --username ${GITHUB_ACTOR} --password-stdin
         cd Segmentation; docker build . --file Dockerfile --tag ${IMAGE}
         docker push ${IMAGE}
