@@ -16,7 +16,7 @@ class Resource:
             candidate = data['candidate']
             references = data['references']
             if len(references) < 2:
-                raise falcon.HTTPBadRequest('Need at least 2 refeerences')
+                raise falcon.HTTPBadRequest('Need at least 2 references')
             else:
                 confidence = calculate_confidence(candidate, references)
                 result = {
