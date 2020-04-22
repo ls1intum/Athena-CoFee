@@ -11,7 +11,8 @@ The approach is based on the paper:
   API for computing Language Embeddings using ELMo and Clustering of ELMo Vectors using HDBSCAN
 - **Segmentation:**  
   API for segmenting Student Answers based on Topic Modeling
-
+- **Validation**
+  API for validating automatic feedback based on BLEU 
 ## Contributing
 
 We welcome contributions in any form! Assistance with documentation and tests is always welcome. Please submit a pull request.
