@@ -5,7 +5,7 @@ services:
 # http://localhost:8000/segment
   segmentation:
     build:
-      context: ./Segmentation
+      context: ./segmentation
     image: athene-segmentation
     container_name: athene-segmentation
     ports:
@@ -17,7 +17,7 @@ services:
 # http://localhost:8001/embed and http://localhost:8001/cluster
   clustering:
     build:
-      context: ./Clustering
+      context: ./clustering
     image: athene-clustering
     container_name: athene-clustering
     ports:
