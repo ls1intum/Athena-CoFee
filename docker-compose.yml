@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+
+# http://localhost:8000/segment
+  segmentation:
+    build:
+      context: ./Segmentation
+    image: athene-segmentation
+    container_name: athene-segmentation
+    ports:
+      - 8000:8000
+    working_dir: /usr/src/app
+    networks:
+      - athene
+
+# http://localhost:8001/embed and http://localhost:8001/cluster
+  clustering:
+    build:
+      context: ./Clustering
+    image: athene-clustering
+    container_name: athene-clustering
+    ports:
+      - 8001:8000
+    working_dir: /usr/src/app
+    networks:
+      - athene
+
+networks:
+  athene:
+    driver: bridge
