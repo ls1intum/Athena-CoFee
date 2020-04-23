@@ -6,6 +6,11 @@ from src.validator.confidence_calculator import calculate_confidence
 class Resource:
 
     def on_post(self, request, response):
+        """
+        POST request for calculating the confidence of an automatic feedback
+        :param request: request containg a candidate and the references
+        :param response: response containg the confidence as number between 0 and 100
+        """
         data = json.load(request.stream)
 
         if 'candidate' not in data:
