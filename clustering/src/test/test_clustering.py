@@ -25,20 +25,20 @@ class TestClustering(TestCase):
     def test_cluster_same_sentences(self):
         embeddings_software = self.elmo.embed_sentences([sentences_software[0]] * 10)
         clusters = self.clustering.cluster(embeddings_software)[0]
-        self.assertEquals(len(set(clusters)), 1)
+        self.assertEqual(len(set(clusters)), 1)
 
     def test_cluster_similar_sentences(self):
         embeddings_flowers = self.elmo.embed_sentences(sentences_flowers)
         clusters = self.clustering.cluster(embeddings_flowers)[0]
-        self.assertEquals(len(set(clusters)), 1)
+        self.assertEqual(len(set(clusters)), 1)
 
         embeddings_software = self.elmo.embed_sentences(sentences_software)
         clusters = self.clustering.cluster(embeddings_software)[0]
-        self.assertEquals(len(set(clusters)), 1)
+        self.assertEqual(len(set(clusters)), 1)
 
         embeddings_law = self.elmo.embed_sentences(sentences_law)
         clusters = self.clustering.cluster(embeddings_law)[0]
-        self.assertEquals(len(set(clusters)), 1)
+        self.assertEqual(len(set(clusters)), 1)
 
     def test_cluster_different_topics(self):
         embeddings_flowers = self.elmo.embed_sentences(sentences_flowers)
@@ -48,8 +48,8 @@ class TestClustering(TestCase):
         clusters = self.clustering.cluster(embeddings_flowers+embeddings_software+embeddings_law)[0]
         clusters_flowers, clusters_software, clusters_law = np.split(clusters, [sentences_flowers.__len__(), sentences_flowers.__len__() + sentences_software.__len__()])
         # test: there are 3 different clusters
-        self.assertEquals(len(set(clusters)), 3)
+        self.assertEqual(len(set(clusters)), 3)
         # test: all sentences with the same topic are in the same cluster
-        self.assertEquals(len(set(clusters_flowers)), 1)
-        self.assertEquals(len(set(clusters_software)), 1)
-        self.assertEquals(len(set(clusters_law)), 1)
+        self.assertEqual(len(set(clusters_flowers)), 1)
+        self.assertEqual(len(set(clusters_software)), 1)
+        self.assertEqual(len(set(clusters_law)), 1)
