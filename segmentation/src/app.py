@@ -44,4 +44,3 @@ class ObjRequestClass:
 nltk.data.path.append('src/lib/nltk_data')
 api = application = falcon.API()
 api.add_route("/segment", ObjRequestClass())
-

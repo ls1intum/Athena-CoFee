@@ -26,7 +26,7 @@ class ELMo:
         return list(map(lambda vector: vector[2].sum(axis=0), vectors))
 
     def __embed_two_sentences(self, sentences: TwoSentences) -> Tuple[ElmoVector, ElmoVector]:
-        vectors = embed_sentences(list(sentences))
+        vectors = self.embed_sentences(list(sentences))
         return (vectors[0], vectors[1])
         
 
