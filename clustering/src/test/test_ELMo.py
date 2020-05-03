@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from clustering.src.elmo import ELMo
+from src.elmo import ELMo
 
 
 class TestELMo(TestCase):

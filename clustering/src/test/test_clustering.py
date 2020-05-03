@@ -1,8 +1,8 @@
 from unittest import TestCase
 import numpy as np
 
-from clustering.src.clustering import Clustering
-from clustering.src.elmo import ELMo
+from src.clustering import Clustering
+from src.elmo import ELMo
 
 sentences_flowers = ["A second flower blossomed and remained.",
                      "I have red and yellow  flowers",
