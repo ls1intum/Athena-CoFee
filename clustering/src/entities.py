@@ -1,4 +1,3 @@
-from typing import List
 from numpy import array
 
 Word = str

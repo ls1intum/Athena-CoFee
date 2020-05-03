@@ -1,12 +1,12 @@
-from typing import List, Tuple
 import json
-from falcon import Request, Response, HTTP_200
+from datetime import datetime
 from logging import getLogger
+from typing import List
+from falcon import Request, Response, HTTP_200
 from numpy import ndarray
 from .elmo import ELMo
 from .entities import Sentence, TextBlock, ElmoVector, Embedding
 from .errors import emptyBody, requireTwoBlocks
-from datetime import datetime
 
 class EmbeddingResource:
 
