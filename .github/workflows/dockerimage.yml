@@ -27,3 +27,5 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build and Push the athene-clustering Docker image
       run: ./.github/workflows/scripts/dockerimage.sh "clustering"
+    - name: Run unittests for clustering-component
+      run: docker run -i --rm --entrypoint python docker.pkg.github.com/ls1intum/athene/athene-clustering:${GITHUB_REF##*/} -m unittest discover -p test_*.py
