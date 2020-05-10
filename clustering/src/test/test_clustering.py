@@ -1,5 +1,6 @@
 from unittest import TestCase
 import numpy as np
+import matplotlib.pyplot as plt
 
 from src.clustering import Clustering
 from src.elmo import ELMo
@@ -39,6 +40,22 @@ class TestClustering(TestCase):
         embeddings_law = self.elmo.embed_sentences(sentences_law)
         clusters = self.clustering.cluster(embeddings_law)[0]
         self.assertEqual(len(set(clusters)), 1)
+
+    def test_visualize_tree_structure(self):
+        embeddings_flowers = self.elmo.embed_sentences(sentences_flowers)
+        embeddings_software = self.elmo.embed_sentences(sentences_software)
+        embeddings_law = self.elmo.embed_sentences(sentences_law)
+
+        self.clustering.visualize_tree(embeddings_flowers+embeddings_software+embeddings_law, show_clusters=False)
+        plt.show()
+
+    def test_visualize_clusters(self):
+        embeddings_flowers = self.elmo.embed_sentences(sentences_flowers)
+        embeddings_software = self.elmo.embed_sentences(sentences_software)
+        embeddings_law = self.elmo.embed_sentences(sentences_law)
+
+        self.clustering.visualize_tree(embeddings_flowers+embeddings_software+embeddings_law, show_clusters=True)
+        plt.show()
 
     def test_cluster_different_topics(self):
         embeddings_flowers = self.elmo.embed_sentences(sentences_flowers)
