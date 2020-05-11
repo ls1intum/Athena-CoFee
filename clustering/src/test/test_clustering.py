@@ -31,7 +31,7 @@ class TestClustering(TestCase):
     def test_cluster_same_sentences(self):
         embeddings_same = self.elmo.embed_sentences([sentences_software[0]] * 10)
         clusters = self.clustering.cluster(embeddings_same)[0]
-        self.assertEqual(len(set(clusters)), 2)
+        self.assertEqual(len(set(clusters)), 1)
 
     def test_cluster_similar_sentences(self):
         clusters = self.clustering.cluster(self.embeddings_flowers)[0]
