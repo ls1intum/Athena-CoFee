@@ -23,46 +23,36 @@ class TestClustering(TestCase):
     clustering = Clustering()
     elmo = ELMo()
 
+    embeddings_flowers = elmo.embed_sentences(sentences_flowers)
+    embeddings_software = elmo.embed_sentences(sentences_software)
+    embeddings_law = elmo.embed_sentences(sentences_law)
+    embeddings = embeddings_flowers+embeddings_software+embeddings_law
+
     def test_cluster_same_sentences(self):
-        embeddings_software = self.elmo.embed_sentences([sentences_software[0]] * 10)
-        clusters = self.clustering.cluster(embeddings_software)[0]
-        self.assertEqual(len(set(clusters)), 1)
+        embeddings_same = self.elmo.embed_sentences([sentences_software[0]] * 10)
+        clusters = self.clustering.cluster(embeddings_same)[0]
+        self.assertEqual(len(set(clusters)), 2)
 
     def test_cluster_similar_sentences(self):
-        embeddings_flowers = self.elmo.embed_sentences(sentences_flowers)
-        clusters = self.clustering.cluster(embeddings_flowers)[0]
+        clusters = self.clustering.cluster(self.embeddings_flowers)[0]
         self.assertEqual(len(set(clusters)), 1)
 
-        embeddings_software = self.elmo.embed_sentences(sentences_software)
-        clusters = self.clustering.cluster(embeddings_software)[0]
+        clusters = self.clustering.cluster(self.embeddings_software)[0]
         self.assertEqual(len(set(clusters)), 1)
 
-        embeddings_law = self.elmo.embed_sentences(sentences_law)
-        clusters = self.clustering.cluster(embeddings_law)[0]
+        clusters = self.clustering.cluster(self.embeddings_law)[0]
         self.assertEqual(len(set(clusters)), 1)
 
     def test_visualize_tree_structure(self):
-        embeddings_flowers = self.elmo.embed_sentences(sentences_flowers)
-        embeddings_software = self.elmo.embed_sentences(sentences_software)
-        embeddings_law = self.elmo.embed_sentences(sentences_law)
-
-        self.clustering.visualize_tree(embeddings_flowers+embeddings_software+embeddings_law, show_clusters=False)
+        self.clustering.visualize_tree(self.embeddings, show_clusters=False)
         plt.show()
 
     def test_visualize_clusters(self):
-        embeddings_flowers = self.elmo.embed_sentences(sentences_flowers)
-        embeddings_software = self.elmo.embed_sentences(sentences_software)
-        embeddings_law = self.elmo.embed_sentences(sentences_law)
-
-        self.clustering.visualize_tree(embeddings_flowers+embeddings_software+embeddings_law, show_clusters=True)
+        self.clustering.visualize_tree(self.embeddings, show_clusters=True)
         plt.show()
 
     def test_cluster_different_topics(self):
-        embeddings_flowers = self.elmo.embed_sentences(sentences_flowers)
-        embeddings_software = self.elmo.embed_sentences(sentences_software)
-        embeddings_law = self.elmo.embed_sentences(sentences_law)
-
-        clusters = self.clustering.cluster(embeddings_flowers+embeddings_software+embeddings_law)[0]
+        clusters = self.clustering.cluster(self.embeddings)[0]
         clusters_flowers, clusters_software, clusters_law = np.split(clusters, [sentences_flowers.__len__(), sentences_flowers.__len__() + sentences_software.__len__()])
         # test: there are 3 different clusters
         self.assertEqual(len(set(clusters)), 3)
