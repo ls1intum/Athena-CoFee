@@ -10,7 +10,7 @@ from .errors import emptyBody, requireTwoBlocks
 
 
 class EmbeddingResource:
-    __elmo: ELMo = ELMo()
+    __elmo: ELMo = None
     __logger = getLogger(__name__)
 
     def __default(self, o) -> int:
@@ -29,6 +29,12 @@ class EmbeddingResource:
         if "blocks" not in doc:
             self.__logger.error("{} ({})".format(requireTwoBlocks.title, requireTwoBlocks.description))
             raise requireTwoBlocks
+
+        if "courseId" not in doc:
+            self.__logger.info("No courseId provided in the request")
+            self.__elmo = ELMo()
+        else:
+            self.__elmo = ELMo(doc["courseId"])
 
         blocks: List[TextBlock] = list(map(lambda dict: TextBlock.from_dict(dict), doc['blocks']))
         sentences: List[Sentence] = list(map(lambda b: b.text, blocks))
