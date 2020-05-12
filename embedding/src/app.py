@@ -1,7 +1,7 @@
 import sys
 import falcon
 import logging
-from .ClusteringResource import ClusteringResource
+from .EmbeddingResource import EmbeddingResource
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -14,4 +14,4 @@ logger.addHandler(handler)
 
 api = application = falcon.API()
 
-api.add_route('/cluster', ClusteringResource())
+api.add_route('/embed', EmbeddingResource())

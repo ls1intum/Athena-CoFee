@@ -8,12 +8,12 @@ from .elmo import ELMo
 from .entities import Sentence, TextBlock, ElmoVector, Embedding
 from .errors import emptyBody, requireTwoBlocks
 
-class EmbeddingResource:
 
+class EmbeddingResource:
     __elmo: ELMo = ELMo()
     __logger = getLogger(__name__)
 
-    def __default(self, o) -> int :
+    def __default(self, o) -> int:
         if isinstance(o, Embedding): return o.__dict__
         if isinstance(o, ndarray): return o.tolist()
         raise TypeError
@@ -24,7 +24,7 @@ class EmbeddingResource:
         if req.content_length == 0:
             self.__logger.error("{} ({})".format(emptyBody.title, emptyBody.description))
             raise emptyBody
-        
+
         doc = json.load(req.stream)
         if "blocks" not in doc:
             self.__logger.error("{} ({})".format(requireTwoBlocks.title, requireTwoBlocks.description))
@@ -35,12 +35,12 @@ class EmbeddingResource:
 
         if len(blocks) < 2:
             self.__logger.error("{} ({})".format(requireTwoBlocks.title, requireTwoBlocks.description))
-            raise  requireTwoBlocks
+            raise requireTwoBlocks
 
         self.__logger.info("Computing embeddings of {} blocks.".format(len(blocks)))
         vectors: List[ElmoVector] = self.__elmo.embed_sentences(sentences)
 
-        embeddings: List[Embedding] = [ Embedding(block.id, vectors[i]) for i, block in enumerate(blocks) ]
+        embeddings: List[Embedding] = [Embedding(block.id, vectors[i]) for i, block in enumerate(blocks)]
 
         doc = {
             'embeddings': embeddings
