@@ -14,24 +14,24 @@ services:
     networks:
       - athene
 
-# http://localhost:8001/cluster
-  clustering:
+# http://localhost:8001/embed
+  embedding:
     build:
-      context: ./clustering
-    image: athene-clustering
-    container_name: athene-clustering
+      context: ./embedding
+    image: athene-embedding
+    container_name: athene-embedding
     ports:
       - 8001:8000
     working_dir: /usr/src/app
     networks:
       - athene
 
-# http://localhost:8002/embed
-  embedding:
+# http://localhost:8002/cluster
+  clustering:
     build:
-      context: ./embedding
-    image: athene-embedding
-    container_name: athene-embedding
+      context: ./clustering
+    image: athene-clustering
+    container_name: athene-clustering
     ports:
       - 8002:8000
     working_dir: /usr/src/app
