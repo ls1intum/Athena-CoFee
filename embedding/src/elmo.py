@@ -1,3 +1,4 @@
+from logging import getLogger
 from typing import List, Tuple
 from allennlp.commands.elmo import ElmoEmbedder
 from numpy import ndarray
@@ -14,12 +15,15 @@ class ELMo:
     __DEFAULT_WEIGHT_FILE = "elmo_2x4096_512_2048cnn_2xhighway_5.5B_weights.hdf5"
     __INCREMENTALLY_TRAINED_WEIGHTS_FILE = "weights_book.hdf5"
 
+    __logger = getLogger(__name__)
+
     def __init__(self, course_id = None):
         if course_id is None:
             self.weights_path = (self.__RESOURCE_PATH / self.__DEFAULT_WEIGHT_FILE).resolve()
         else:
             self.weights_path = (self.__RESOURCE_PATH / self.__INCREMENTALLY_TRAINED_WEIGHTS_FILE).resolve()
 
+        self.__logger.info("Using the ELMo Model {}".format(self.weights_path))
         self.elmo = ElmoEmbedder(self.__OPTIONS_PATH, self.weights_path)
 
     def __split_sentence(self, sentence: Sentence) -> List[Word]:

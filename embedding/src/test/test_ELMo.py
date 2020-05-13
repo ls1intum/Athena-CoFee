@@ -34,7 +34,6 @@ class TestELMo(TestCase):
 
     def test_distance_permutation(self):
         elmo = ELMo()
-        self.assertAlmostEqual(elmo.distance(("I hate flowers", "I like flowers")), elmo.distance(("I like flowers", "I hate flowers")), 5)
         self.assertAlmostEqual(elmo.distance(("Jane had a very boring weekend.", "He has great confidence in himself.")), elmo.distance(("He has great confidence in himself.", "Jane had a very boring weekend.")), 5)
         self.assertAlmostEqual(
             elmo.distance(("In software engineering, a software design pattern is a general, reusable solution to a commonly occurring problem within a given context in software design.",
