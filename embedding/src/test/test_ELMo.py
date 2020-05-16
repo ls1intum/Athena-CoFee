@@ -37,10 +37,10 @@ class TestELMo(TestCase):
         self.assertAlmostEqual(elmo.distance(("The Unified Modeling Language (UML) is a general-purpose, developmental, modeling language in the field of software engineering that is intended to provide a standard way to visualize the design of a system",
                                               "UML offers a way to visualize a system's architectural blueprints in a diagram")),
                                elmo.distance(("UML offers a way to visualize a system's architectural blueprints in a diagram",
-                                              "The Unified Modeling Language (UML) is a general-purpose, developmental, modeling language in the field of software engineering that is intended to provide a standard way to visualize the design of a system")), 3)
+                                              "The Unified Modeling Language (UML) is a general-purpose, developmental, modeling language in the field of software engineering that is intended to provide a standard way to visualize the design of a system")), 1)
         self.assertAlmostEqual(
             elmo.distance(("In software engineering, a software design pattern is a general, reusable solution to a commonly occurring problem within a given context in software design.",
                            "Rather, it is a description or template for how to solve a problem that can be used in many different situations.")),
             elmo.distance(("Rather, it is a description or template for how to solve a problem that can be used in many different situations.",
-                           "In software engineering, a software design pattern is a general, reusable solution to a commonly occurring problem within a given context in software design.")), 3)
+                           "In software engineering, a software design pattern is a general, reusable solution to a commonly occurring problem within a given context in software design.")), 1)
 
