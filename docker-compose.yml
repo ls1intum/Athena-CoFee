@@ -11,8 +11,6 @@ services:
     ports:
       - 8000:8000
     working_dir: /usr/src/app
-    volumes:
-      - .:/usr/src/app/logs
     networks:
       - athene
 
@@ -25,8 +23,6 @@ services:
     ports:
       - 8001:8000
     working_dir: /usr/src/app
-    volumes:
-      - .:/usr/src/app/logs
     networks:
       - athene
 
@@ -39,8 +35,6 @@ services:
     ports:
       - 8002:8000
     working_dir: /usr/src/app
-    volumes:
-      - .:/usr/src/app/logs
     networks:
       - athene
 
