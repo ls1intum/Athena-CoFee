@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from Benchmark.src.networking.api_services import embed_sentences, cluster
+from benchmark.src.networking.api_services import embed_sentences, cluster
 
 sentences_flowers = ["A second flower blossomed and remained.",
                      "I have red and yellow  flowers",

@@ -1,6 +1,6 @@
 from logging import getLogger
 
-from Benchmark.src.networking.api_requests import post
+from benchmark.src.networking.api_requests import post
 
 __logger = getLogger(__name__)
 

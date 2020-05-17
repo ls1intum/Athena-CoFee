@@ -1,7 +1,9 @@
 import logging
 import sys
 
-from Benchmark.src.networking.api_requests import post
+from benchmark.src.data.data_retriever import read_sentences_from_csv
+from benchmark.src.networking.api_requests import post
+from benchmark.src.networking.api_services import *
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -12,18 +14,4 @@ formatter = logging.Formatter('[%(asctime)s] [%(process)d] [%(levelname)s] [%(na
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-data = {
-    "courseId": 25,
-    "blocks": [
-        {
-            "id": 1,
-            "text": "hi there kljfhf"
-        },
-        {
-            "id": 2,
-            "text": "sdfsdfg dh dh hfg hf ff"
-        }
-    ]
-}
-
-print(post("http://localhost:8001/embed", data))
+print (cluster(embed_sentences(read_sentences_from_csv())))
