@@ -2,7 +2,7 @@ import logging
 import sys
 
 from benchmark.src.data.data_retriever import read_sentences_from_csv
-from benchmark.src.networking.api_requests import post
+from benchmark.src.entities.cluster import Cluster
 from benchmark.src.networking.api_services import *
 
 logger = logging.getLogger()
@@ -14,4 +14,7 @@ formatter = logging.Formatter('[%(asctime)s] [%(process)d] [%(levelname)s] [%(na
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-print (cluster(embed_sentences(read_sentences_from_csv())))
+
+text_blocks = read_sentences_from_csv()
+embeddings = embed(text_blocks)
+clusters = Cluster.clusters_from_network_response(cluster(embeddings))

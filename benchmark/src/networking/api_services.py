@@ -21,7 +21,7 @@ def segment(submissions, keywords=None):
 def embed(text_blocks, courseId=None):
     # request with {'courseId': 25, 'blocks': [{'id': 1, 'text': 'this is the first block'}, {'id': 2, 'text': 'this is the second block'}]}
     # response with { 'embeddings': [{'id': , 'vector':[]}] }
-    request = {"blocks": text_blocks}
+    request = {"blocks": [ text_block.json_rep() for text_block in text_blocks]}
     if courseId is not None:
         request["courseId"] = courseId
     return post(EMBEDDING_URL, request)['embeddings']
@@ -33,7 +33,3 @@ def cluster(embeddings):
     request = {"embeddings": embeddings}
     return post(CLUSTERING_URL, request)['clusters']
 
-
-def embed_sentences(sentences, courseId=None):
-    sentences_with_ids = [{"id": i, 'text': sentence} for i, sentence in enumerate(sentences)]
-    return embed(sentences_with_ids, courseId)
