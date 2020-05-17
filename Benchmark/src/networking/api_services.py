@@ -24,11 +24,16 @@ def embed(text_blocks, courseId=None):
     request = {"blocks": text_blocks}
     if courseId is not None:
         request["courseId"] = courseId
-    return post(EMBEDDING_URL, request)
+    return post(EMBEDDING_URL, request)['embeddings']
 
 
 def cluster(embeddings):
     # request with { "embeddings": [{"id": ,"vector":[]}] }
     # response with {"clusters": {"-1": {"blocks": [{"id": 1}, {"id": 2}], "probabilities": [0.0, 0.0], "distanceMatrix": [[0.0, 0.22923004776660816], [0.22923004776660816, 0.0]]}}}
     request = {"embeddings": embeddings}
-    return post(CLUSTERING_URL, request)
+    return post(CLUSTERING_URL, request)['clusters']
+
+
+def embed_sentences(sentences, courseId=None):
+    sentences_with_ids = [{"id": i, 'text': sentence} for i, sentence in enumerate(sentences)]
+    return embed(sentences_with_ids, courseId)
