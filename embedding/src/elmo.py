@@ -8,7 +8,10 @@ from .entities import ElmoVector, Sentence, Word
 
 TwoSentences = Tuple[Sentence, Sentence]
 
+
 class ELMo:
+    ELMo_models_cache = {}
+
     __RESOURCE_PATH = (Path.cwd() / "src/resources/").resolve()
     __OPTIONS_PATH = (__RESOURCE_PATH / "elmo_2x4096_512_2048cnn_2xhighway_5.5B_options.json").resolve()
 
@@ -17,17 +20,21 @@ class ELMo:
 
     __logger = getLogger(__name__)
 
-    def __init__(self, course_id = None):
+    def __init__(self, course_id=None):
         if course_id is None:
             self.weights_path = (self.__RESOURCE_PATH / self.__DEFAULT_WEIGHT_FILE).resolve()
         else:
             self.weights_path = (self.__RESOURCE_PATH / self.__INCREMENTALLY_TRAINED_WEIGHTS_FILE).resolve()
 
         self.__logger.info("Using the ELMo Model {}".format(self.weights_path))
-        self.elmo = ElmoEmbedder(self.__OPTIONS_PATH, self.weights_path)
+
+        if self.weights_path not in ELMo.ELMo_models_cache:
+            ELMo.ELMo_models_cache[self.weights_path] = ElmoEmbedder(self.__OPTIONS_PATH, self.weights_path)
+
+        self.elmo = ELMo.ELMo_models_cache[self.weights_path]
 
     def __split_sentence(self, sentence: Sentence) -> List[Word]:
-        sentence = sentence.lower().replace('\n', ' ').replace('\t', ' ').replace('\xa0',' ')
+        sentence = sentence.lower().replace('\n', ' ').replace('\t', ' ').replace('\xa0', ' ')
         words = sentence.split()
         words = map(lambda word: word.strip(), words)
         return list(words)
@@ -41,7 +48,6 @@ class ELMo:
     def __embed_two_sentences(self, sentences: TwoSentences) -> Tuple[ElmoVector, ElmoVector]:
         vectors = self.embed_sentences(list(sentences))
         return (vectors[0], vectors[1])
-        
 
     def distance(self, sentences: TwoSentences) -> float:
         sentence_vector_1, sentence_vector_2 = self.__embed_two_sentences(sentences)
