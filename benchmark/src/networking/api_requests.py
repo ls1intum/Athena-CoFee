@@ -8,9 +8,8 @@ __logger = getLogger(__name__)
 def post(api_endpoint, data):
     response = requests.post(url=api_endpoint, json=data)
 
-    if response:
-        __logger.info("POST successful on {}: {}".format(api_endpoint, data))
-    else:
+    if not response:
         __logger.error("POST failed on {}: Status Code: {}".format(api_endpoint, response.status_code))
+        return None
 
     return response.json()

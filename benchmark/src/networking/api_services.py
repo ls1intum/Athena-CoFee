@@ -22,8 +22,7 @@ def segment(submissions, keywords=None):
 def __embed(text_blocks, courseId=None):
     # request with {'courseId': 25, 'blocks': [{'id': 1, 'text': 'this is the first block'}, {'id': 2, 'text': 'this is the second block'}]}
     # response with { 'embeddings': [{'id': , 'vector':[]}] }
-    request = {"courseId" : 1234,
-               "blocks": [ text_block.json_rep() for text_block in text_blocks]}
+    request = {"blocks": [ text_block.json_rep() for text_block in text_blocks]}
     if courseId is not None:
         request["courseId"] = courseId
     return post(EMBEDDING_URL, request)['embeddings']
