@@ -12,11 +12,16 @@ TwoSentences = Tuple[Sentence, Sentence]
 class ELMo:
     ELMo_models_cache = {}
 
-    __RESOURCE_PATH = (Path.cwd() / "src/resources/").resolve()
+    __RESOURCE_PATH = (Path.cwd() / "src/resources/models").resolve()
     __OPTIONS_PATH = (__RESOURCE_PATH / "elmo_2x4096_512_2048cnn_2xhighway_5.5B_options.json").resolve()
-
     __DEFAULT_WEIGHT_FILE = "elmo_2x4096_512_2048cnn_2xhighway_5.5B_weights.hdf5"
-    __INCREMENTALLY_TRAINED_WEIGHTS_FILE = "weights_book.hdf5"
+
+    courseId_to_model = {
+        1601: "weights_book_bs16.hdf5",
+        1602: "weights_bs16_epochs2.hdf5",
+        6401: "weights_book_bs64.hdf5",
+        640101: "weights_book_bs64_fullclean.hdf5"
+    }
 
     __logger = getLogger(__name__)
 
@@ -24,7 +29,8 @@ class ELMo:
         if course_id is None:
             self.weights_path = (self.__RESOURCE_PATH / self.__DEFAULT_WEIGHT_FILE).resolve()
         else:
-            self.weights_path = (self.__RESOURCE_PATH / self.__INCREMENTALLY_TRAINED_WEIGHTS_FILE).resolve()
+            model_name = self.courseId_to_model.get(course_id, self.__DEFAULT_WEIGHT_FILE)
+            self.weights_path = (self.__RESOURCE_PATH / model_name).resolve()
 
         self.__logger.info("Using the ELMo Model {}".format(self.weights_path))
 

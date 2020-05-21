@@ -29,9 +29,15 @@ def clean_data(sentence):
 
     # join seperated words
     sentence.replace('-', '')
-    # Convert to lowercase
-    sentence = sentence.lower()
-    # # Convert to list from string
+    # # Remove punctuations
+    # sentence = re.sub(r"[^a-zA-Z]", " ", sentence)
+    # # Convert to lowercase
+    # sentence = sentence.lower()
+    # # remove tags
+    # sentence = re.sub("&lt;/?.*?&gt;", " &lt;&gt; ", sentence)
+    # # remove special characters and digits
+    # sentence = re.sub("(\\d|\\W)+", " ", sentence)
+    # Convert to list from string
     sentence = sentence.split()
     # Lemmatisation
     lem = WordNetLemmatizer()
