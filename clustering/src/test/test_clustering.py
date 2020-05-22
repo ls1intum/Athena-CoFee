@@ -24,10 +24,10 @@ from src.clustering import Clustering
 class TestClustering(TestCase):
     clustering = Clustering()
     # Read the precomputed embeddings here
-    embeddings_flowers = pd.read_csv('exampleEmbeddings/flower_embeddings.csv').values.tolist()
-    embeddings_software = pd.read_csv('exampleEmbeddings/software_embeddings.csv').values.tolist()
-    embeddings_law = pd.read_csv('exampleEmbeddings/law_embeddings.csv').values.tolist()
-    embeddings_same = pd.read_csv('exampleEmbeddings/same_sentence_embeddings.csv').values.tolist()
+    embeddings_flowers = pd.read_csv('src/test/exampleEmbeddings/flower_embeddings.csv').values.tolist()
+    embeddings_software = pd.read_csv('src/test/exampleEmbeddings/software_embeddings.csv').values.tolist()
+    embeddings_law = pd.read_csv('src/test/exampleEmbeddings/law_embeddings.csv').values.tolist()
+    embeddings_same = pd.read_csv('src/test/exampleEmbeddings/same_sentence_embeddings.csv').values.tolist()
 
     def test_cluster_same_sentences(self):
         clusters = self.clustering.cluster(self.embeddings_same)[0]
