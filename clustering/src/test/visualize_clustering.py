@@ -61,9 +61,9 @@ def get_vectors(file=''):
     except FileNotFoundError:
         # Read default values to skip embedding computation
         try:
-            embedding_data = pd.read_csv('example_embeddings.csv')
+            embedding_data = pd.read_csv('exampleEmbeddings/example_embeddings.csv')
             embeddings = embedding_data.values.tolist()
-            sentence_data = pd.read_csv('example_sentences.csv')
+            sentence_data = pd.read_csv('exampleEmbeddings/example_sentences.csv')
             sentences = sentence_data.values.tolist()
             return sentences, embeddings
         # If files not found, compute embeddings again
