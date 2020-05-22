@@ -1,4 +1,4 @@
-# Listed dependencies as of 2020-04-22
+# Listed dependencies as of 2020-05-22
 docutils==0.15.2
 falcon==2.0.0
 gunicorn==20.0.4
@@ -23,5 +23,9 @@ scikit-learn==0.22.2.post1
 #  - scipy [required: >=0.17.0, installed: 1.4.1]
 #    - numpy [required: >=1.13.3, installed: 1.18.3]
 scipy==1.4.1
-#    - numpy [required: >=1.13.3, installed: 1.18.3]
+#  - numpy [required: >=1.13.3, installed: 1.18.3]
 pandas==1.0.3
+#  - numpy [required: >=1.13.3, installed: 1.18.3]
+#  - python-dateutil [required: >=2.6.1, installed: 2.8.1]
+#    - six [required: >=1.5, installed: 1.15.0]
+#  - pytz [required: >=2017.2, installed: 2020.1]
