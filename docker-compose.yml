@@ -44,8 +44,6 @@ services:
     container_name: athene-mongodb
     ports:
       - 27017:27017
-    expose:
-      - 27017
     environment:
       - MONGO_INITDB_DATABASE=athene_db
       - MONGO_INITDB_ROOT_USERNAME=root
