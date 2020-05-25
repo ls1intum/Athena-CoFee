@@ -16,20 +16,26 @@ class ELMo:
     __OPTIONS_PATH = (__RESOURCE_PATH / "elmo_2x4096_512_2048cnn_2xhighway_5.5B_options.json").resolve()
     __DEFAULT_WEIGHT_FILE = "elmo_2x4096_512_2048cnn_2xhighway_5.5B_weights.hdf5"
 
-    courseId_to_model = {
-        1601: "weights_book_bs16.hdf5",
-        1602: "weights_bs16_epochs2.hdf5",
-        6401: "weights_book_bs64.hdf5",
-        640101: "weights_book_bs64_fullclean.hdf5"
-    }
+    # courseId_to_model = {
+    #     1601: "weights_book_bs16.hdf5",
+    #     1602: "weights_bs16_epochs2.hdf5",
+    #     6401: "weights_book_bs64.hdf5",
+    #     640101: "weights_book_bs64_fullclean.hdf5"
+    # }
 
     __logger = getLogger(__name__)
+
+    @staticmethod
+    def __courseId_to_model(course_id, default_model):
+        epochs = course_id % 10
+        bs = course_id // 100
+        return "weights_bs{}_epochs{}.hdf5".format(bs, epochs)
 
     def __init__(self, course_id=None):
         if course_id is None:
             self.weights_path = (self.__RESOURCE_PATH / self.__DEFAULT_WEIGHT_FILE).resolve()
         else:
-            model_name = self.courseId_to_model.get(course_id, self.__DEFAULT_WEIGHT_FILE)
+            model_name = self.__DEFAULT_WEIGHT_FILE #self.__courseId_to_model(course_id, self.__DEFAULT_WEIGHT_FILE)
             self.weights_path = (self.__RESOURCE_PATH / model_name).resolve()
 
         self.__logger.info("Using the ELMo Model {}".format(self.weights_path))

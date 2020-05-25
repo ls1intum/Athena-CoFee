@@ -5,7 +5,6 @@ from benchmark.src.data.data_retriever import read_sentences_from_csv
 from benchmark.src.entities.cluster import Cluster
 from benchmark.src.networking.api_services import *
 from benchmark.src.similarity_measure import SimilarityMeasure
-from clustering.src.entities import TextBlock
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -20,7 +19,7 @@ logger.addHandler(handler)
 text_blocks = read_sentences_from_csv()
 for text_block in text_blocks:
     text_block.clean_text()
-embeddings = embed(text_blocks, courseId=1602)
+embeddings = embed(text_blocks, courseId=6403)
 clusters = Cluster.clusters_from_network_response(cluster(embeddings))
 for text_block in text_blocks:
     text_block.extract_cluster(clusters)
