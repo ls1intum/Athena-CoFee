@@ -6,14 +6,19 @@ from sklearn.metrics import pairwise_distances
 from .entities import ElmoVector
 
 class Clustering:
-    
+
+    clusterer = hdbscan.HDBSCAN(algorithm='best', alpha=1.0, approx_min_span_tree=True,
+                                gen_min_span_tree=False, leaf_size=40, memory=Memory(cachedir=None),
+                                metric='braycurtis', min_cluster_size=2, min_samples=None, p=None)
+
     def cluster(self, vectors: List[ElmoVector]) -> Tuple[array, array]:
-        clusterer = hdbscan.HDBSCAN(algorithm='best', alpha=1.0, approx_min_span_tree=True,
-        gen_min_span_tree=False, leaf_size=40, memory=Memory(cachedir=None),
-        metric='braycurtis', min_cluster_size=2, min_samples=None, p=None)
-        clusterer.fit(vectors)
-        return (clusterer.labels_, clusterer.probabilities_)
-    
+        self.clusterer.fit(vectors)
+        return (self.clusterer.labels_, self.clusterer.probabilities_)
+
+    def visualize_tree(self, vectors: List[ElmoVector], show_clusters: bool):
+        self.clusterer.fit(vectors)
+        self.clusterer.condensed_tree_.plot(select_clusters=show_clusters)
+
     def distances_within_cluster(self, vectors: List[ElmoVector]) -> array:
         """
         Returns
