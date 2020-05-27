@@ -1,11 +1,12 @@
 FROM python:3.7.7
 LABEL author="Jan Philip Bernius <janphilip.bernius@tum.de>"
 
-COPY requirements.txt /tmp/requirements.txt
+COPY ./embedding/requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -qr /tmp/requirements.txt
 
 WORKDIR /usr/src/app
-COPY src/ src/
+COPY ./embedding/src/ src/
+COPY ./shared src/shared/
 RUN make -C src/resources
 
 # Run the image as a non-root user
