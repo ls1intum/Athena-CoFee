@@ -3,7 +3,7 @@
 # Edit at https://www.gitignore.io/?templates=python
 
 ### Database ###
-.data/
+data/
 
 ### PyCharm ###
 .idea/
