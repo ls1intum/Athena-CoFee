@@ -1,7 +1,19 @@
 db.createUser(
     {
-        user: "user1",
-        pwd: "user1_password",
+        user: "embedding",
+            pwd: "embedding_password",
+            roles: [
+            {
+                role: "readWrite",
+                db: "athene_db"
+            }
+        ]
+    }
+);
+db.createUser(
+    {
+        user: "clustering",
+        pwd: "clustering_password",
         roles: [
             {
                 role: "readWrite",
@@ -9,4 +21,4 @@ db.createUser(
             }
         ]
     }
-)
+);
