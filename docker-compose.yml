@@ -17,8 +17,7 @@ services:
 # http://localhost:8001/embed
   embedding:
     build:
-      context: ./
-      dockerfile: ./embedding/Dockerfile
+      context: ./embedding
     image: athene-embedding
     container_name: athene-embedding
     ports:
