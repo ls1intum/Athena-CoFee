@@ -4,7 +4,7 @@ import pymongo
 class Connection:
 
     def __init__(self):
-        self.client = pymongo.MongoClient('database', 27017, username='root', password='root_password')
+        self.client = pymongo.MongoClient('database', 27017, username='clustering', password='clustering_password')
         # self.client = pymongo.MongoClient('localhost', 27017, username='user1', password='user1_password', authSource='athene_db')
         self.db = self.client["athene_db"]
         self.collection = None
