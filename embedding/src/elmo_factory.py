@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from allennlp.commands.elmo import ElmoEmbedder
 from logging import getLogger
@@ -18,6 +19,7 @@ class ELMoFactory:
     __DEFAULT_WEIGHT_FILE = "elmo_2x4096_512_2048cnn_2xhighway_5.5B_weights.hdf5"
     ELMo_models_cache = {}
     ELMo_to_status = {__DEFAULT_WEIGHT_FILE: FileStatus.Ready}
+    ELMo_to_last_updated = {}
     cloud = owncloud.Client("https://nextcloud.in.tum.de/")
     remote_models_path = "Athene/models"
 
@@ -28,11 +30,17 @@ class ELMoFactory:
     def __fetch_remote_model(file_name):
         try:
             ELMoFactory.__logger.info("fetching remote model {}".format(file_name))
+            if file_name in ELMoFactory.ELMo_to_status and ELMoFactory.ELMo_to_status[file_name] == FileStatus.Fetching:
+                return
             ELMoFactory.ELMo_to_status[file_name] = FileStatus.Fetching
+            if os.path.exists((ELMoFactory.__RESOURCE_PATH / file_name).resolve()):
+                os.remove((ELMoFactory.__RESOURCE_PATH / file_name).resolve())
             success = ELMoFactory.cloud.get_file(ELMoFactory.remote_models_path + "/" + file_name,
                                                  (ELMoFactory.__RESOURCE_PATH / file_name).resolve())
             if success:
                 ELMoFactory.ELMo_to_status[file_name] = FileStatus.Ready
+                ELMoFactory.ELMo_to_last_updated[file_name] = ELMoFactory.__fetch_remote_model_update_time(file_name)
+                del ELMoFactory.ELMo_models_cache[file_name]
                 ELMoFactory.__logger.info("successfully loaded remote model {}".format(file_name))
             else:
                 del ELMoFactory.ELMo_to_status[file_name]
@@ -41,6 +49,24 @@ class ELMoFactory:
         except owncloud.HTTPResponseError:
             del ELMoFactory.ELMo_to_status[file_name]
             ELMoFactory.__logger.error("unable to load model {}".format(file_name))
+
+    @staticmethod
+    def __fetch_remote_model_update_time(file_name):
+        try:
+            info = ELMoFactory.cloud.file_info(ELMoFactory.remote_models_path + "/" + file_name)
+            if info is not None:
+                ELMoFactory.__logger.info("successfully loaded metadata of model {}".format(file_name))
+                return info.get_last_modified()
+            else:
+                ELMoFactory.__logger.info("model {} was not found remotely".format(file_name))
+        except owncloud.HTTPResponseError:
+            ELMoFactory.__logger.error("unable to load metadata of model {}".format(file_name))
+        return None
+
+    @staticmethod
+    def __update_model(file_name):
+        if ELMoFactory.ELMo_to_last_updated[file_name] != ELMoFactory.__fetch_remote_model_update_time(file_name):
+            ELMoFactory.__fetch_remote_model(file_name)
 
     def __course_id_to_file_name(self, course_id):
         file_name = "weights_course_{}.hdf5".format(course_id)
@@ -52,6 +78,8 @@ class ELMoFactory:
 
         if ELMoFactory.ELMo_to_status[file_name] == FileStatus.Ready and \
                 (ELMoFactory.__RESOURCE_PATH / file_name).resolve().exists():
+            thr = threading.Thread(target=ELMoFactory.__update_model, args=(file_name,))
+            thr.start()
             return file_name
 
         return ELMoFactory.__DEFAULT_WEIGHT_FILE

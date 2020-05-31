@@ -19,7 +19,7 @@ logger.addHandler(handler)
 text_blocks = read_sentences_from_csv()
 for text_block in text_blocks:
     text_block.clean_text()
-embeddings = embed(text_blocks, courseId=6403)
+embeddings = embed(text_blocks, courseId=999981)
 clusters = Cluster.clusters_from_network_response(cluster(embeddings))
 for text_block in text_blocks:
     text_block.extract_cluster(clusters)
