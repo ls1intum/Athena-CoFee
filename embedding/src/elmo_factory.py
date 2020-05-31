@@ -17,9 +17,11 @@ class ELMoFactory:
     __RESOURCE_PATH = (Path.cwd() / "src/resources/models").resolve()
     __OPTIONS_PATH = (__RESOURCE_PATH / "elmo_2x4096_512_2048cnn_2xhighway_5.5B_options.json").resolve()
     __DEFAULT_WEIGHT_FILE = "elmo_2x4096_512_2048cnn_2xhighway_5.5B_weights.hdf5"
+
     ELMo_models_cache = {}
     ELMo_to_status = {__DEFAULT_WEIGHT_FILE: FileStatus.Ready}
     ELMo_to_last_updated = {}
+
     cloud = owncloud.Client("https://nextcloud.in.tum.de/")
     remote_models_path = "Athene/models"
 
@@ -40,7 +42,8 @@ class ELMoFactory:
             if success:
                 ELMoFactory.ELMo_to_status[file_name] = FileStatus.Ready
                 ELMoFactory.ELMo_to_last_updated[file_name] = ELMoFactory.__fetch_remote_model_update_time(file_name)
-                del ELMoFactory.ELMo_models_cache[file_name]
+                if file_name in ELMoFactory.ELMo_models_cache:
+                    del ELMoFactory.ELMo_models_cache[file_name]
                 ELMoFactory.__logger.info("successfully loaded remote model {}".format(file_name))
             else:
                 del ELMoFactory.ELMo_to_status[file_name]
@@ -68,7 +71,8 @@ class ELMoFactory:
         if ELMoFactory.ELMo_to_last_updated[file_name] != ELMoFactory.__fetch_remote_model_update_time(file_name):
             ELMoFactory.__fetch_remote_model(file_name)
 
-    def __course_id_to_file_name(self, course_id):
+    @staticmethod
+    def __course_id_to_file_name(course_id):
         file_name = "weights_course_{}.hdf5".format(course_id)
 
         if file_name not in ELMoFactory.ELMo_to_status:
@@ -88,11 +92,15 @@ class ELMoFactory:
         if course_id is None:
             model_name = self.__DEFAULT_WEIGHT_FILE
         else:
-            model_name = self.__course_id_to_file_name(course_id)
+            model_name = ELMoFactory.__course_id_to_file_name(course_id)
 
         if model_name not in ELMoFactory.ELMo_models_cache:
             weights_path = (self.__RESOURCE_PATH / model_name).resolve()
-            ELMoFactory.ELMo_models_cache[model_name] = ElmoEmbedder(ELMoFactory.__OPTIONS_PATH, weights_path)
+            try:
+                ELMoFactory.ELMo_models_cache[model_name] = ElmoEmbedder(ELMoFactory.__OPTIONS_PATH, weights_path)
+            except FileNotFoundError:
+                self.__logger.error("Model not found, Using default elmo model")
+                return ElmoEmbedder(ELMoFactory.__OPTIONS_PATH, self.__DEFAULT_WEIGHT_FILE)
 
         self.__logger.info("Using the ELMo Model {}".format(model_name))
         return ELMoFactory.ELMo_models_cache[model_name]
