@@ -1,6 +1,7 @@
 from unittest import TestCase
 
-from benchmark.src.networking.api_services import embed_sentences, cluster
+from benchmark.src.entities.text_block import TextBlock
+from benchmark.src.networking.api_services import cluster, embed
 
 sentences_flowers = ["A second flower blossomed and remained.",
                      "I have red and yellow  flowers",
@@ -15,29 +16,30 @@ sentences_law = ["the congress decided against this law",
                  "you can't brake the law like this",
                  "Law breaking is usually punished with jail"]
 
-embeddings_flowers = embed_sentences(sentences_flowers)
-embeddings_software = embed_sentences(sentences_software)
-embeddings_law = embed_sentences(sentences_law)
+embeddings_flowers = embed(TextBlock.from_sentences(sentences_flowers))
+embeddings_software = embed(TextBlock.from_sentences(sentences_software))
+embeddings_law = embed(TextBlock.from_sentences(sentences_law))
 
 
 class TestClustering(TestCase):
 
     def test_cluster_same_sentences(self):
-        embeddings_software_repeated = embed_sentences([sentences_software[0]] * 10)
+        embeddings_software_repeated = embed(TextBlock.from_sentences([sentences_software[0]] * 5))
         clusters = cluster(embeddings_software_repeated)
-        self.assertEqual(len(clusters), 1)
+        print(clusters)
+        self.assertEqual(1, len(clusters))
 
     def test_cluster_similar_sentences(self):
         clusters = cluster(embeddings_flowers)
-        self.assertEqual(len(clusters), 1)
+        self.assertEqual(1, len(clusters))
 
         clusters = cluster(embeddings_software)
-        self.assertEqual(len(clusters), 1)
+        self.assertEqual(1, len(clusters))
 
         clusters = cluster(embeddings_law)
-        self.assertEqual(len(clusters), 1)
+        self.assertEqual(1, len(clusters))
 
     def test_cluster_different_topics(self):
         clusters = cluster(embeddings_flowers+embeddings_software+embeddings_law)
         # test: there are 3 different clusters
-        self.assertEqual(len(clusters), 3)
+        self.assertEqual(3, len(clusters))
