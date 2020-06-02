@@ -83,6 +83,20 @@ def get_embeddings_for_exercise(exercise_id=-1):
     return filtered_embeddings
 
 
+# Reads previous clustering results and prints them for comparison
+def print_old_clustering_results():
+    old_clustering = 'clustering-2020-05-18_10_16_03.269799.json'
+    path = os.getcwd() + '/exampleEmbeddings/dataset/clusterings/' + old_clustering
+    df = pd.json_normalize(pd.read_json(path)['clusters'])
+    old_cluster_list = df['blocks'].values.tolist()
+    print('Old clustering results for the same data: ' + old_clustering)
+    print('Number of clusters: {}'.format(len(old_cluster_list) - 1))
+    print('Number of blocks without a cluster: {}'.format(len(old_cluster_list[0])))
+    for i in range(len(old_cluster_list)):
+        if i != 0:
+            print('Number of blocks in cluster {}: {}'.format(i, len(old_cluster_list[i])))
+
+
 # Clustering and ELMo objects
 clustering = Clustering()
 
@@ -96,10 +110,11 @@ clustering.clusterer.min_cluster_size = 2
 clustering.clusterer.min_samples = 2
 clusters = clustering.cluster(vectors)[0]
 
-# Print clusters
+# Print current clusters and old ones read from archive
 print('Number of clusters: {}'.format(len(set(clusters)) - 1))
 print()
 print_clusters(block_ids, clusters)
+print_old_clustering_results()
 
 """
 clustering.visualize_tree(vectors, True)
