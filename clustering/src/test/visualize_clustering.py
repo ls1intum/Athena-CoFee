@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import glob
-import os
+from glob import glob
+from os import getcwd
 
 from src.clustering import Clustering
 
@@ -21,9 +21,9 @@ def print_clusters(block_array: [str], cluster_array: [int]):
         else:
             print('{} blocks in cluster {}:'.format(len(clusters[i]), i))
         for block in clusters[i]:
-            print(block)
+            print('[BLOCK]: ' + block)
         print()
-    print('-' * 100)
+    print('#' * 100)
 
 
 # Gets the default blocks and vectors from the csv files.
@@ -38,8 +38,8 @@ def get_vectors():
 # Reads the exercise_id - textblock_id mappings from csv file.
 # Returns a dictionary per default. If return_dict is set to false, returns a list of grouped up text blocks.
 def read_mappings_from_csv(return_dict=True):
-    all_mappings = pd.read_csv('exampleEmbeddings/dataset/textblock_exercise_submission_mapping.csv',
-                          usecols=[0, 2], keep_default_na=False)
+    path = getcwd() + '/exampleEmbeddings/dataset/textblock_exercise_submission_mapping.csv'
+    all_mappings = pd.read_csv(path, usecols=[0, 2], keep_default_na=False)
     if return_dict:
         mapping_list = list(filter(lambda x: x[1] != 'NULL', all_mappings.values.tolist()))
         mapping_dict = {}
@@ -61,8 +61,8 @@ def read_mappings_from_csv(return_dict=True):
 
 # Reads all json embedding files and concatenates them to a list of tuples (textblock_id, vector)
 def concat_embeddings_from_json():
-    path = os.getcwd() + '/exampleEmbeddings/dataset/embeddings'
-    embedding_files = glob.glob(path + "/*.json")
+    path = getcwd() + '/exampleEmbeddings/dataset/embeddings'
+    embedding_files = glob(path + "/*.json")
     all_embeddings = pd.concat((pd.json_normalize(pd.read_json(file)['embeddings']) for file in embedding_files))
     return all_embeddings.values.tolist()
 
@@ -83,44 +83,67 @@ def get_embeddings_for_exercise(exercise_id=-1):
     return filtered_embeddings
 
 
+# Takes a list of block ids and maps them to their actual text, by reading the mapping from csv
+def map_id_to_text(ids: [str]):
+    path = getcwd() + '/exampleEmbeddings/dataset/tb_id_text.csv'
+    mapping_df = pd.read_csv(path, sep=';')
+    mapping_list = mapping_df.values.tolist()
+    mapping_dict = {}
+    for elem in mapping_list:
+        mapping_dict[elem[0]] = elem[1]
+    texts = list(map(lambda x: mapping_dict[x], ids))
+    return texts
+
+
 # Reads previous clustering results and prints them for comparison
 def print_old_clustering_results():
     old_clustering = 'clustering-2020-05-18_10_16_03.269799.json'
-    path = os.getcwd() + '/exampleEmbeddings/dataset/clusterings/' + old_clustering
+    path = getcwd() + '/exampleEmbeddings/dataset/clusterings/' + old_clustering
     df = pd.json_normalize(pd.read_json(path)['clusters'])
     old_cluster_list = df['blocks'].values.tolist()
     print('Old clustering results for the same data: ' + old_clustering)
     print('Number of clusters: {}'.format(len(old_cluster_list) - 1))
     print('Number of blocks without a cluster: {}'.format(len(old_cluster_list[0])))
+    clustered_blocks = 0
+    for x in old_cluster_list:
+        clustered_blocks += len(x)
+    clustered_blocks -= len(old_cluster_list[0])
+    print('Number of blocks in clusters: {}'.format(clustered_blocks))
+    print('-'*100)
     for i in range(len(old_cluster_list)):
         if i != 0:
             print('Number of blocks in cluster {}: {}'.format(i, len(old_cluster_list[i])))
 
 
-# Clustering and ELMo objects
-clustering = Clustering()
+# Performs the analysis. Optional flags can be set for additional behaviour:
+#   - visualise: Plots the condensed tree of the clustering
+#   - print_old_results: Prints the old clustering results for the same data set
+#   - export_condensed_tree: Saves the condensed tree to a csv file
+def perform_analysis(exercise_id, cluster_obj, visualise=False, print_old_results=False, export_condensed_tree=False):
+    embeddings = get_embeddings_for_exercise(exercise_id)
+    (block_ids, vectors) = map(list, zip(*embeddings))
+    blocks = map_id_to_text(block_ids)
+    clusters = cluster_obj.cluster(vectors)[0]
 
-# Get vector representations
-embeddings = get_embeddings_for_exercise(1211)
-(block_ids, vectors) = map(list, zip(*embeddings))
-# embeddings = concat_embeddings_from_json()
+    print('Number of clusters: {}'.format(len(set(clusters)) - 1))
+    print_clusters(blocks, clusters)
+
+    if print_old_results:
+        print_old_clustering_results()
+
+    if visualise:
+        clustering.clusterer.condensed_tree_.plot(select_clusters=True)
+        plt.show()
+
+    if export_condensed_tree:
+        tree = clustering.clusterer.condensed_tree_.to_pandas()
+        tree.to_csv('condensed_tree.csv', index=False)
+
 
 # Parameters of HDBSCAN can be changed here
+clustering = Clustering()
 clustering.clusterer.min_cluster_size = 2
 clustering.clusterer.min_samples = 2
-clusters = clustering.cluster(vectors)[0]
 
-# Print current clusters and old ones read from archive
-print('Number of clusters: {}'.format(len(set(clusters)) - 1))
-print()
-print_clusters(block_ids, clusters)
-print_old_clustering_results()
+perform_analysis(exercise_id=1211, cluster_obj=clustering)
 
-"""
-clustering.visualize_tree(vectors, True)
-plt.show()
-
-# Export the condensed tree to a csv file
-tree = clustering.clusterer.condensed_tree_.to_pandas()
-tree.to_csv('condensed_tree.csv', index=False)
-"""
