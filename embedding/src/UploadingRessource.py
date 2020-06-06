@@ -34,7 +34,7 @@ class UploadingResource:
             self.__logger.error("{} ({})".format(requireFileData.title, requireFileData.description))
             raise requireFileData
 
-        remote_path = CloudConnection.upload_file(doc["fileName"], doc["fileData"],  doc["courseId"])
+        remote_path = CloudConnection.upload_file(doc["fileName"], doc["fileData"],  str(doc["courseId"]))
 
         doc = {
             'remotePath': remote_path
