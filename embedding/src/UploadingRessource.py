@@ -1,3 +1,4 @@
+import base64
 import json
 from datetime import datetime
 from logging import getLogger
@@ -34,7 +35,9 @@ class UploadingResource:
             self.__logger.error("{} ({})".format(requireFileData.title, requireFileData.description))
             raise requireFileData
 
-        remote_path = CloudConnection.upload_file(doc["fileName"], doc["fileData"],  str(doc["courseId"]))
+        decoded_file_data = base64.b64decode(doc["fileData"])
+
+        remote_path = CloudConnection.upload_file(doc["fileName"], decoded_file_data,  str(doc["courseId"]))
 
         doc = {
             'remotePath': remote_path
