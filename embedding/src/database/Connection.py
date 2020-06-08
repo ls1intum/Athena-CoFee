@@ -19,7 +19,7 @@ class Connection:
             self.collection = self.db[collection]
             self.collection.insert_one(document)
         except Exception as e:
-            print(e)
+            raise e
 
     # inserts an array of documents to a collection
     # collection {string} - collection name to store the document
@@ -29,7 +29,7 @@ class Connection:
             self.collection = self.db[collection]
             self.collection.insert_many(documents)
         except Exception as e:
-            print(e)
+            raise e
 
     # query database and returns results
     # filter_dict {field-value pairs} - specifies elements which must be present in the resulting set
@@ -43,7 +43,7 @@ class Connection:
             docs = self.collection.find(filter=filter_dict, projection=projection, skip=skip, limit=limit,
                                         max_time_ms=max_time_ms)
         except Exception as e:
-            print(e)
+            raise e
         else:
             return docs
 
@@ -57,7 +57,7 @@ class Connection:
             self.collection = self.db[collection]
             result = self.collection.update_one(filter_dict, update_dict, upsert)
         except Exception as e:
-            print(e)
+            raise e
         else:
             return result
 
@@ -67,7 +67,16 @@ class Connection:
             self.collection = self.db[collection]
             result = self.collection.update_many(filter_dict, update_dict, upsert)
         except Exception as e:
-            print(e)
+            raise e
+        else:
+            return result
+
+    def replace_document(self, collection, filter_dict, replacement_dict, upsert=False):
+        try:
+            self.collection = self.db[collection]
+            result = self.collection.replace_one(filter_dict, replacement_dict, upsert)
+        except Exception as e:
+            raise e
         else:
             return result
 
@@ -77,7 +86,7 @@ class Connection:
             self.collection = self.db[collection]
             result = self.collection.delete_one(filter_dict)
         except Exception as e:
-            print(e)
+            raise e
         else:
             return result
 
@@ -87,7 +96,7 @@ class Connection:
             self.collection = self.db[collection]
             result = self.collection.delete_many(filter_dict)
         except Exception as e:
-            print(e)
+            raise e
         else:
             return result
 
@@ -97,7 +106,7 @@ class Connection:
             self.collection = self.db[collection]
             result = self.collection.count_documents(filter_dict)
         except Exception as e:
-            print(e)
+            raise e
         else:
             return result
 

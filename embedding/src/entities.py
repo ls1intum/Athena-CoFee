@@ -1,8 +1,10 @@
 from numpy import array
+import json
 
 Word = str
 Sentence = str
 ElmoVector = array
+
 
 class TextBlock:
     id: str
@@ -12,10 +14,11 @@ class TextBlock:
         self.id = id
         if text is not None:
             self.text = text
-    
+
     @classmethod
     def from_dict(cls, dict: dict) -> 'TextBlock':
         return cls(dict['id'], dict['text'])
+
 
 class Embedding:
     id: str
@@ -24,7 +27,53 @@ class Embedding:
     def __init__(self, id: str, vector: ElmoVector):
         self.id = id
         self.vector = vector
-    
+
     @classmethod
     def from_dict(cls, dict: dict) -> 'Embedding':
         return cls(dict['id'], dict['vector'])
+
+
+class Feedback:
+    id: str
+    text: Sentence
+    score: float
+    feedbackEmbeddings: [ElmoVector]
+
+    def __init__(self, _id: str, text: Sentence, score: float):
+        self.id = _id
+        self.text = text
+        self.score = score
+        self.feedbackEmbeddings = []
+
+    @classmethod
+    def from_dict(cls, _dict: dict) -> 'Feedback':
+        return cls(_dict['id'], _dict['text'], _dict['score'])
+
+
+class FeedbackWithTextBlock:
+    id: str
+    submission_id: int
+    cluster_id: int
+    position_in_cluster: int
+    added_distance: float
+    text: str
+    feedback: Feedback
+
+    def __init__(self, _id: str, submission_id: int, cluster_id: int, position_in_cluster: int, added_distance: float,
+                 text: str, feedback: Feedback):
+        self.id = _id
+        self.submission_id = submission_id
+        self.cluster_id = cluster_id
+        self.position_in_cluster = position_in_cluster
+        self.added_distance = added_distance
+        self.text = text
+        self.feedback = feedback
+
+    def add_feedback_embedding(self, embedding: ElmoVector):
+        self.feedback.feedbackEmbeddings.append(embedding)
+
+    @classmethod
+    def from_dict(cls, _dict: dict, feedback: Feedback) -> 'FeedbackWithTextBlock':
+        return cls(_dict['id'], _dict['submission_id'], _dict['cluster_id'], _dict['position_in_cluster'],
+                   _dict['added_distance'], _dict['text'], feedback)
+
