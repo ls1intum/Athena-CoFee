@@ -1,5 +1,7 @@
 from owncloud import owncloud
 
+from .config import nextcloud_credentials
+
 
 class CloudConnection:
     remote_models_path = "Athene/models"
@@ -10,7 +12,7 @@ class CloudConnection:
     def __establish_cloud_connection():
         if CloudConnection.cloud is None:
             CloudConnection.cloud = owncloud.Client("https://nextcloud.in.tum.de/")
-            CloudConnection.cloud.login('khachnao@in.tum.de', 'JaZP6-oN8sG-xyTxk-w6NGT-7MxC3')
+            CloudConnection.cloud.login(nextcloud_credentials["login"], nextcloud_credentials["password"])
 
     @staticmethod
     def __get_course_id_from_remote_path(remote_path):
