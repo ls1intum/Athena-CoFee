@@ -5,6 +5,7 @@ from logging import getLogger
 import owncloud
 import threading
 from enum import Enum
+from src.cloud.cloud_connection import CloudConnection
 
 
 class FileStatus(Enum):
@@ -22,11 +23,10 @@ class ELMoFactory:
     ELMo_to_status = {__DEFAULT_WEIGHT_FILE: FileStatus.Ready}
     ELMo_to_last_updated = {}
 
-    cloud = owncloud.Client("https://nextcloud.in.tum.de/")
-    remote_models_path = "Athene/models"
+    cloud = CloudConnection.get_cloud_connection()
 
     def __init__(self):
-        ELMoFactory.cloud.login('khachnao@in.tum.de', 'JaZP6-oN8sG-xyTxk-w6NGT-7MxC3')
+        pass
 
     @staticmethod
     def __fetch_remote_model(file_name):
@@ -37,7 +37,7 @@ class ELMoFactory:
             ELMoFactory.ELMo_to_status[file_name] = FileStatus.Fetching
             if os.path.exists((ELMoFactory.__RESOURCE_PATH / file_name).resolve()):
                 os.remove((ELMoFactory.__RESOURCE_PATH / file_name).resolve())
-            success = ELMoFactory.cloud.get_file(ELMoFactory.remote_models_path + "/" + file_name,
+            success = ELMoFactory.cloud.get_file(CloudConnection.remote_models_path + "/" + file_name,
                                                  (ELMoFactory.__RESOURCE_PATH / file_name).resolve())
             if success:
                 ELMoFactory.ELMo_to_status[file_name] = FileStatus.Ready
@@ -56,7 +56,7 @@ class ELMoFactory:
     @staticmethod
     def __fetch_remote_model_update_time(file_name):
         try:
-            info = ELMoFactory.cloud.file_info(ELMoFactory.remote_models_path + "/" + file_name)
+            info = ELMoFactory.cloud.file_info(CloudConnection.remote_models_path + "/" + file_name)
             if info is not None:
                 ELMoFactory.__logger.info("successfully loaded metadata of model {}".format(file_name))
                 return info.get_last_modified()

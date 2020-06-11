@@ -15,6 +15,7 @@ services:
       - athene
 
 # http://localhost:8001/embed
+# http://localhost:8001/upload
   embedding:
     build:
       context: ./embedding
