@@ -6,7 +6,7 @@ RUN pip install --no-cache-dir -qr /tmp/requirements.txt
 
 WORKDIR /usr/src/app
 COPY src/ src/
-RUN make -C src/resources
+RUN make -C src/resources/models
 
 # Run the image as a non-root user
 RUN groupadd -r textemb && useradd --no-log-init -r -g textemb textemb
