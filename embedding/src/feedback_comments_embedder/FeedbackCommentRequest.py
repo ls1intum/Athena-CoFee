@@ -1,15 +1,12 @@
 import json
 from logging import getLogger
 from falcon import Request, Response, HTTP_200
-from src.elmo import ELMo
 from src.errors import emptyBody, requireTextBlocks, requireFeedback
 from src.entities import FeedbackWithTextBlock, Feedback
 from src.feedback_comments_embedder.FeedbackCommentResource import FeedbackCommentResource
 
 
 class FeedbackCommentRequest:
-    __elmo: ELMo = None
-    __fcr = FeedbackCommentResource()
     __logger = getLogger(__name__)
 
     def on_post(self, req: Request, resp: Response) -> None:
@@ -36,7 +33,8 @@ class FeedbackCommentRequest:
                     blocks.append(FeedbackWithTextBlock.from_dict(b, Feedback.from_dict(f)))
                     break
 
-        response = "success" if self.__fcr.store_feedback(feedback_with_tb=blocks) else "failure"
+        __fcr = FeedbackCommentResource()
+        response = "success" if __fcr.store_feedback(feedback_with_tb=blocks) else "failure"
 
         resp.body = json.dumps(response, ensure_ascii=False)
 

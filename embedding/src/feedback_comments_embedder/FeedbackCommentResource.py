@@ -26,7 +26,7 @@ class FeedbackCommentResource:
             feedback.append({"id": f.feedback.id, "text": f.feedback.text})
 
         self.__logger.info(feedback)
-        request = {"submissions": feedback}
+        request = {"feedback": feedback}
         return self.post(SEGMENTATION_URL, request)
 
     def __embed_feedback_comments(self, sentence: List[Sentence]):
