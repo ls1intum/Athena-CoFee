@@ -1,37 +1,19 @@
 from logging import getLogger
 from typing import List, Tuple
-from allennlp.commands.elmo import ElmoEmbedder
 from numpy import ndarray
-from pathlib import Path
 from scipy.spatial import distance
+from .elmo_factory import ELMoFactory
 from .entities import ElmoVector, Sentence, Word
 
 TwoSentences = Tuple[Sentence, Sentence]
 
 
 class ELMo:
-    ELMo_models_cache = {}
-
-    __RESOURCE_PATH = (Path.cwd() / "src/resources/").resolve()
-    __OPTIONS_PATH = (__RESOURCE_PATH / "elmo_2x4096_512_2048cnn_2xhighway_5.5B_options.json").resolve()
-
-    __DEFAULT_WEIGHT_FILE = "elmo_2x4096_512_2048cnn_2xhighway_5.5B_weights.hdf5"
-    __INCREMENTALLY_TRAINED_WEIGHTS_FILE = "weights_book.hdf5"
-
     __logger = getLogger(__name__)
+    elmo_factory = ELMoFactory()
 
     def __init__(self, course_id=None):
-        if course_id is None:
-            self.weights_path = (self.__RESOURCE_PATH / self.__DEFAULT_WEIGHT_FILE).resolve()
-        else:
-            self.weights_path = (self.__RESOURCE_PATH / self.__INCREMENTALLY_TRAINED_WEIGHTS_FILE).resolve()
-
-        self.__logger.info("Using the ELMo Model {}".format(self.weights_path))
-
-        if self.weights_path not in ELMo.ELMo_models_cache:
-            ELMo.ELMo_models_cache[self.weights_path] = ElmoEmbedder(self.__OPTIONS_PATH, self.weights_path)
-
-        self.elmo = ELMo.ELMo_models_cache[self.weights_path]
+        self.elmo = self.elmo_factory.get_model_for_course(course_id)
 
     def __split_sentence(self, sentence: Sentence) -> List[Word]:
         sentence = sentence.lower().replace('\n', ' ').replace('\t', ' ').replace('\xa0', ' ')
