@@ -231,3 +231,4 @@ scikit-learn==0.22.2.post1
 #    - numpy [required: >=1.13.3, installed: 1.18.3]
 scipy==1.4.1
 #    - numpy [required: >=1.13.3, installed: 1.18.3]
+pyocclient==0.4
