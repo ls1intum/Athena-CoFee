@@ -3,14 +3,13 @@ from logging import getLogger
 
 
 class SimilarityMeasure(ABC):
-    __logger = getLogger(__name__)
-
     @abstractmethod
     def output_results(self):
         pass
 
 
 class PrecisionRecallSimilarity(SimilarityMeasure):
+    __logger = getLogger(__name__)
 
     def __init__(self, text_blocks):
         self.text_blocks = text_blocks
@@ -41,11 +40,13 @@ class PrecisionRecallSimilarity(SimilarityMeasure):
 
 
 class GradeBasedSimilarity(SimilarityMeasure):
+    __logger = getLogger(__name__)
 
     def __init__(self, text_blocks):
         for text_block in text_blocks:
             text_block.compute_grade_from_cluster(text_blocks)
-        self.l2_loss = sum([pow((text_block.grade_from_cluster - text_block.ground_truth_grade), 2) for text_block in text_blocks])
+        self.l2_loss = sum(
+            [pow((text_block.grade_from_cluster - text_block.ground_truth_grade), 2) for text_block in text_blocks])
 
     def output_results(self):
         self.__logger.info('The L2 loss for the model is {}'.format(self.l2_loss))
