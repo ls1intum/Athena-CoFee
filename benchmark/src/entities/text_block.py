@@ -6,6 +6,7 @@ class TextBlock:
 
     def __init__(self, text, id=None, ground_truth_cluster=None, ground_truth_grade=None):
         self.text = text
+        self.original_text = text
         self.ground_truth_cluster = ground_truth_cluster
         self.ground_truth_grade = ground_truth_grade
         self.cluster = None
@@ -43,7 +44,7 @@ class TextBlock:
     def compute_grade_from_cluster(self, text_blocks):
         if self.cluster is None:
             raise Exception("cluster for text block {} not defined".format(self.id))
-        cluster_grades = [block.ground_truth_grade for block in text_blocks if block.cluster == self.cluster]
+        cluster_grades = [block.ground_truth_grade for block in text_blocks if self.similar(block)]
         self.grade_from_cluster = sum(cluster_grades) / float(len(cluster_grades))
 
     @staticmethod

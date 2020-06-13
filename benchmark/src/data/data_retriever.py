@@ -26,7 +26,7 @@ def read_sentences_feedback_from_csv():
     result = pd.merge(text_blocks_csv, feedback_csv, left_on="id",  right_on="reference")
     result = result[~result["points"].isnull()]
     result = result[~result["text"].isnull()]
-    ids = result[["id"]].values.flatten()[:1000]
-    text_blocks = result[["text"]].values.flatten()[:1000]
-    points = result[["points"]].values.flatten()[:1000]
+    ids = result[["id"]].values.flatten()[2000:3000]
+    text_blocks = result[["text"]].values.flatten()[2000:3000]
+    points = result[["points"]].values.flatten()[2000:3000]
     return [TextBlock(text_blocks[i], ground_truth_grade=points[i], id=ids[i]) for i in range(len(text_blocks))]

@@ -45,8 +45,24 @@ class GradeBasedSimilarity(SimilarityMeasure):
     def __init__(self, text_blocks):
         for text_block in text_blocks:
             text_block.compute_grade_from_cluster(text_blocks)
-        self.l2_loss = sum(
-            [pow((text_block.grade_from_cluster - text_block.ground_truth_grade), 2) for text_block in text_blocks])
+        self.text_blocks = text_blocks
+        self.l1_loss = sum(
+            [abs((text_block.grade_from_cluster - text_block.ground_truth_grade)) for text_block in text_blocks]) / \
+                       len(text_blocks)
 
     def output_results(self):
-        self.__logger.info('The L2 loss for the model is {}'.format(self.l2_loss))
+        self.__logger.info('The L1 loss for the model is {}'.format(self.l1_loss))
+        max_over_graded = max(self.text_blocks,
+                              key=lambda text_block: text_block.grade_from_cluster - text_block.ground_truth_grade)
+        self.__logger.info(
+            "The most over-graded sentence is \"{}\". \n Assigned:{} but ground truth: {}".format(
+                max_over_graded.original_text,
+                max_over_graded.grade_from_cluster,
+                max_over_graded.ground_truth_grade))
+        max_under_graded = max(self.text_blocks,
+                               key=lambda text_block: text_block.ground_truth_grade - text_block.grade_from_cluster)
+        self.__logger.info(
+            "The most under-graded sentence is \"{}\". \n Assigned:{} but ground truth: {}".format(
+                max_under_graded.original_text,
+                max_under_graded.grade_from_cluster,
+                max_under_graded.ground_truth_grade))
