@@ -1,6 +1,7 @@
 from logging import getLogger
 
 from benchmark.src.networking.api_requests import post
+from benchmark.src.entities.feedback_with_text_block import FeedbackWithTextBlock
 import numpy as np
 
 __logger = getLogger(__name__)
@@ -8,6 +9,7 @@ __logger = getLogger(__name__)
 SEGMENTATION_URL = "http://localhost:8000/segment"
 EMBEDDING_URL = "http://localhost:8001/embed"
 CLUSTERING_URL = "http://localhost:8002/cluster"
+EMBED_FEEDBACK_URL = "http://localhost:8001/embed_feedback_comments"
 
 
 def segment(submissions, keywords=None):
@@ -18,6 +20,23 @@ def segment(submissions, keywords=None):
         request["keywords"] = keywords
     return post(SEGMENTATION_URL, request)
 
+
+def __embed_feedback_comments(text_blocks, feedback):
+    # request with {"text_blocks":[{id:,submission_id:,cluster_id:,position_in_cluster:,added_distance;,reference;}],
+    # "feedback":[{id:,text:,score:,reference}]} response with true and false at the moment
+    request = {"text_blocks": text_blocks, "feedback": feedback}
+    return post(EMBED_FEEDBACK_URL, request)
+
+
+def embed_feedback_comments(feedback_with_text_blocks: [FeedbackWithTextBlock]):
+    step_size = 5
+    responses = []
+    for i in range(0, len(feedback_with_text_blocks), step_size):
+        blocks = feedback_with_text_blocks[i:i + step_size]
+        text_blocks = [block.json_rep_text_block() for block in blocks]
+        feedback = [block.json_rep_feedback() for block in blocks]
+        responses.append(__embed_feedback_comments(text_blocks, feedback))
+    return responses
 
 def __embed(text_blocks, courseId=None):
     # request with {'courseId': 25, 'blocks': [{'id': 1, 'text': 'this is the first block'}, {'id': 2, 'text': 'this is the second block'}]}
