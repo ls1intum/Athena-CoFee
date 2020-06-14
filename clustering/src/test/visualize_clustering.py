@@ -131,7 +131,7 @@ def perform_analysis(exercise_id, cluster_obj, visualise=False, print_old_result
     biggest_cluster = mode(no_noise)
     biggest_cluster_size = len(list(filter(lambda x: x == biggest_cluster, clusters)))
     print('Biggest cluster is {} with size {}.'.format(biggest_cluster, biggest_cluster_size))
-    # print_clusters(blocks, clusters)
+    print_clusters(blocks, clusters)
 
     if print_old_results:
         print_old_clustering_results()
