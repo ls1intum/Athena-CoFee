@@ -6,8 +6,6 @@ from src.segmentor.segmentor import segment_data, segment_feedback_data
 import falcon
 import json
 import nltk
-import sys
-import logging
 
 
 class ObjRequestClass:
@@ -46,15 +44,6 @@ class ObjRequestClass:
                 output = load_result_to_json(keywords, segmentation_result)
         resp.body = json.dumps(output)
 
-
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-
-handler = logging.StreamHandler(sys.stdout)
-handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter('[%(asctime)s] [%(process)d] [%(levelname)s] [%(name)s] %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 
 nltk.data.path.append('src/lib/nltk_data')
 api = application = falcon.API()

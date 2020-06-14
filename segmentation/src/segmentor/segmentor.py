@@ -1,9 +1,6 @@
 import re
 import nltk
 from nltk.stem.porter import PorterStemmer
-from logging import getLogger
-
-__logger = getLogger(__name__)
 
 
 def __segmentation_helper(sentences, sentences_index):
@@ -126,7 +123,7 @@ def segment_data(dataset, keywords):
                     segment_index.append(sentences_index[i - 1][1])
                 segment_index.append(sentences_index[i][0])
                 first_text_block_found = True
-        __logger.info("segment index {}".format(segment_index))
+
         if segment_index:
             segment_index.append(sentences_index[len(sentences) - 1][1])
             tuple_segmentation_result = []
@@ -138,7 +135,6 @@ def segment_data(dataset, keywords):
         else:
             segmentation_result[submission_id] = [(0, 0)]
 
-    __logger.info("segmentation_result {}".format(segmentation_result))
     return segmentation_result
 
 
@@ -167,12 +163,9 @@ def segment_feedback_data(dataset):
         sentences_index = list(tokenizer.span_tokenize(original_doc))
         sentences, sentences_index = __segmentation_helper(sentences, sentences_index)
 
-        __logger.info("sentences index {}".format(sentences_index))
-
         tuple_segmentation_result = []
         for index in sentences_index:
             tuple_segmentation_result.append((index[0], index[1]))
         segmentation_result[feedback_id] = tuple_segmentation_result
 
-    __logger.info("segmentation_result {}".format(segmentation_result))
     return segmentation_result

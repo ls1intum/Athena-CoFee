@@ -13,7 +13,7 @@ class FeedbackCommentResource:
     __conn: Connection = None
     __elmo: ELMo = None
     __logger = getLogger(__name__)
-    __collection = 'feedback'
+    __collection = 'feedback_test'
 
     def __init__(self):
         self.__elmo = ELMo()
@@ -66,12 +66,11 @@ class FeedbackCommentResource:
     def store_feedback(self, feedback_with_tb: list):
         self.__logger.info("Store Feedback.")
         segmented_feedback_comments = self.__segment_feedback_comments(feedback_with_tb)
-        #self.__logger.info(segmented_feedback_comments['textBlocks'])
+
         docs = []
         for fwt in feedback_with_tb:
             blocks = (blocks for blocks in segmented_feedback_comments['textBlocks'] if fwt.feedback.id == blocks['id'])
             sentences: List[Sentence] = list(map(lambda b: fwt.feedback.text[b['startIndex']:b['endIndex']], blocks))
-            #self.__logger.info(sentences)
             vectors: List[ElmoVector] = self.__embed_feedback_comments(sentences)
             for v in vectors:
                 fwt.add_feedback_embedding(v)
