@@ -13,7 +13,7 @@ class FeedbackCommentResource:
     __conn: Connection = None
     __elmo: ELMo = None
     __logger = getLogger(__name__)
-    __collection = 'feedback_test'
+    __collection = 'feedback'
 
     def __init__(self):
         self.__elmo = ELMo()
