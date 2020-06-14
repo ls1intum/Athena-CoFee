@@ -26,6 +26,7 @@ scipy==1.4.1
 #    - numpy [required: >=1.13.3, installed: 1.18.3]
 matplotlib==3.1.1
 pandas==1.0.3
+pymongo==3.10.1
 #  - numpy [required: >=1.13.3, installed: 1.18.3]
 #  - python-dateutil [required: >=2.6.1, installed: 2.8.1]
 #    - six [required: >=1.5, installed: 1.15.0]

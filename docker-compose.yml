@@ -38,6 +38,22 @@ services:
     networks:
       - athene
 
+  database:
+    image: mongo:latest
+    restart: always
+    container_name: athene-mongodb
+    expose:
+      - 27017
+    environment:
+      - MONGO_INITDB_DATABASE=athene_db
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root_password
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./data/db:/data/db
+    networks:
+      - athene
+
 networks:
   athene:
     driver: bridge
