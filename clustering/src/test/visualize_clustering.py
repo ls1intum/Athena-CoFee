@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from glob import glob
 from os import getcwd
+from statistics import mode
 
 from src.clustering import Clustering
 
@@ -126,7 +127,11 @@ def perform_analysis(exercise_id, cluster_obj, visualise=False, print_old_result
     clusters = cluster_obj.cluster(vectors)[0]
 
     print('Number of clusters: {}'.format(len(set(clusters)) - 1))
-    print_clusters(blocks, clusters)
+    no_noise = filter(lambda x: x != -1, clusters)
+    biggest_cluster = mode(no_noise)
+    biggest_cluster_size = len(list(filter(lambda x: x == biggest_cluster, clusters)))
+    print('Biggest cluster is {} with size {}.'.format(biggest_cluster, biggest_cluster_size))
+    # print_clusters(blocks, clusters)
 
     if print_old_results:
         print_old_clustering_results()
