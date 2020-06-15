@@ -67,19 +67,21 @@ class FeedbackCommentResource:
         self.__logger.info("Embed Feedback.")
         segmented_feedback_comments = self.__segment_feedback_comments(feedback_with_tb)
 
-        docs = []
         for fwt in feedback_with_tb:
             blocks = (blocks for blocks in segmented_feedback_comments['textBlocks'] if fwt.feedback.id == blocks['id'])
             sentences: List[Sentence] = list(map(lambda b: fwt.feedback.text[b['startIndex']:b['endIndex']], blocks))
             vectors: List[ElmoVector] = self.__embed_feedback_comments(sentences)
             for v in vectors:
                 fwt.add_feedback_embedding(v)
-            docs.append(self.__create_feedback_document(feedback_with_tb=fwt))
 
-        return docs
+        return feedback_with_tb
 
-    def store_feedback(self, docs):
+    def store_feedback(self, feedback_with_tb: list):
         self.__logger.info("Store Feedback.")
+
+        docs = []
+        for fwt in feedback_with_tb:
+            docs.append(self.__create_feedback_document(feedback_with_tb=fwt))
 
         return self.__replace_insert_documents(documents=docs)
 

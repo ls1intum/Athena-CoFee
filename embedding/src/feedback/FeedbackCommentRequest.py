@@ -34,12 +34,9 @@ class FeedbackCommentRequest:
                     break
 
         __fcr = FeedbackCommentResource()
-        embedded_feedback = __fcr.embed_feedback(feedback_with_tb=blocks)
+        blocks = __fcr.embed_feedback(feedback_with_tb=blocks)
 
-        if not embedded_feedback:
-            response = "failure"
-        else:
-            response = "success" if __fcr.store_feedback(docs=embedded_feedback) else "failure"
+        response = "success" if __fcr.store_feedback(feedback_with_tb=blocks) else "failure"
 
         resp.body = json.dumps(response, ensure_ascii=False)
 
