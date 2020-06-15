@@ -3,6 +3,7 @@ import re
 import nltk.data
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
+import ssl
 
 
 def get_stop_words(language):
@@ -11,6 +12,12 @@ def get_stop_words(language):
     :param language: language for stop words
     :return: list of stop words
     """
+    try:
+        _create_unverified_https_context = ssl._create_unverified_context
+    except AttributeError:
+        pass
+    else:
+        ssl._create_default_https_context = _create_unverified_https_context
     nltk.download('stopwords')
     nltk.download('wordnet')
     nltk.download('punkt')
