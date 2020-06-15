@@ -63,8 +63,8 @@ class FeedbackCommentResource:
                     "Modified Count: {} Upserted id {}".format(result.modified_count, result.upserted_id))
         return True
 
-    def store_feedback(self, feedback_with_tb: list):
-        self.__logger.info("Store Feedback.")
+    def embed_feedback(self, feedback_with_tb: list):
+        self.__logger.info("Embed Feedback.")
         segmented_feedback_comments = self.__segment_feedback_comments(feedback_with_tb)
 
         docs = []
@@ -75,6 +75,11 @@ class FeedbackCommentResource:
             for v in vectors:
                 fwt.add_feedback_embedding(v)
             docs.append(self.__create_feedback_document(feedback_with_tb=fwt))
+
+        return docs
+
+    def store_feedback(self, docs):
+        self.__logger.info("Store Feedback.")
 
         return self.__replace_insert_documents(documents=docs)
 
