@@ -20,13 +20,17 @@ def read_labeled_sentences_from_csv():
             range(len(sentences))]
 
 
-def read_sentences_feedback_from_csv():
+def read_sentences_feedback_from_csv(num_sentences=None):
     text_blocks_csv = read_csv(PATH_TEXT_BLOCKS)
     feedback_csv = read_csv(PATH_FEEDBACK)
     result = pd.merge(text_blocks_csv, feedback_csv, left_on="id",  right_on="reference")
     result = result[~result["points"].isnull()]
     result = result[~result["text"].isnull()]
-    ids = result[["id"]].values.flatten()[2000:3000]
-    text_blocks = result[["text"]].values.flatten()[2000:3000]
-    points = result[["points"]].values.flatten()[2000:3000]
-    return [TextBlock(text_blocks[i], ground_truth_grade=points[i], id=ids[i]) for i in range(len(text_blocks))]
+    ids = result[["id"]].values.flatten()
+    text_blocks = result[["text"]].values.flatten()
+    points = result[["points"]].values.flatten()
+    if num_sentences is None:
+        num_sentences = len(text_blocks)
+    else:
+        num_sentences = min(num_sentences, len(text_blocks))
+    return [TextBlock(text_blocks[i], ground_truth_grade=points[i], id=ids[i]) for i in range(num_sentences)]

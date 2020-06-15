@@ -25,7 +25,7 @@ def evaluate_by_labeled_sentences(courseId = None):
 
 
 def evaluate_by_artemis_data(courseId = None):
-    text_blocks = read_sentences_feedback_from_csv()
+    text_blocks = read_sentences_feedback_from_csv(num_sentences=1500)
     text_blocks = process_text_blocks(text_blocks, courseId)
     similarity_measure = GradeBasedSimilarity(text_blocks)
     similarity_measure.output_results()
