@@ -1,7 +1,5 @@
 from logging import getLogger
-
 from owncloud import owncloud, HTTPResponseError
-
 from .config import nextcloud_credentials
 
 

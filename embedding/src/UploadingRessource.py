@@ -2,10 +2,7 @@ import base64
 import json
 from datetime import datetime
 from logging import getLogger
-from typing import List
-
 from falcon import Request, Response, HTTP_200
-
 from src.cloud.cloud_connection import CloudConnection
 from src.errors import emptyBody, requireCourseId, requireFileName, requireFileData
 
