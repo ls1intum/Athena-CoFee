@@ -22,8 +22,8 @@ def segment(submissions, keywords=None):
 
 
 def __embed_feedback_comments(text_blocks, feedback):
-    # request with {"text_blocks":[{id:,submission_id:,cluster_id:,position_in_cluster:,added_distance;,reference;}],
-    # "feedback":[{id:,text:,score:,reference}]} response with true and false at the moment
+    # request with {"text_blocks":[{'id':,'submission_id':,'cluster_id':,'position_in_cluster':,'added_distance':'text':,'reference':}]}
+    # {"feedback":[{'id':,'text':,'score':,'reference'}]} response with "success" and "failure" at the moment
     request = {"text_blocks": text_blocks, "feedback": feedback}
     return post(EMBED_FEEDBACK_URL, request)
 
@@ -37,6 +37,7 @@ def embed_feedback_comments(feedback_with_text_blocks: [FeedbackWithTextBlock]):
         feedback = [block.json_rep_feedback() for block in blocks]
         responses.append(__embed_feedback_comments(text_blocks, feedback))
     return responses
+
 
 def __embed(text_blocks, courseId=None):
     # request with {'courseId': 25, 'blocks': [{'id': 1, 'text': 'this is the first block'}, {'id': 2, 'text': 'this is the second block'}]}
@@ -60,3 +61,4 @@ def cluster(embeddings):
     # response with {"clusters": {"-1": {"blocks": [{"id": 1}, {"id": 2}], "probabilities": [0.0, 0.0], "distanceMatrix": [[0.0, 0.22923004776660816], [0.22923004776660816, 0.0]]}}}
     request = {"embeddings": embeddings}
     return post(CLUSTERING_URL, request)['clusters']
+
