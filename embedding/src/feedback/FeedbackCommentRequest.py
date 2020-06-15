@@ -3,7 +3,7 @@ from logging import getLogger
 from falcon import Request, Response, HTTP_200
 from src.errors import emptyBody, requireTextBlocks, requireFeedback
 from src.entities import FeedbackWithTextBlock, Feedback
-from src.feedback_comments_embedder.FeedbackCommentResource import FeedbackCommentResource
+from src.feedback.FeedbackCommentResource import FeedbackCommentResource
 
 
 class FeedbackCommentRequest:

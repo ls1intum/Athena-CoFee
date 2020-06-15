@@ -2,7 +2,7 @@ import sys
 import falcon
 import logging
 from .EmbeddingResource import EmbeddingResource
-from src.feedback_comments_embedder.FeedbackCommentRequest import FeedbackCommentRequest
+from src.feedback.FeedbackCommentRequest import FeedbackCommentRequest
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
