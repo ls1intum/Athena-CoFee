@@ -10,6 +10,7 @@ class TextBlock:
         self.ground_truth_cluster = ground_truth_cluster
         self.ground_truth_grade = ground_truth_grade
         self.cluster = None
+        self.embedding = None
         self.grade_from_cluster = None
         self.probability_in_cluster = None
         if id is None:
@@ -31,6 +32,9 @@ class TextBlock:
     def extract_cluster(self, clusters: list):
         self.cluster = [cluster for cluster in clusters if cluster.contains_block(self.id)][0]
         self.probability_in_cluster = self.cluster.probability_of_block(self.id)
+
+    def extract_embedding(self, embeddings: list):
+        self.embedding = [embedding['vector'] for embedding in embeddings if embedding['id'] == self.id][0]
 
     def similar(self, other):
         return self.cluster.id == other.cluster.id
