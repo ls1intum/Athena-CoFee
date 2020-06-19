@@ -1,9 +1,10 @@
-from owncloud import owncloud
-
+from logging import getLogger
+from owncloud import owncloud, HTTPResponseError
 from .config import nextcloud_credentials
 
 
 class CloudConnection:
+    __logger = getLogger(__name__)
     remote_models_path = "Athene/models"
     remote_training_data_path = "Athene/training_data"
     cloud = None
@@ -12,7 +13,11 @@ class CloudConnection:
     def __establish_cloud_connection():
         if CloudConnection.cloud is None:
             CloudConnection.cloud = owncloud.Client("https://nextcloud.in.tum.de/")
-            CloudConnection.cloud.login(nextcloud_credentials["login"], nextcloud_credentials["password"])
+            try:
+                CloudConnection.cloud.login(nextcloud_credentials["login"], nextcloud_credentials["password"])
+            except HTTPResponseError as e:
+                CloudConnection.__logger.error("connection to cloud failed. Please check your credentials.")
+
 
     @staticmethod
     def __get_course_id_from_remote_path(remote_path):
@@ -34,10 +39,13 @@ class CloudConnection:
 
     @staticmethod
     def upload_file(file_name, file_data, course_id):
-        CloudConnection.__establish_cloud_connection()
-        course_dir_remote_path = CloudConnection.remote_training_data_path + "/" + "course_{}".format(course_id)
-        if course_id not in CloudConnection.get_available_course_ids():
-            CloudConnection.cloud.mkdir(course_dir_remote_path)
-        new_file_remote_path = course_dir_remote_path + "/" + file_name
-        CloudConnection.cloud.put_file_contents(new_file_remote_path, file_data)
-        return new_file_remote_path
+        try:
+            CloudConnection.__establish_cloud_connection()
+            course_dir_remote_path = CloudConnection.remote_training_data_path + "/" + "course_{}".format(course_id)
+            if course_id not in CloudConnection.get_available_course_ids():
+                CloudConnection.cloud.mkdir(course_dir_remote_path)
+            new_file_remote_path = course_dir_remote_path + "/" + file_name
+            CloudConnection.cloud.put_file_contents(new_file_remote_path, file_data)
+            return new_file_remote_path
+        except HTTPResponseError as e:
+            CloudConnection.__logger.error("upload of file {} failed. Please check the connection to the cloud".format(file_name))
