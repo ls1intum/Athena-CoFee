@@ -2,6 +2,7 @@ import sys
 import falcon
 import logging
 from .EmbeddingResource import EmbeddingResource
+from .UploadingRessource import UploadingResource
 from src.feedback.FeedbackCommentRequest import FeedbackCommentRequest
 
 logger = logging.getLogger()
@@ -17,3 +18,4 @@ api = application = falcon.API()
 
 api.add_route('/embed', EmbeddingResource())
 api.add_route('/embed_feedback_comments', FeedbackCommentRequest())
+api.add_route('/upload', UploadingResource())

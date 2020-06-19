@@ -1,2 +1,2 @@
 deps:
-	@$(MAKE) -C src/resources;
+	@$(MAKE) -C src/resources/models;
