@@ -17,5 +17,5 @@ logger.addHandler(handler)
 api = application = falcon.API()
 
 api.add_route('/embed', EmbeddingResource())
-api.add_route('/embed_feedback_comments', FeedbackCommentRequest())
+api.add_route('/feedback_consistency', FeedbackCommentRequest())
 api.add_route('/upload', UploadingResource())
