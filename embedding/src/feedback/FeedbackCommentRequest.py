@@ -4,6 +4,7 @@ from falcon import Request, Response, HTTP_200
 from src.errors import emptyBody, requireTextBlocks, requireFeedback
 from src.entities import FeedbackWithTextBlock, Feedback
 from src.feedback.FeedbackCommentResource import FeedbackCommentResource
+from src.feedback.FeedbackConsistency import FeedbackConsistency
 
 
 class FeedbackCommentRequest:
@@ -36,13 +37,16 @@ class FeedbackCommentRequest:
         __fcr = FeedbackCommentResource()
         blocks = __fcr.embed_feedback(feedback_with_tb=blocks)
 
-        response = "success" if __fcr.store_feedback(feedback_with_tb=blocks) else "failure"
-
+        __fc = FeedbackConsistency()
+        response = __fc.check_consistency(feedback_with_text_blocks=blocks)
         resp.body = json.dumps(response, ensure_ascii=False)
+
+        __fcr.store_feedback(feedback_with_tb=blocks)
+
 
         # The following line can be omitted because 200 is the default
         # status returned by the framework, but it is included here to
         # illustrate how this may be overridden as needed.
         resp.status = HTTP_200
-        self.__logger.info("Completed Embedding Request.")
+        self.__logger.info("Completed Feedback Comment Embedding Request.")
         self.__logger.debug("-" * 80)

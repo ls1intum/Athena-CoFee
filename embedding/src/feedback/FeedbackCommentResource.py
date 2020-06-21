@@ -1,4 +1,5 @@
 import pickle
+import numpy as np
 import requests
 from logging import getLogger
 from typing import List
@@ -25,7 +26,6 @@ class FeedbackCommentResource:
         for f in feedback_with_tb:
             feedback.append({"id": f.feedback.id, "text": f.feedback.text})
 
-        self.__logger.info(feedback)
         request = {"feedback": feedback}
         return self.post(SEGMENTATION_URL, request)
 
@@ -35,12 +35,10 @@ class FeedbackCommentResource:
     def __create_feedback_document(self, feedback_with_tb: FeedbackWithTextBlock):
         embeddings = []
         for embedding in feedback_with_tb.feedback.feedbackEmbeddings:
-            embeddings.append({'embedding': pickle.dumps(embedding)})
+            embeddings.append({'embedding': pickle.dumps(np.array(embedding).flatten().tolist())})
 
         doc = {'_id': feedback_with_tb.id, 'submission_id': feedback_with_tb.submission_id,
                'cluster_id': feedback_with_tb.cluster_id,
-               'position_in_cluster': feedback_with_tb.position_in_cluster,
-               'added_distance': feedback_with_tb.added_distance,
                'text': feedback_with_tb.text, 'feedback': {'feedback_id': feedback_with_tb.feedback.id,
                                                            'feedback_text': feedback_with_tb.feedback.text,
                                                            'feedback_score': feedback_with_tb.feedback.score,
@@ -57,11 +55,9 @@ class FeedbackCommentResource:
                                                       replacement_dict=doc, upsert=True)
             except Exception as e:
                 self.__logger.error(e)
-                return False
             else:
                 self.__logger.info(
                     "Modified Count: {} Upserted id {}".format(result.modified_count, result.upserted_id))
-        return True
 
     def embed_feedback(self, feedback_with_tb: list):
         self.__logger.info("Embed Feedback.")
@@ -83,7 +79,7 @@ class FeedbackCommentResource:
         for fwt in feedback_with_tb:
             docs.append(self.__create_feedback_document(feedback_with_tb=fwt))
 
-        return self.__replace_insert_documents(documents=docs)
+        self.__replace_insert_documents(documents=docs)
 
     def post(self, api_endpoint, data):
         response = requests.post(url=api_endpoint, json=data)
