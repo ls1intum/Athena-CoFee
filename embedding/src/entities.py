@@ -54,18 +54,13 @@ class FeedbackWithTextBlock:
     id: str
     submission_id: int
     cluster_id: int
-    position_in_cluster: int
-    added_distance: float
     text: str
     feedback: Feedback
 
-    def __init__(self, _id: str, submission_id: int, cluster_id: int, position_in_cluster: int, added_distance: float,
-                 text: str, feedback: Feedback):
+    def __init__(self, _id: str, submission_id: int, cluster_id: int, text: str, feedback: Feedback):
         self.id = _id
         self.submission_id = submission_id
         self.cluster_id = cluster_id
-        self.position_in_cluster = position_in_cluster
-        self.added_distance = added_distance
         self.text = text
         self.feedback = feedback
 
@@ -74,6 +69,5 @@ class FeedbackWithTextBlock:
 
     @classmethod
     def from_dict(cls, _dict: dict, feedback: Feedback) -> 'FeedbackWithTextBlock':
-        return cls(_dict['id'], _dict['submission_id'], _dict['cluster_id'], _dict['position_in_cluster'],
-                   _dict['added_distance'], _dict['text'], feedback)
+        return cls(_dict['id'], _dict['submission_id'], _dict['cluster_id'], _dict['text'], feedback)
 

@@ -28,10 +28,7 @@ def read_feedback_from_csv():
     texts = data[["textblock_text"]].values.flatten()
     submission_ids = data[["textblock_submission_id"]].values.flatten()
     cluster_ids = data[["textblock_cluster_id"]].values.flatten()
-    position_in_clusters = data[["textblock_position_in_cluster"]].values.flatten()
-    added_distances = data[["textblock_added_distance"]].values.flatten()
     return [FeedbackWithTextBlock(textblock_id=ids[i], submission_id=submission_ids[i], cluster_id=cluster_ids[i],
-                                  position_in_cluster=position_in_clusters[i], added_distance=added_distances[i],
                                   text=texts[i], feedback_id=feedback_ids[i], feedback_score=feedback_scores[i],
                                   feedback_text=feedback_texts[i], reference=references[i]) for i in
             range(len(data))]
