@@ -38,6 +38,20 @@ services:
     networks:
       - athene
 
+# http://localhost:8003/tracking
+  tracking:
+    build:
+      context: tracking
+    image: athene-tracking
+    container_name: athene-tracking
+    ports:
+      - 8003:80
+    working_dir: /usr/src/app
+    depends_on:
+      - database
+    networks:
+      - athene
+
   database:
     image: mongo:latest
     restart: always
