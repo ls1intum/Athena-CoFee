@@ -46,12 +46,12 @@ jobs:
 
   athene-tracking:
     runs-on: ubuntu-latest
-      steps:
-      - uses: actions/checkout@v1
-      - uses: azure/docker-login@v1
-        with:
-          login-server: docker.pkg.github.com
-          username: ${GITHUB_ACTOR}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and Push the artemis-tracking Docker image
-        run: ./.github/workflows/scripts/dockerimage.sh "tracking"
+    steps:
+    - uses: actions/checkout@v1
+    - uses: azure/docker-login@v1
+      with:
+        login-server: docker.pkg.github.com
+        username: ${GITHUB_ACTOR}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build and Push the artemis-tracking Docker image
+      run: ./.github/workflows/scripts/dockerimage.sh "tracking"

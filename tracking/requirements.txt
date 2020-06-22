@@ -20,6 +20,7 @@ MarkupSafe==1.1.1
 orjson==3.1.0
 promise==2.3
 pydantic==1.5.1
+pymongo==3.10.1
 python-multipart==0.0.5
 PyYAML==5.3.1
 requests==2.23.0
