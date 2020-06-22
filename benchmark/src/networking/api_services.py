@@ -61,23 +61,3 @@ def cluster(embeddings):
     # response with {"clusters": {"-1": {"blocks": [{"id": 1}, {"id": 2}], "probabilities": [0.0, 0.0], "distanceMatrix": [[0.0, 0.22923004776660816], [0.22923004776660816, 0.0]]}}}
     request = {"embeddings": embeddings}
     return post(CLUSTERING_URL, request)['clusters']
-
-
-t = [
-    {'id': 7, 'submission_id': 3, 'cluster_id': 3, 'text': "First Answer", 'position_in_cluster': 0,
-     'added_distance': 0,
-     'reference': "ref"},
-    {'id': 8, 'submission_id': 3, 'cluster_id': 4, 'text': "Second answer", 'position_in_cluster': 0,
-     'added_distance': 0,
-     'reference': "ref2"}]
-f = [{'id': 8,
-      'text': "Well done! Great answer.",
-      'score': 1, 'reference': "ref"},
-     {'id': 9, 'text': "Aggregation example is not detailed enough. Your composition example is incorrect, that's an aggregation.", 'score': 1, 'reference': "ref2"}]
-x = __check_feedback_consistency(text_blocks=t, feedback=f)
-print(x)
-# "Well done! Correct explanation, but it's not entirely clear." 'silhouette': 0.23047011119693042
-# "Well done! Correct explanation, but it's not entirely clear. this is an example for inheritance." 'silhouette': 0.16875091164932954
-# "Good example, well done! Correct explanation, but it's not entirely clear what you mean by. this is an example for inheritance."
-# [[0.42518826151003386, 0.5443454057650379, 0.5818820121801975], [0.6612295672577371, 0.593989990570547, 0.6768367871277435], [0.4096789407036616, 0.38561426973970303, 0.2813647948879576]]
-# [[0.4204443091615502, 0.5426907687878102, 0.5779279218374214], [0.6588718630986558, 0.5926580588976887, 0.6740467468747203], [0.4099106413129088, 0.39017932192938576, 0.2875782998545642
