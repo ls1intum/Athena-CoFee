@@ -23,4 +23,6 @@ if [ "${GITHUB_REF##*/}" = "master" ]; then
   echo "INFO: Tag and Push image additionally as ${IMAGE}:latest"
   docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
   docker push ${IMAGE}:latest
+  docker tag ${IMAGE}:${TAG} ls1intum/athene-${COMPONENT}
+  docker push ls1intum/athene-${COMPONENT}
 fi
