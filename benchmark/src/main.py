@@ -1,8 +1,9 @@
 import logging
 import sys
-
+import matplotlib.pyplot as plt
 from benchmark.src.data.data_retriever import read_labeled_sentences_from_csv, read_sentences_feedback_from_csv
 from benchmark.src.entities.cluster import Cluster
+from benchmark.src.entities.text_block import TextBlock
 from benchmark.src.networking.api_services import *
 from benchmark.src.plotting import plot_embeddings
 from benchmark.src.similarity_measure import SimilarityMeasure, PrecisionRecallSimilarity, GradeBasedSimilarity
@@ -45,4 +46,11 @@ if __name__ == "__main__":
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
-    evaluate_by_artemis_data()
+    # evaluate_by_artemis_data(643)
+    # evaluate_by_artemis_data()
+
+    evaluate_by_labeled_sentences(1478643)
+    evaluate_by_labeled_sentences(81)
+    evaluate_by_labeled_sentences()
+
+    plt.show()

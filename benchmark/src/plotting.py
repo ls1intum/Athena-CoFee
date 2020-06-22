@@ -15,11 +15,12 @@ def plot_embeddings(textblocks: [TextBlock]):
     textblocks = [textblock for textblock in textblocks if int(textblock.cluster.id) >= 0]
     vectors = [textblock.embedding for textblock in textblocks]
     texts = [textblock.original_text for textblock in textblocks]
-    clusters = [int(textblock.cluster.id) for textblock in textblocks]
+    # clusters = [int(textblock.cluster.id) for textblock in textblocks]
+    clusters = [int(textblock.ground_truth_cluster) for textblock in textblocks]
     probabilities = [textblock.probability_in_cluster for textblock in textblocks]
     vectors = reduce_dimensions(vectors)
 
-    color_palette = sns.color_palette('deep', len(set(clusters)))
+    color_palette = sns.color_palette('deep', max(clusters)+1)
     cluster_colors = [color_palette[x] if x >= 0
                       else (0.5, 0.5, 0.5)
                       for x in clusters]
@@ -34,6 +35,8 @@ def plot_embeddings(textblocks: [TextBlock]):
     norm = plt.Normalize(1, 4)
     fig, ax = plt.subplots()
     sc = plt.scatter(x, y, c=colors, s=100, norm=norm)
+    plt.xlim(-50, 50)
+    plt.ylim(-50, 50)
 
     annotation = ax.annotate("", xy=(0, 0), xytext=(20, 20), textcoords="offset points",
                         bbox=dict(boxstyle="round", fc="w"),
@@ -61,4 +64,4 @@ def plot_embeddings(textblocks: [TextBlock]):
                     fig.canvas.draw_idle()
 
     fig.canvas.mpl_connect("motion_notify_event", hover)
-    plt.show()
+

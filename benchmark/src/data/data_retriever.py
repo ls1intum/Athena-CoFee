@@ -11,13 +11,18 @@ PATH_TEXT_BLOCKS = (__cwd / "data/resources/ArTEMiS_text_block.csv").resolve()
 PATH_FEEDBACK = (__cwd / "data/resources/ArTEMiS_feedback.csv").resolve()
 
 
-def read_labeled_sentences_from_csv():
+def read_labeled_sentences_from_csv(num_sentences=None):
     submissions = read_csv(PATH_LABELED_SUBMISSIONS)
+    submissions = submissions[~submissions["manual_cluster_id"].isnull()]
     sentences = submissions[["text"]].values.flatten()
     ground_truth_clusters = submissions[["manual_cluster_id"]].values.flatten()
     ids = submissions[["id"]].values.flatten()
+    if num_sentences is None:
+        num_sentences = len(sentences)
+    else:
+        num_sentences = min(num_sentences, len(sentences))
     return [TextBlock(sentences[i], ground_truth_cluster=ground_truth_clusters[i], id=ids[i]) for i in
-            range(len(sentences))]
+            range(num_sentences)]
 
 
 def read_sentences_feedback_from_csv(num_sentences=None):
