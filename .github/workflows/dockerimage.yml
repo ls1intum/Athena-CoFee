@@ -58,5 +58,5 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
       if: github.ref == 'refs/heads/master'
-    - name: Build and Push the artemis-tracking Docker image
+    - name: Build and Push the athene-tracking Docker image
       run: ./.github/workflows/scripts/dockerimage.sh "tracking"
