@@ -53,5 +53,10 @@ jobs:
         login-server: docker.pkg.github.com
         username: ${GITHUB_ACTOR}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - uses: azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      if: github.ref == 'refs/heads/master'
     - name: Build and Push the artemis-tracking Docker image
       run: ./.github/workflows/scripts/dockerimage.sh "tracking"
