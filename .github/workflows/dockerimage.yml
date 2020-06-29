@@ -58,3 +58,12 @@ jobs:
       run: ./.github/workflows/scripts/dockerimage.sh "clustering"
     - name: Run unittests for clustering-component
       run: docker run -i --rm --entrypoint python docker.pkg.github.com/ls1intum/athene/athene-clustering:${GITHUB_REF##*/} -m unittest discover -p test_*.py
+  
+  trigger-bamboo:
+    needs: [athene-segmentation, athene-embedding, athene-clustering]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/heads/')
+    steps:
+    - run: |
+        BRANCH_PLAN_KEY=curl --user ${{ secrets.BAMBOO_USER }}:${{ secrets.BAMBOO_PASSWORD }} ${{ secrets.BAMBOO_HOST }}/rest/api/latest/plan/${{ secrets.BAMBOO_PLAN }}/branch/${${GITHUB_REF/refs\/heads\//}/\//-} | jq -r  '.key'
+        curl -X POST --user ${{ secrets.BAMBOO_USER }}:${{ secrets.BAMBOO_PASSWORD }} ${{ secrets.BAMBOO_HOST }}/rest/api/latest/queue/${BRANCH_PLAN_KEY}?vcsBranch="${GITHUB_REF}"

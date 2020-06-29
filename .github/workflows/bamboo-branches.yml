@@ -1,0 +1,9 @@
+name: Bamboo Branches
+on: [create]
+
+jobs:
+  create-bamboo-branch-plan:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/heads/')
+    steps:
+    - run: curl -X PUT --user ${{ secrets.BAMBOO_USER }}:${{ secrets.BAMBOO_PASSWORD }} ${{ secrets.BAMBOO_HOST }}/rest/api/latest/plan/${{ secrets.BAMBOO_PLAN }}/branch/${${GITHUB_REF/refs\/heads\//}/\//-}?vcsBranch="${GITHUB_REF}"
