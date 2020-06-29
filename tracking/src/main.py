@@ -19,5 +19,4 @@ async def testPost(feedback_id: int, request: Request):
         conn.insert_document('feedback', feedback)
     except Exception as e:
         return {"message": "Saving in the database did not work!"}
-    print(9)
     return {"id": feedback_id}
