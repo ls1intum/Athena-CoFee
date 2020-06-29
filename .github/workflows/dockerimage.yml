@@ -13,6 +13,11 @@ jobs:
         login-server: docker.pkg.github.com
         username: ${GITHUB_ACTOR}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - uses: azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      if: github.ref == 'refs/heads/master'
     - name: Build and Push the athene-segmentation Docker image
       run: ./.github/workflows/scripts/dockerimage.sh "segmentation"
 
@@ -25,6 +30,11 @@ jobs:
         login-server: docker.pkg.github.com
         username: ${GITHUB_ACTOR}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - uses: azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      if: github.ref == 'refs/heads/master'
     - name: Build and Push the athene-embedding Docker image
       run: ./.github/workflows/scripts/dockerimage.sh "embedding"
     - name: Run unittests for embedding-component
@@ -39,6 +49,11 @@ jobs:
         login-server: docker.pkg.github.com
         username: ${GITHUB_ACTOR}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - uses: azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      if: github.ref == 'refs/heads/master'
     - name: Build and Push the athene-clustering Docker image
       run: ./.github/workflows/scripts/dockerimage.sh "clustering"
     - name: Run unittests for clustering-component
