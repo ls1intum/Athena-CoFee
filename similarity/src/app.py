@@ -1,8 +1,10 @@
-import sys
-import falcon
 import logging
-from .SimilarityResource import SimilarityResource
+import sys
+
+import falcon
+
 from .NetworkTrainingResource import NetworkTrainingResource
+from .SimilarityResource import SimilarityResource
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)

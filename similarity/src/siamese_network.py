@@ -1,12 +1,14 @@
-from keras.callbacks import EarlyStopping
-from keras.models import model_from_json, Model, Sequential
-from keras.layers import Dense, Input, Dropout, MaxPooling1D, Dot, Conv1D, Flatten
-from keras.regularizers import l2
-from keras import optimizers
-from sklearn.model_selection import train_test_split
-import numpy as np
 from typing import List
+
+import numpy as np
+from keras import optimizers
+from keras.callbacks import EarlyStopping
+from keras.layers import Dense, Input, Dropout, MaxPooling1D, Dot, Conv1D, Flatten
+from keras.models import model_from_json, Model, Sequential
+from keras.regularizers import l2
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+
 from .entities import ElmoVector, Embedding, EmbeddingsPair
 
 

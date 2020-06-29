@@ -39,6 +39,19 @@ services:
     networks:
       - athene
 
+# http://localhost:8003/similarity
+# http://localhost:8003/train
+  similarity:
+    build:
+      context: ./similarity
+    image: athene-similarity
+    container_name: athene-similarity
+    ports:
+      - 8003:8000
+    working_dir: /usr/src/app
+    networks:
+      - athene
+
   database:
     image: mongo:latest
     restart: always

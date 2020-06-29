@@ -1,11 +1,13 @@
+import json
+from datetime import datetime
 from logging import getLogger
+from typing import List
+
 from falcon import Request, Response, HTTP_200
 from numpy import ndarray
-from .errors import emptyBody, requireTwoEmbeddings, requireTextBlockPairs
-import json
-from typing import List
-from datetime import datetime
-from .entities import ElmoVector, Embedding, EmbeddingsPair
+
+from .entities import Embedding, EmbeddingsPair
+from .errors import emptyBody, requireTextBlockPairs
 from .siamese_network import SiameseNetwork
 
 

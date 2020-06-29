@@ -1,12 +1,14 @@
+import json
+from datetime import datetime
 from logging import getLogger
+from typing import List
+
 from falcon import Request, Response, HTTP_200
 from numpy import ndarray
-from .errors import emptyBody, requireTwoEmbeddings
-import json
-from typing import List
-from datetime import datetime
+
 from .entities import ElmoVector, Embedding
-from.siamese_network import SiameseNetwork
+from .errors import emptyBody, requireTwoEmbeddings
+from .siamese_network import SiameseNetwork
 
 
 class SimilarityResource:
