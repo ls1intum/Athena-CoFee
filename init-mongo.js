@@ -22,3 +22,16 @@ db.createUser(
         ]
     }
 );
+
+db.createUser(
+    {
+        user: "tracking",
+        pwd: "tracking_password",
+        roles: [
+            {
+                role: "readWrite",
+                db: "athene_db"
+            }
+        ]
+    }
+);
