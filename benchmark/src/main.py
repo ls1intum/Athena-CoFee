@@ -11,7 +11,7 @@ from benchmark.src.similarity_measure import SimilarityMeasure, PrecisionRecallS
 __logger = getLogger(__name__)
 
 
-def process_text_blocks(text_blocks, courseId=None, plot=True):
+def process_text_blocks(text_blocks, courseId=None, plot=True, log_clusters=False):
     for text_block in text_blocks:
         text_block.clean_text()
     embeddings = embed(text_blocks, courseId=courseId)
@@ -21,6 +21,11 @@ def process_text_blocks(text_blocks, courseId=None, plot=True):
         text_block.extract_embedding(embeddings)
     if plot:
         plot_embeddings(text_blocks)
+    if log_clusters:
+        cluster_to_text = ["cluster {}: {}".format(textblock.cluster.id, textblock.original_text) for textblock in text_blocks]
+        cluster_to_text.sort()
+        for result in cluster_to_text:
+            logger.info(result + "\n")
     return text_blocks
 
 
@@ -70,10 +75,10 @@ if __name__ == "__main__":
         "I booked first class seat on the train",
     ]
 
-    plot_sentences(sentences)
-    plot_sentences(sentences, courseId="64310643")
 
-    # evaluate_by_artemis_data(courseId="021")
-    # evaluate_by_labeled_sentences(courseId="021")
+    plot_sentences(sentences, courseId="022")
+    plot_sentences(sentences)
+    evaluate_by_artemis_data(courseId="022")
+    evaluate_by_labeled_sentences(courseId="022")
 
     plt.show()
