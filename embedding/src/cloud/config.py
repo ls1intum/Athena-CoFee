@@ -2,5 +2,5 @@ nextcloud_credentials = {
     "login": "",
     "password": ""
 }
-# modes = {"dev", "testServer1", "testServer2", "testServer3"}
-mode = "dev"
+# modes = ["production", "test_server_1", "test_server_2", "test_server_3"]
+mode = "production"

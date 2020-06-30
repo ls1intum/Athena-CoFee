@@ -1,12 +1,13 @@
 from logging import getLogger
 from owncloud import owncloud, HTTPResponseError
-from .config import nextcloud_credentials
+from .config import nextcloud_credentials, mode
 
 
 class CloudConnection:
     __logger = getLogger(__name__)
-    remote_models_path = "Athene/models"
-    remote_training_data_path = "Athene/training_data"
+    possible_modes = ["production", "test_server_1", "test_server_2", "test_server_3"]
+    remote_models_path = "Athene/{}/models".format(mode)
+    remote_training_data_path = "Athene/{}/training_data".format(mode)
     cloud = None
 
     @staticmethod
@@ -34,6 +35,8 @@ class CloudConnection:
 
     @staticmethod
     def get_cloud_connection():
+        if mode not in CloudConnection.possible_modes:
+            raise Exception("mode {} is not implemented. Possible modes are {}".format(mode, CloudConnection.possible_modes))
         CloudConnection.__establish_cloud_connection()
         return CloudConnection.cloud
 
