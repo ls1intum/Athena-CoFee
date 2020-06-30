@@ -11,6 +11,8 @@ services:
     ports:
       - 8000:8000
     working_dir: /usr/src/app
+    volumes:
+      - ./text_preprocessing:/usr/src/app/src/text_preprocessing
     networks:
       - athene
 
@@ -24,6 +26,8 @@ services:
     ports:
       - 8001:8000
     working_dir: /usr/src/app
+    volumes:
+      - ./text_preprocessing:/usr/src/app/src/text_preprocessing
     networks:
       - athene
 

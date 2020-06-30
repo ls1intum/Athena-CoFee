@@ -1,7 +1,7 @@
 import re
 
-from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import stopwords
+from nltk.stem.wordnet import WordNetLemmatizer
 
 
 def get_stop_words(language):
@@ -30,22 +30,32 @@ def clean_data(dataset):
 
     corpus = []
     for submission_id, submission_text in dataset.items():
-        # Remove punctuations
-        text = re.sub(r"[^a-zA-Z]", " ", submission_text)
-        # Convert to lowercase
-        text = text.lower()
-        # remove tags
-        text = re.sub("&lt;/?.*?&gt;", " &lt;&gt; ", text)
-        # remove special characters and digits
-        text = re.sub("(\\d|\\W)+", " ", text)
-        # Convert to list from string
-        text = text.split()
-        # Lemmatisation
-        lem = WordNetLemmatizer()
-        text = [lem.lemmatize(word) for word in text if not
-                word in
-                stop_words]
-        text = " ".join(text)
+        text = clean_text(submission_text)
         corpus.append(text)
 
     return corpus
+
+
+def clean_text(text, lemmatization=True):
+    # Creating a list of stop words in english and german
+    stop_words = get_stop_words("english")
+    stop_words = stop_words.union(get_stop_words("german"))
+
+    # Remove punctuations
+    text = re.sub(r"[^a-zA-Z]", " ", text)
+    # Convert to lowercase
+    text = text.lower()
+    # remove tags
+    text = re.sub("&lt;/?.*?&gt;", " &lt;&gt; ", text)
+    # remove special characters and digits
+    text = re.sub("(\\d|\\W)+", " ", text)
+    # Convert to list from string
+    text = text.split()
+    # Lemmatisation
+    lem = WordNetLemmatizer()
+    text = [lem.lemmatize(word) if lemmatization else word for word in text if
+            word not in
+            stop_words]
+    text = " ".join(text)
+
+    return text

@@ -1,7 +1,7 @@
 from src.json_processor.serializer import load_result_to_json
-from src.text_processor.data_cleaner import clean_data
+from src.text_preprocessing.data_cleaner import clean_data
 from src.json_processor.deserialzer import load_submissions_from_json, load_keywords_from_json
-from src.text_processor.keyword_extractor import get_top_n_words
+from src.text_preprocessing.keyword_extractor import get_top_n_words
 from src.segmentor.segmentor import segment_data
 import falcon
 import json
