@@ -47,6 +47,8 @@ services:
     container_name: athene-tracking
     ports:
       - 8003:80
+    environment:
+      - JWT_SECRET_BASE64=YWVuaXF1YWRpNWNlaXJpNmFlbTZkb283dXphaVF1b29oM3J1MWNoYWlyNHRoZWUzb2huZ2FpM211bGVlM0VpcAo=
     working_dir: /usr/src/app
     depends_on:
       - database
