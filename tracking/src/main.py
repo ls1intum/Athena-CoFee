@@ -23,7 +23,7 @@ async def testPost(result_id: int, request: Request):
         encoded_jwt_token = decode(jwt_token, base64.b64decode(secret_base64), verify=True, algorithms=['HS256'])
         if (encoded_jwt_token.get('result_id')) != feedback.get('results')[0].get('id'):
             return {"message": "Please don't spam manually!"}
-    except exceptions as e:
+    except Exception as e:
         print(e)
         return {"message": "Your token is not valid!"}
     try:
