@@ -41,7 +41,7 @@ class EmbeddingResource:
         blocks: List[TextBlock] = list(map(lambda dict: TextBlock.from_dict(dict), doc['blocks']))
         sentences: List[Sentence] = list(map(lambda b: b.text, blocks))
 
-        sentences = [clean_text(sentence) for sentence in sentences]
+        sentences = [clean_text(sentence, lemmatization=False) for sentence in sentences]
 
         if len(blocks) < 2:
             self.__logger.error("{} ({})".format(requireTwoBlocks.title, requireTwoBlocks.description))

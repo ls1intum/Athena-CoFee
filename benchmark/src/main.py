@@ -77,9 +77,9 @@ if __name__ == "__main__":
     ]
 
 
+
     plot_sentences(sentences, courseId="022")
     plot_sentences(sentences)
-    evaluate_by_artemis_data(courseId="022")
-    evaluate_by_labeled_sentences(courseId="022")
+
 
     plt.show()
