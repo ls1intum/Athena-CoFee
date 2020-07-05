@@ -1,6 +1,26 @@
 version: '3'
 
 services:
+# http://localhost/segment
+# http://localhost/embed
+# http://localhost/upload
+# http://localhost/cluster
+  traefik:
+    image: traefik:v2.2.1
+    container_name: athene-traefik
+    depends_on:
+      - segmentation
+      - embedding
+      - clustering
+    ports:
+      - 8080:8080
+      - 80:80
+      - 443:443
+    networks:
+      - athene
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik.yml:/etc/traefik/traefik.yml
 
 # http://localhost:8000/segment
   segmentation:
@@ -13,6 +33,10 @@ services:
     working_dir: /usr/src/app
     networks:
       - athene
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.segmentation.rule=Path(`/segment`)
+      - traefik.http.routers.segmentation.entrypoints=web,websecure
 
 # http://localhost:8001/embed
 # http://localhost:8001/upload
@@ -26,6 +50,10 @@ services:
     working_dir: /usr/src/app
     networks:
       - athene
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.embedding.rule=Path(`/embed`)||Path(`/upload`)
+      - traefik.http.routers.embedding.entrypoints=web,websecure
 
 # http://localhost:8002/cluster
   clustering:
@@ -38,6 +66,10 @@ services:
     working_dir: /usr/src/app
     networks:
       - athene
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.clustering.rule=Path(`/cluster`)
+      - traefik.http.routers.clustering.entrypoints=web,websecure
 
   database:
     image: mongo:latest
