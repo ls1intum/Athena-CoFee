@@ -3,6 +3,8 @@ import pandas as pd
 from glob import glob
 from os import getcwd
 from statistics import mode
+from math import isinf
+import json
 
 from src.clustering import Clustering
 
@@ -172,11 +174,32 @@ def find_cousin_clusters(tree, cluster_id):
     return cousins
 
 
+def export_json_files(cluster_obj, labels, tree, exercise_id, vectors):
+    data = {'labels': [], 'distances': [], 'tree': []}
+    matrix = cluster_obj.distances_within_cluster(vectors=vectors)
+    data['labels'] = [int(labels[i]) for i in range(len(labels))]
+    for row in matrix:
+        data['distances'].append(list([float(row[i]) for i in range(len(row))]))
+    for row in tree.values.tolist():
+        if isinf(float(row[2])):
+            row[2] = -1
+        data['tree'].append({
+            'parent': int(row[0]),
+            'child': int(row[1]),
+            'lambda_val': float(row[2]),
+            'child_size': int(row[3])
+        })
+    with open("results_{}.json".format(exercise_id), 'w') as outfile:
+        json.dump({'data': data}, outfile)
+
+
 # Performs the analysis. Optional flags can be set for additional behaviour:
 #   - visualise: Plots the condensed tree of the clustering
 #   - print_old_results: Prints the old clustering results for the same data set
 #   - export_condensed_tree: Saves the condensed tree to a csv file
-def perform_analysis(exercise_id, cluster_obj, visualise=False, print_old_results=False, export_condensed_tree=False):
+#   - export_json: Saves the labels, tree and distance matrix to JSON
+def perform_analysis(exercise_id, cluster_obj, visualise=False, print_old_results=False, export_condensed_tree=False,
+                     export_json=False):
     embeddings = get_embeddings_for_exercise(exercise_id)
     (block_ids, vectors) = map(list, zip(*embeddings))
     blocks = map_id_to_text(block_ids)
@@ -207,6 +230,9 @@ def perform_analysis(exercise_id, cluster_obj, visualise=False, print_old_result
 
     if export_condensed_tree:
         tree.to_csv('condensed_tree.csv', index=False)
+
+    if export_json:
+        export_json_files(cluster_obj=cluster_obj, labels=labels, tree=tree, exercise_id=exercise_id, vectors=vectors)
 
 
 # Parameters of HDBSCAN can be changed here
