@@ -7,6 +7,7 @@ from numpy import int64, ndarray
 from .entities import TextBlock, ElmoVector, Embedding
 from .errors import emptyBody, requireTwoEmbeddings
 from datetime import datetime
+from math import isinf
 
 class ClusteringResource:
 
@@ -50,8 +51,23 @@ class ClusteringResource:
                 'probabilities': [ probabilities[i] for i in indices ],
                 'distanceMatrix': self.__clustering.distances_within_cluster(clusterEmbeddings)
             }
+        doc = { 'clusters': clusters, 'distanceMatrix': [], 'tree': []}
 
-        doc = { 'clusters': clusters }
+        matrix = self.__clustering.distances_within_cluster(vectors)
+        tree = self.__clustering.clusterer.condensed_tree_.to_pandas()
+
+        for row in matrix:
+            doc['distancesMatrix'].append(list([float(row[i]) for i in range(len(row))]))
+
+        for row in tree.values.tolist():
+            if isinf(float(row[2])):
+                row[2] = -1
+            doc['tree'].append({
+                'parent': int(row[0]),
+                'child': int(row[1]),
+                'lambda_val': float(row[2]),
+                'child_size': int(row[3])
+            })
 
         with open("logs/clustering-{}.json".format(datetime.now()), 'w') as outfile:
             json.dump(doc, outfile, ensure_ascii=False, default=self.__default)
