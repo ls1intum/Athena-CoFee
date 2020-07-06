@@ -16,16 +16,10 @@ class SiameseNetwork:
 
     model: Model = None
 
-    def load_model(self, model_path: str):
-        # load json and create model
-        json_file = open(model_path + '.json', 'r')
-        loaded_model_json = json_file.read()
-        json_file.close()
-        self.model = model_from_json(loaded_model_json)
-        # load weights into new model
-        self.model.load_weights(model_path + ".h5")
-        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
-
+    '''
+    Build the model architecture.
+    @:param input_shape The shape of the input layer.
+    '''
     def build_siamese_model(self, input_shape):
         initialize_weights = 'he_normal'
         initialize_bias = 'he_normal'
@@ -67,6 +61,12 @@ class SiameseNetwork:
         # return the model
         return siamese_model
 
+    '''
+    Train the network and save the result into files.
+    @:param embeddingPairs List of embeddings labeled by similarity
+    @:param path The path to save the model files
+    @:return History object of the training process
+    '''
     def train_siamese_network(self, embeddingPairs: List[EmbeddingsPair], path: str):
         #split into training and test set
         embeddingPairs_train, embeddingPairs_test = train_test_split(embeddingPairs, test_size=0.2, shuffle=True)
@@ -115,6 +115,27 @@ class SiameseNetwork:
 
         return history
 
+
+    '''
+    Load the model from saved files. JSON file for the architecture and .h5 file for the weights.
+    @:param model_path The path of the model files (including file name, without file ending) 
+    '''
+    def load_model(self, model_path: str):
+        # load json and create model
+        json_file = open(model_path + '.json', 'r')
+        loaded_model_json = json_file.read()
+        json_file.close()
+        self.model = model_from_json(loaded_model_json)
+        # load weights into new model
+        self.model.load_weights(model_path + ".h5")
+        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
+
+
+    '''
+    Compute a pair wise similarity matrix using the siamese network. 
+    @:param vectors List of Elmo vectors for which to calculate the pair wise similarities
+    @:return 2D matrix [len(vectors), len(vectors)] containing pair wise similarities
+    '''
     def compute_similarity_matrix(self, vectors: List[ElmoVector]) -> np.array:
         matrix = np.zeros(len(vectors), len(vectors))
         for i in range(0, len(vectors)):
