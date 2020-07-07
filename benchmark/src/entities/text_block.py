@@ -8,7 +8,7 @@ class TextBlock:
         self.original_text = text
         self.ground_truth_cluster = ground_truth_cluster
         self.ground_truth_grade = ground_truth_grade
-        self.cluster = 0
+        self.cluster = -1
         self.embedding = None
         self.grade_from_cluster = None
         self.probability_in_cluster = None
@@ -17,7 +17,7 @@ class TextBlock:
             self.id = TextBlock.__last_id
         else:
             self.id = id
-            TextBlock.__last_id = id
+            TextBlock.__last_id = self.id
 
     def __str__(self):
         self.text.__str__()

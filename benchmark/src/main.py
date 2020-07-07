@@ -8,24 +8,35 @@ from benchmark.src.entities.cluster import Cluster
 from benchmark.src.entities.text_block import TextBlock
 from benchmark.src.networking.api_services import *
 from benchmark.src.plotting import plot_embeddings
-from benchmark.src.similarity_measure import PrecisionRecallSimilarity, GradeBasedSimilarity
+from benchmark.src.similarity_measure import PrecisionRecallSimilarity, L1Similarity, QWKSimilarity
 
 __logger = getLogger(__name__)
 
 
-def process_text_blocks(text_blocks, courseId=None, plot=True, log_clusters=False):
+def process_text_blocks(text_blocks, courseId=None, plot=True, log_textblocks_to_clusters=False,
+                        log_cluster_sizes=True):
     embeddings = embed(text_blocks, courseId=courseId)
     clusters = Cluster.clusters_from_network_response(cluster(embeddings))
     for text_block in text_blocks:
         text_block.extract_cluster(clusters)
         text_block.extract_embedding(embeddings)
+
     if plot:
         plot_embeddings(text_blocks)
-    if log_clusters:
-        cluster_to_text = ["cluster {}: {}".format(textblock.cluster.id, textblock.original_text) for textblock in text_blocks]
+
+    if log_textblocks_to_clusters:
+        cluster_to_text = ["cluster {}: {}".format(textblock.cluster.id, textblock.original_text) for textblock in
+                           text_blocks]
         cluster_to_text.sort()
         for result in cluster_to_text:
             logger.info(result + "\n")
+
+    if log_cluster_sizes:
+        percentage_clustered = 100.0*len([text_block for text_block in text_blocks if text_block.cluster != -1]) / len(text_blocks)
+        avg_cluster_size = sum([len(c.block_ids) for c in clusters if c.id != -1]) / len(clusters)
+        logger.info("Percentage of clustered sentences: {}".format(percentage_clustered))
+        logger.info("Average cluster size: {}".format(avg_cluster_size))
+
     return text_blocks
 
 
@@ -38,11 +49,11 @@ def evaluate_by_labeled_sentences(courseId=None):
 
 
 def evaluate_by_artemis_data(courseId=None):
-    text_blocks = read_sentences_feedback_from_csv(num_sentences=1000)
+    text_blocks = read_sentences_feedback_from_csv(num_sentences=750)
     text_blocks = process_text_blocks(text_blocks, courseId)
-    similarity_measure = GradeBasedSimilarity(text_blocks)
     __logger.info("similarity grade-based for course {}".format(courseId))
-    similarity_measure.output_results()
+    L1Similarity(text_blocks).output_results()
+    QWKSimilarity(text_blocks).output_results()
 
 
 def plot_sentences(sentences, courseId=None):
@@ -75,9 +86,7 @@ if __name__ == "__main__":
         "I booked first class seat on the train",
     ]
 
-
-    evaluate_by_labeled_sentences(1478643)
-    evaluate_by_labeled_sentences(81)
-    evaluate_by_labeled_sentences()
+    evaluate_by_artemis_data()
+    evaluate_by_artemis_data(courseId="022")
 
     plt.show()
