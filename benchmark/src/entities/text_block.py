@@ -4,12 +4,12 @@ from benchmark.src.data.data_cleaner import clean_data
 class TextBlock:
     __last_id = 0
 
-    def __init__(self, text, id=None, ground_truth_cluster=None, ground_truth_grade=None):
+    def __init__(self, text, id=None, ground_truth_cluster=0, ground_truth_grade=None):
         self.text = text
         self.original_text = text
         self.ground_truth_cluster = ground_truth_cluster
         self.ground_truth_grade = ground_truth_grade
-        self.cluster = None
+        self.cluster = 0
         self.embedding = None
         self.grade_from_cluster = None
         self.probability_in_cluster = None

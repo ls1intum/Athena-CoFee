@@ -50,7 +50,7 @@ def clean_data(sentence):
     sentence = sentence.split()
     # Lemmatisation
     lem = WordNetLemmatizer()
-    sentence = [lem.lemmatize(word) for word in sentence if not word in stop_words]
+    sentence = [word for word in sentence if word not in stop_words]
     sentence = " ".join(sentence)
 
     return sentence
