@@ -3,7 +3,7 @@
 class Cluster:
 
     def __init__(self, id, block_ids, probabilities, distances):
-        self.id = id
+        self.id = int(id)
         self.block_ids = block_ids
         self.probabilities = probabilities
         self.distances = distances

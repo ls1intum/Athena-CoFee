@@ -32,7 +32,7 @@ def process_text_blocks(text_blocks, courseId=None, plot=True, log_textblocks_to
             logger.info(result + "\n")
 
     if log_cluster_sizes:
-        percentage_clustered = 100.0*len([text_block for text_block in text_blocks if text_block.cluster != -1]) / len(text_blocks)
+        percentage_clustered = 100.0*len([text_block for text_block in text_blocks if text_block.cluster.id != -1]) / len(text_blocks)
         avg_cluster_size = sum([len(c.block_ids) for c in clusters if c.id != -1]) / len(clusters)
         logger.info("Percentage of clustered sentences: {}".format(percentage_clustered))
         logger.info("Average cluster size: {}".format(avg_cluster_size))
