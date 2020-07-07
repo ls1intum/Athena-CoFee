@@ -22,8 +22,7 @@ def process_text_blocks(text_blocks, courseId=None, plot=True, log_clusters=Fals
     if plot:
         plot_embeddings(text_blocks)
     if log_clusters:
-        cluster_to_text = ["cluster {}: {}".format(textblock.cluster.id, textblock.original_text) for textblock in
-                           text_blocks]
+        cluster_to_text = ["cluster {}: {}".format(textblock.cluster.id, textblock.original_text) for textblock in text_blocks]
         cluster_to_text.sort()
         for result in cluster_to_text:
             logger.info(result + "\n")
