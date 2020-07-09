@@ -8,11 +8,6 @@ from os import environ
 app = FastAPI()
 
 
-@app.get('/tracking')
-async def root():
-    return {'message': 'Hello World!'}
-
-
 @app.post('/tracking/text-exercise-assessment', status_code=201)
 async def testPost(request: Request, response: Response):
     feedback = await request.json()
@@ -20,7 +15,7 @@ async def testPost(request: Request, response: Response):
     secret_base64 = environ['JWT_SECRET_BASE64']
     try:
         encoded_jwt_token = decode(jwt_token, base64.b64decode(secret_base64), verify=True, algorithms=['HS256'])
-        if (encoded_jwt_token.get('result_id')) != feedback.get('participation').get('results')[0].get('id'):
+        if encoded_jwt_token.get('result_id') != feedback.get('participation').get('results')[0].get('id'):
             response.status_code = status.HTTP_403_FORBIDDEN
             return {'Please do not spam manually!'}
     except Exception as e:
