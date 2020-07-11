@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from logging import getLogger
 
+import sklearn
+
 
 class SimilarityMeasure(ABC):
     @abstractmethod
@@ -12,7 +14,7 @@ class PrecisionRecallSimilarity(SimilarityMeasure):
     __logger = getLogger(__name__)
 
     def __init__(self, text_blocks):
-        self.text_blocks = [text_block for text_block in text_blocks if text_block.cluster.id != -1]
+        self.text_blocks = text_blocks
         self.false_negatives = 0
         self.false_positives = 0
         self.true_negatives = 0
@@ -39,13 +41,26 @@ class PrecisionRecallSimilarity(SimilarityMeasure):
         self.__logger.info('The achieved F1_score is {}'.format(self.f1_score))
 
 
+class AdjustedRandIndexSimilarity(SimilarityMeasure):
+    __logger = getLogger(__name__)
+
+    def __init__(self, text_blocks):
+        self.text_blocks = text_blocks
+        labels_true = [text_block.ground_truth_cluster for text_block in self.text_blocks]
+        labels_pred = [text_block.computed_cluster.id for text_block in self.text_blocks]
+        self.ARI = sklearn.metrics.adjusted_rand_score(labels_true, labels_pred)
+
+    def output_results(self):
+        self.__logger.info('The achieved Adjusted Rand Index is {}'.format(self.ARI))
+
+
 class L1Similarity(SimilarityMeasure):
     __logger = getLogger(__name__)
 
     def __init__(self, text_blocks):
         for text_block in text_blocks:
             text_block.compute_grade_from_cluster(text_blocks)
-        self.text_blocks = [text_block for text_block in text_blocks if text_block.cluster.id != -1]
+        self.text_blocks = [text_block for text_block in text_blocks if text_block.computed_cluster.id != -1]
         self.l1_loss = sum(
             [abs((text_block.grade_from_cluster - text_block.ground_truth_grade)) for text_block in text_blocks]) / \
                        len(text_blocks)
@@ -74,7 +89,7 @@ class QWKSimilarity(SimilarityMeasure):
     def __init__(self, text_blocks):
         for text_block in text_blocks:
             text_block.compute_grade_from_cluster(text_blocks)
-        self.text_blocks = [text_block for text_block in text_blocks if text_block.cluster.id != -1]
+        self.text_blocks = [text_block for text_block in text_blocks if text_block.computed_cluster.id != -1]
 
         ground_truth_grades = [text_block.ground_truth_grade for text_block in text_blocks]
         predicted_grades = [text_block.grade_from_cluster for text_block in text_blocks]

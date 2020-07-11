@@ -8,7 +8,8 @@ from benchmark.src.entities.cluster import Cluster
 from benchmark.src.entities.text_block import TextBlock
 from benchmark.src.networking.api_services import *
 from benchmark.src.plotting import plot_embeddings
-from benchmark.src.similarity_measure import PrecisionRecallSimilarity, L1Similarity, QWKSimilarity
+from benchmark.src.similarity_measure import PrecisionRecallSimilarity, L1Similarity, QWKSimilarity, \
+    AdjustedRandIndexSimilarity
 
 __logger = getLogger(__name__)
 
@@ -25,14 +26,15 @@ def process_text_blocks(text_blocks, courseId=None, plot=True, log_textblocks_to
         plot_embeddings(text_blocks)
 
     if log_textblocks_to_clusters:
-        cluster_to_text = ["cluster {}: {}".format(textblock.cluster.id, textblock.original_text) for textblock in
+        cluster_to_text = ["cluster {}: {}".format(textblock.computed_cluster.id, textblock.original_text) for textblock in
                            text_blocks]
         cluster_to_text.sort()
         for result in cluster_to_text:
             logger.info(result + "\n")
 
     if log_cluster_sizes:
-        percentage_clustered = 100.0*len([text_block for text_block in text_blocks if text_block.cluster.id != -1]) / len(text_blocks)
+        percentage_clustered = 100.0 * len(
+            [text_block for text_block in text_blocks if text_block.computed_cluster.id != -1]) / len(text_blocks)
         avg_cluster_size = sum([len(c.block_ids) for c in clusters if c.id != -1]) / len(clusters)
         logger.info("Percentage of clustered sentences: {}".format(percentage_clustered))
         logger.info("Average cluster size: {}".format(avg_cluster_size))
@@ -43,13 +45,13 @@ def process_text_blocks(text_blocks, courseId=None, plot=True, log_textblocks_to
 def evaluate_by_labeled_sentences(courseId=None):
     text_blocks = read_labeled_sentences_from_csv()
     text_blocks = process_text_blocks(text_blocks, courseId)
-    similarity_measure = PrecisionRecallSimilarity(text_blocks)
     __logger.info("similarity labeled data for course {}".format(courseId))
-    similarity_measure.output_results()
+    PrecisionRecallSimilarity(text_blocks).output_results()
+    AdjustedRandIndexSimilarity(text_blocks).output_results()
 
 
 def evaluate_by_artemis_data(courseId=None):
-    text_blocks = read_sentences_feedback_from_csv(num_sentences=750)
+    text_blocks = read_sentences_feedback_from_csv( num_sentences=750)
     text_blocks = process_text_blocks(text_blocks, courseId)
     __logger.info("similarity grade-based for course {}".format(courseId))
     L1Similarity(text_blocks).output_results()
@@ -86,7 +88,10 @@ if __name__ == "__main__":
         "I booked first class seat on the train",
     ]
 
-    evaluate_by_artemis_data()
-    evaluate_by_artemis_data(courseId="022")
+    # plot_sentences(sentences, courseId="022")
+    # plot_sentences(sentences)
+    evaluate_by_labeled_sentences(courseId="021")
+    evaluate_by_labeled_sentences( courseId="022")
+    evaluate_by_labeled_sentences()
 
     plt.show()

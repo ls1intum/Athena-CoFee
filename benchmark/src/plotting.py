@@ -4,7 +4,7 @@ from sklearn.manifold import TSNE
 
 from benchmark.src.entities.text_block import TextBlock
 
-tsne = TSNE(n_components=2, random_state=0)
+tsne = TSNE(n_components=2, random_state=0, metric="cosine", perplexity=10)
 
 
 def reduce_dimensions(vectors):
@@ -12,10 +12,10 @@ def reduce_dimensions(vectors):
 
 
 def plot_embeddings(textblocks: [TextBlock], persist_labels=False):
-    textblocks = [textblock for textblock in textblocks if int(textblock.cluster.id) >= -1]
+    textblocks = [textblock for textblock in textblocks if int(textblock.computed_cluster.id) > -1]
     vectors = [textblock.embedding for textblock in textblocks]
     texts = [textblock.original_text for textblock in textblocks]
-    clusters = [int(textblock.cluster.id) for textblock in textblocks]
+    clusters = [int(textblock.computed_cluster.id) for textblock in textblocks]
     # clusters = [int(textblock.ground_truth_cluster) for textblock in textblocks]
     probabilities = [textblock.probability_in_cluster for textblock in textblocks]
     vectors = reduce_dimensions(vectors)
