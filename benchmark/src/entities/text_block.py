@@ -8,7 +8,7 @@ class TextBlock:
         self.original_text = text
         self.ground_truth_cluster = ground_truth_cluster
         self.ground_truth_grade = ground_truth_grade
-        self.cluster = -1
+        self.computed_cluster = -1
         self.embedding = None
         self.grade_from_cluster = None
         self.probability_in_cluster = None
@@ -29,20 +29,20 @@ class TextBlock:
         }
 
     def extract_cluster(self, clusters: list):
-        self.cluster = [cluster for cluster in clusters if cluster.contains_block(self.id)][0]
-        self.probability_in_cluster = self.cluster.probability_of_block(self.id)
+        self.computed_cluster = [cluster for cluster in clusters if cluster.contains_block(self.id)][0]
+        self.probability_in_cluster = self.computed_cluster.probability_of_block(self.id)
 
     def extract_embedding(self, embeddings: list):
         self.embedding = [embedding['vector'] for embedding in embeddings if embedding['id'] == self.id][0]
 
     def similar(self, other):
-        return self.cluster.id == other.cluster.id
+        return self.computed_cluster.id == other.computed_cluster.id
 
     def ground_truth_similar(self, other):
         return self.ground_truth_cluster == other.ground_truth_cluster
 
     def compute_grade_from_cluster(self, text_blocks):
-        if self.cluster is None:
+        if self.computed_cluster is None:
             raise Exception("cluster for text block {} not defined".format(self.id))
         cluster_grades = [block.ground_truth_grade for block in text_blocks if self.similar(block)]
         self.grade_from_cluster = sum(cluster_grades) / float(len(cluster_grades))
