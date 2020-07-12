@@ -11,10 +11,8 @@ SEGMENTATION_URL = "http://segmentation:8000/segment"
 
 
 class FeedbackCommentResource:
-    __conn: Connection = None
-    __elmo: ELMo = None
     __logger = getLogger(__name__)
-    __collection = 'feedback'
+    __collection = 'feedback_consistency'
 
     def __init__(self):
         self.__elmo = ELMo()
@@ -29,7 +27,7 @@ class FeedbackCommentResource:
         request = {"feedback": feedback}
         return self.post(SEGMENTATION_URL, request)
 
-    def __embed_feedback_comments(self, sentence: List[Sentence]):
+    def __embed_sentences(self, sentence: List[Sentence]):
         return self.__elmo.embed_sentences(sentence)
 
     def __create_feedback_document(self, feedback_with_tb: FeedbackWithTextBlock):
@@ -66,11 +64,16 @@ class FeedbackCommentResource:
         for fwt in feedback_with_tb:
             blocks = (blocks for blocks in segmented_feedback_comments['textBlocks'] if fwt.feedback.id == blocks['id'])
             sentences: List[Sentence] = list(map(lambda b: fwt.feedback.text[b['startIndex']:b['endIndex']], blocks))
-            vectors: List[ElmoVector] = self.__embed_feedback_comments(sentences)
+            vectors: List[ElmoVector] = self.__embed_sentences(sentences)
             for v in vectors:
                 fwt.add_feedback_embedding(v)
 
         return feedback_with_tb
+
+    def embed_feedback_text_blocks(self, text_blocks):
+        sentences: List[Sentence] = text_blocks
+        vectors: List[ElmoVector] = self.__embed_sentences(sentences)
+        return vectors
 
     def store_feedback(self, feedback_with_tb: list):
         self.__logger.info("Store Feedback.")
@@ -80,6 +83,26 @@ class FeedbackCommentResource:
             docs.append(self.__create_feedback_document(feedback_with_tb=fwt))
 
         self.__replace_insert_documents(documents=docs)
+
+    def get_feedback_in_same_cluster(self, cluster_id: int):
+        self.__logger.info("Get feedback with same cluster id.")
+        _filter = {'cluster_id': cluster_id}
+        try:
+            result = self.__conn.find_documents(collection=self.__collection, filter_dict=_filter)
+        except Exception as e:
+            self.__logger.error(e)
+            return None
+        else:
+            return result
+
+    def set_feedback_consistency_results(self, collection, doc):
+        try:
+            result = self.__conn.insert_document(collection=collection, document=doc)
+        except Exception as e:
+            self.__logger.error(e)
+            return None
+        else:
+            return result
 
     def post(self, api_endpoint, data):
         response = requests.post(url=api_endpoint, json=data)

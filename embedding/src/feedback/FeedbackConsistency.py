@@ -2,48 +2,28 @@ import pickle
 import numpy as np
 from logging import getLogger
 from sklearn.metrics import pairwise_distances, silhouette_score
-from src.elmo import ELMo
-from src.database.Connection import Connection
+from src.feedback.FeedbackCommentResource import FeedbackCommentResource
 
 
 class FeedbackConsistency:
-    __conn: Connection = None
-    __elmo: ELMo = None
     __logger = getLogger(__name__)
-    __collection = 'feedback'
+    __feedback_with_text_blocks: list = None
 
     def __init__(self):
-        self.__conn = Connection()
-        self.base_threshold = 0.25
-        self.upper_threshold = 0.75
-        self.score_divider = 10
+        self.__feedback_comment_resource = FeedbackCommentResource()
+        self.__comment_threshold = 0.37
+        self.__text_block_threshold = 0.21
 
-    def __get_feedback_in_same_cluster(self, cluster_id: int):
-        __filter = {'cluster_id': cluster_id}
-        try:
-            result = self.__conn.find_documents(collection=self.__collection, filter_dict=__filter)
-        except Exception as e:
-            self.__logger.error(e)
+    def __get_inconsistency(self, score_diff: float, comment_distance: float, text_block_distance: float):
+        if text_block_distance < self.__text_block_threshold:
+            if score_diff:
+                return 'inconsistent score' if comment_distance < self.__comment_threshold else 'inconsistent feedback'
+            else:
+                return 'inconsistent comment' if comment_distance > self.__comment_threshold else None
+        else:
             return None
-        else:
-            return result
 
-    def __get_threshold(self, score_diff: float):
-        threshold = self.base_threshold + score_diff / self.score_divider
-        return threshold if threshold < self.upper_threshold else self.upper_threshold
-
-    def __get_consistency(self, threshold: float, distance: float):
-        lower_threshold = threshold - self.base_threshold
-        if threshold >= distance >= lower_threshold:
-            return "consistent"
-        elif distance - threshold <= 0.05 or lower_threshold - distance <= 0.05:
-            return "slight inconsistency"
-        elif distance - threshold <= 0.1 or lower_threshold - distance <= 0.1:
-            return "inconsistent"
-        else:
-            return "high inconsistency"
-
-    def __calculate_distance_with_cohesion(self, x: [], y: []):
+    def __calculate_distance_with_silhouette_score(self, x: [], y: []):
         if len(x) < 2 and len(y) < 2:
             distance = pairwise_distances(X=x, Y=y, metric='cosine').flatten()[0]
         else:
@@ -57,16 +37,30 @@ class FeedbackConsistency:
         return np.mean(np.mean(distance, axis=1))
 
     def check_consistency(self, feedback_with_text_blocks):
-        response = {}
-        for fwt in feedback_with_text_blocks:
+        self.__logger.info("Check Consistencies")
+        # Find embeddings for each feedback comment
+        self.__feedback_with_text_blocks = self.__feedback_comment_resource.embed_feedback(feedback_with_tb=feedback_with_text_blocks)
+        doc = {}
+        # Compare each new assessment with the ones in the database
+        for fwt in self.__feedback_with_text_blocks:
             vector_x = fwt.feedback.feedbackEmbeddings
-            cluster = self.__get_feedback_in_same_cluster(cluster_id=fwt.cluster_id)
+            # Get the assessments which have same the same cluster id
+            cluster = self.__feedback_comment_resource.get_feedback_in_same_cluster(cluster_id=fwt.cluster_id)
             distances = []
+            # Calculate distances between each feedback embeddings and text block embeddings(student answers)
             for item in cluster:
                 vector_y = list(map(lambda embedding: pickle.loads(embedding['embedding']),
                                     item['feedback']['feedback_text_blocks']))
-                distance = self.__calculate_distance_with_cohesion(x=vector_x, y=vector_y)
-                threshold = self.__get_threshold(score_diff=abs(fwt.feedback.score - item['feedback']['feedback_score']))
-                distances.append({"feedback_id": item['feedback']['feedback_id'], "distance": format(distance, '.4f'), "threshold": threshold, "consistency": self.__get_consistency(threshold=threshold, distance=abs(distance))})
-            response.update({fwt.feedback.id: distances})
-        return response
+                distance = self.__calculate_mean_distance(x=vector_x, y=vector_y)
+                text_block_embeddings = self.__feedback_comment_resource.embed_feedback_text_blocks([fwt.text, item['text']])
+                text_block_distance = self.__calculate_mean_distance(x=text_block_embeddings[0].reshape(1, -1).tolist(), y=text_block_embeddings[1].reshape(1, -1).tolist())
+                inconsistency = self.__get_inconsistency(score_diff=abs(fwt.feedback.score - item['feedback']['feedback_score']), comment_distance=distance, text_block_distance=text_block_distance)
+                if inconsistency:
+                    distances.append({"second_feedback_id": item['feedback']['feedback_id'], "inconsistency_type": inconsistency})
+
+            if distances:
+                doc.update({"first_feedback_id": fwt.feedback.id, "comparison": distances})
+        return None if not doc else doc
+
+    def store_feedback(self):
+        self.__feedback_comment_resource.store_feedback(self.__feedback_with_text_blocks)
