@@ -1,7 +1,5 @@
 from logging import getLogger
-
 from benchmark.src.networking.api_requests import post
-from benchmark.src.entities.feedback_with_text_block import FeedbackWithTextBlock
 import numpy as np
 
 __logger = getLogger(__name__)
@@ -28,15 +26,11 @@ def __check_feedback_consistency(text_blocks, feedback):
     return post(FEEDBACK_CONSISTENCY_URL, request)
 
 
-def check_feedback_consistency(feedback_with_text_blocks: [FeedbackWithTextBlock]):
-    step_size = 5
-    responses = []
-    for i in range(0, len(feedback_with_text_blocks), step_size):
-        blocks = feedback_with_text_blocks[i:i + step_size]
-        text_blocks = [block.json_rep_text_block() for block in blocks]
-        feedback = [block.json_rep_feedback() for block in blocks]
-        responses.append(__check_feedback_consistency(text_blocks, feedback))
-    return responses
+def check_feedback_consistency(feedback_with_text_blocks):
+    for fwt in feedback_with_text_blocks:
+        text_blocks = [block.json_rep_text_block() for block in fwt]
+        feedback = [block.json_rep_feedback() for block in fwt]
+        return __check_feedback_consistency(text_blocks, feedback)
 
 
 def __embed(text_blocks, courseId=None):

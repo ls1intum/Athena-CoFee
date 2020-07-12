@@ -1,8 +1,8 @@
 from pandas import read_csv
 from pathlib import Path
-
 from benchmark.src.entities.text_block import TextBlock
 from benchmark.src.entities.feedback_with_text_block import FeedbackWithTextBlock
+import itertools
 
 __cwd = Path.cwd()
 PATH_SUBMISSIONS = (__cwd / "data/resources/text_block.csv").resolve()
@@ -19,16 +19,18 @@ def read_sentences_from_csv():
 
 
 def read_feedback_from_csv():
-    data = read_csv(PATH_FEEDBACK)
+    data = read_csv(PATH_FEEDBACK, sep=";", keep_default_na=False)
     feedback_ids = data[["feedback_id"]].values.flatten()
-    feedback_texts = data[["feedback_detail_text"]].values.flatten()
-    feedback_scores = data[["feedback_credits"]].values.flatten()
-    references = data[["feedback_reference"]].values.flatten()
+    feedback_texts = data[["feedback_text"]].values.flatten()
+    feedback_scores = data[["score"]].values.flatten()
+    references = data[["reference"]].values.flatten()
     ids = data[["textblock_id"]].values.flatten()
     texts = data[["textblock_text"]].values.flatten()
-    submission_ids = data[["textblock_submission_id"]].values.flatten()
-    cluster_ids = data[["textblock_cluster_id"]].values.flatten()
-    return [FeedbackWithTextBlock(textblock_id=ids[i], submission_id=submission_ids[i], cluster_id=cluster_ids[i],
-                                  text=texts[i], feedback_id=feedback_ids[i], feedback_score=feedback_scores[i],
-                                  feedback_text=feedback_texts[i], reference=references[i]) for i in
-            range(len(data))]
+    submission_ids = data[["submission_id"]].values.flatten()
+    cluster_ids = data[["cluster_id"]].values.flatten()
+    blocks = [FeedbackWithTextBlock(textblock_id=ids[i], submission_id=submission_ids[i], cluster_id=cluster_ids[i],
+                                    text=texts[i], feedback_id=feedback_ids[i], feedback_score=feedback_scores[i],
+                                    feedback_text=feedback_texts[i], reference=references[i]) for i in
+              range(len(data)) if feedback_texts[i] and cluster_ids[i] and texts[i]]
+    return [list(i) for j, i in itertools.groupby(sorted(blocks, key=lambda x: x.submission_id), lambda x: x.submission_id)]
+

@@ -15,7 +15,7 @@ class FeedbackWithTextBlock:
     def json_rep_text_block(self):
         return {
             'id': self.id,
-            'submission_id': self.submission_id,
+            'submission_id': str(self.submission_id),
             'cluster_id': self.cluster_id,
             'text': self.text,
             'reference': self.reference
@@ -23,7 +23,7 @@ class FeedbackWithTextBlock:
 
     def json_rep_feedback(self):
         return {
-            'id': self.feedback_id,
+            'id': str(self.feedback_id),
             'text': self.feedback_text,
             'score': self.feedback_score,
             'reference': self.reference
