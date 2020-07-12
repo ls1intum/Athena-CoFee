@@ -45,20 +45,21 @@ class ClusteringResource:
         clusters = {}
         for clusterLabel in clusterLabels:
             indices = [ i for i, x in enumerate(labels) if x == clusterLabel ]
-            clusterEmbeddings = [ embeddings[i].vector for i in indices ]
             clusters[clusterLabel] = {
                 'blocks': [ TextBlock(embeddings[i].id) for i in indices ],
-                'probabilities': [ probabilities[i] for i in indices ],
-                'distanceMatrix': self.__clustering.distances_within_cluster(clusterEmbeddings)
             }
-        doc = { 'clusters': clusters, 'distanceMatrix': [], 'tree': []}
+        doc = {'clusters': clusters, 'distanceMatrix': [], 'tree': []}
 
         matrix = self.__clustering.distances_within_cluster(vectors)
-        tree = self.__clustering.clusterer.condensed_tree_.to_pandas()
+        # Following loop removes duplicates in matrix
+        for i in range(len(matrix)):
+            for j in range(i):
+                matrix[i][j] = 0
 
         for row in matrix:
             doc['distancesMatrix'].append(list([float(row[i]) for i in range(len(row))]))
 
+        tree = self.__clustering.clusterer.condensed_tree_.to_pandas()
         for row in tree.values.tolist():
             if isinf(float(row[2])):
                 row[2] = -1
