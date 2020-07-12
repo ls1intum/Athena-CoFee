@@ -178,6 +178,12 @@ def export_json_files(cluster_obj, labels, tree, exercise_id, vectors):
     data = {'labels': [], 'distances': [], 'tree': []}
     matrix = cluster_obj.distances_within_cluster(vectors=vectors)
     data['labels'] = [int(labels[i]) for i in range(len(labels))]
+
+    # Following loop removes duplicates in matrix
+    for i in range(len(matrix)):
+        for j in range(i):
+            matrix[i][j] = 0
+
     for row in matrix:
         data['distances'].append(list([float(row[i]) for i in range(len(row))]))
     for row in tree.values.tolist():
