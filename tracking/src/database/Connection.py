@@ -1,3 +1,4 @@
+import os
 import pymongo
 
 
@@ -6,9 +7,10 @@ import pymongo
 class Connection:
 
     def __init__(self):
-        self.client = pymongo.MongoClient('database', 27017, username='tracking', password='tracking_password',
-                                          authSource='athene_db')
-        self.db = self.client["athene_db"]
+        self.client = pymongo.MongoClient('database', 27017, username=os.environ['MONGO_INITDB_ROOT_USERNAME'],
+                                          password=os.environ['MONGO_INITDB_ROOT_PASSWORD'],
+                                          authSource=os.environ['MONGO_INITDB_DATABASE'])
+        self.db = self.client[os.environ['MONGO_INITDB_DATABASE']]
         self.collection = None
 
     # inserts one document to a collection
@@ -37,7 +39,8 @@ class Connection:
     # skip {int} - number of documents to omit (from the start of the result set) when returning the results
     # limit {int} - max number of results to return
     # max_time_ms {int} - Specifies a time limit for a query operation. If the specified time is exceeded, the operation will be aborted
-    def find_documents(self, collection: str, filter_dict: dict, projection: dict = None, skip: int = 0, limit: int = 0, max_time_ms: int = None):
+    def find_documents(self, collection: str, filter_dict: dict, projection: dict = None, skip: int = 0, limit: int = 0,
+                       max_time_ms: int = None):
         try:
             self.collection = self.db[collection]
             docs = self.collection.find(filter=filter_dict, projection=projection, skip=skip, limit=limit,

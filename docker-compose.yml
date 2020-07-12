@@ -49,6 +49,9 @@ services:
       - 8003:80
     environment:
       - JWT_SECRET_BASE64=YWVuaXF1YWRpNWNlaXJpNmFlbTZkb283dXphaVF1b29oM3J1MWNoYWlyNHRoZWUzb2huZ2FpM211bGVlM0VpcAo=
+      - MONGO_INITDB_DATABASE=athene_db
+      - MONGO_INITDB_ROOT_USERNAME=tracking
+      - MONGO_INITDB_ROOT_PASSWORD=tracking_password
     working_dir: /usr/src/app
     depends_on:
       - database
