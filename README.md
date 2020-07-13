@@ -13,6 +13,8 @@ The approach is based on the paper:
   API for computing Language Embeddings using ELMo and uploading training material for ELMo
 - **Clustering:**  
   API for clustering of ELMo Vectors using HDBSCAN
+- **Similarity:**  
+  API for training and usage of a Siamese Neural Network for Similarity Classification on ELMo Vectors.
 
 ## Basic Usage
 
@@ -27,6 +29,8 @@ will automatically build and start the Segmentation, the Embedding and the Clust
 [http://localhost:8001/embed](http://localhost:8001/embed)  
 [http://localhost:8001/upload](http://localhost:8001/upload)  
 [http://localhost:8002/cluster](http://localhost:8002/cluster)  
+[http://localhost:8003/similarity](http://localhost:8003/similarity)  
+[http://localhost:8003/train](http://localhost:8003/train)
 
 For testing and development purposes, a single component can be re-built using e.g.
 
