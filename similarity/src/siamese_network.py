@@ -137,7 +137,7 @@ class SiameseNetwork:
     @:return 2D matrix [len(vectors), len(vectors)] containing pair wise similarities
     '''
     def compute_similarity_matrix(self, vectors: List[ElmoVector]) -> np.array:
-        matrix = np.zeros(len(vectors), len(vectors))
+        matrix = np.zeros((len(vectors), len(vectors)))
         for i in range(0, len(vectors)):
             input1 = np.array(vectors[i])
             input1 = input1.reshape((input1.shape[0], 1))

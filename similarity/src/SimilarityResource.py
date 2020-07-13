@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from logging import getLogger
+from pathlib import Path
 from typing import List
 
 from falcon import Request, Response, HTTP_200
@@ -37,11 +38,13 @@ class SimilarityResource:
             self.__logger.error("{} ({})".format(requireTwoEmbeddings.title, requireTwoEmbeddings.description))
             raise requireTwoEmbeddings
 
-        self.__logger.info("Computing similarities of {} embeddings.".format(len(embeddings)))
+        self.__logger.info("Found {} embeddings.".format(len(embeddings)))
         vectors: List[ElmoVector] = list(map(lambda e: e.vector, embeddings))
 
-        self.__siameseNetwork.load_model("resources/siamese-model")
+        self.__logger.info("Loading network model.")
+        self.__siameseNetwork.load_model("src/resources/siamese-model")
 
+        self.__logger.info("Computing similarities of {} embeddings.".format(len(embeddings)))
         matrix = self.__siameseNetwork.compute_similarity_matrix(vectors)
 
         doc = {'similarity_matrix': matrix}
