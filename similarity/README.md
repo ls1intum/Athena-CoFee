@@ -1,3 +1,5 @@
+**Siamese Neural Network for text similarity classification**
+
 This service was developed as a master's thesis at the Technical University of Munich.
 It offers a siamese neural network to calculate the similarity between vector representations of textual student answers.
 
