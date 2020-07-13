@@ -4,10 +4,11 @@ from logging import getLogger
 from typing import List
 
 from falcon import Request, Response, HTTP_200
+from keras.callbacks import History
 from numpy import ndarray
 
 from .entities import Embedding, EmbeddingsPair
-from .errors import emptyBody, requireTextBlockPairs
+from .errors import emptyBody, requireEmbeddingPairs
 from .siamese_network import SiameseNetwork
 
 
@@ -16,8 +17,11 @@ class NetworkTrainingResource:
     __siameseNetwork: SiameseNetwork = SiameseNetwork()
 
     def __default(self, o) -> int:
-        if isinstance(o, Embedding): return o.__dict__
+        if isinstance(o, EmbeddingsPair): return o.__dict__
         if isinstance(o, ndarray): return o.tolist()
+        if isinstance(o, History): return o.history
+        if isinstance(o, dict): return o.__dict__
+        self.__logger.info("Type Error. Type {} not JSON serializable.".format(type(o)))
         raise TypeError
 
     def on_post(self, req: Request, resp: Response) -> None:
@@ -28,21 +32,23 @@ class NetworkTrainingResource:
             raise emptyBody
 
         doc = json.load(req.stream)
-        if "textBlockPairs" not in doc:
-            self.__logger.error("{} ({})".format(requireTextBlockPairs.title, requireTextBlockPairs.description))
-            raise requireTextBlockPairs
+        if "embeddingPairs" not in doc:
+            self.__logger.error("{} ({})".format(requireEmbeddingPairs.title, requireEmbeddingPairs.description))
+            raise requireEmbeddingPairs
 
         embeddingPairs: List[EmbeddingsPair] = list(map(lambda dict: EmbeddingsPair.from_dict(dict), doc['embeddingPairs']))
 
-        self.__logger.info("Train on {} pairs.".format(len(embeddingPairs)))
-
         #input dimension can be adapted here
+        self.__logger.info("Building model.")
         self.__siameseNetwork.build_siamese_model((1024, 1))
 
         #train siamese network
-        training_history = self.__siameseNetwork.train_siamese_network(embeddingPairs, "resources/siamese-model")
+        self.__logger.info("Start training on {} pairs.".format(len(embeddingPairs)))
+        training_history = self.__siameseNetwork.train_siamese_network(embeddingPairs, "src/resources/siamese-model")
 
-        doc = {'training_history': training_history}
+        doc = {
+            'training_history': str(training_history.history)
+        }
 
         with open("logs/networkTraining-{}.json".format(datetime.now()), 'w') as outfile:
             json.dump(doc, outfile, ensure_ascii=False, default=self.__default)

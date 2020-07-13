@@ -58,8 +58,8 @@ class SiameseNetwork:
         # Connect the inputs with the outputs
         siamese_model = Model(inputs=[left_input, right_input], outputs=prediction)
 
-        # return the model
-        return siamese_model
+        # save the model
+        self.model = siamese_model
 
     '''
     Train the network and save the result into files.
