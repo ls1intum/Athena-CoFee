@@ -47,12 +47,18 @@ services:
     container_name: athene-embedding
     ports:
       - 8001:8000
+    environment:
+      - DATABASE_HOST=database
+      - DATABASE_PORT=27017
+      - DATABASE_NAME=athene_db
+      - DATABASE_USER=embedding
+      - DATABASE_PWD=embedding_password
     working_dir: /usr/src/app
     networks:
       - athene
     labels:
       - traefik.enable=true
-      - traefik.http.routers.embedding.rule=Path(`/embed`)||Path(`/upload`)
+      - traefik.http.routers.embedding.rule=Path(`/embed`,`/upload`)
       - traefik.http.routers.embedding.entrypoints=web,websecure
 
 # http://localhost:8002/cluster
@@ -63,6 +69,12 @@ services:
     container_name: athene-clustering
     ports:
       - 8002:8000
+    environment:
+      - DATABASE_HOST=database
+      - DATABASE_PORT=27017
+      - DATABASE_NAME=athene_db
+      - DATABASE_USER=clustering
+      - DATABASE_PWD=clustering_password
     working_dir: /usr/src/app
     networks:
       - athene
