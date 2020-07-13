@@ -11,6 +11,15 @@ def reduce_dimensions(vectors):
     return tsne.fit_transform(vectors)
 
 
+def plot_cluster_sizes(clusters):
+    cluster_sizes = [len(cluster.block_ids) for cluster in clusters if cluster.id != -1]
+    fig, ax = plt.subplots(1, 1)
+    ax.hist(cluster_sizes, bins=max(cluster_sizes))
+    ax.set_title("histogram of cluster sizes")
+    ax.set_xlabel('cluster size')
+    ax.set_ylabel('no. of clusters')
+
+
 def plot_embeddings(textblocks: [TextBlock], persist_labels=False):
     textblocks = [textblock for textblock in textblocks if int(textblock.computed_cluster.id) > -1]
     vectors = [textblock.embedding for textblock in textblocks]
@@ -38,7 +47,7 @@ def plot_embeddings(textblocks: [TextBlock], persist_labels=False):
     # plt.xlim(-200, 250)
     # plt.xlim(-200, 250)
 
-    if persist_labels :
+    if persist_labels:
         for i in range(len(x)):
             annotation = ax.annotate("", xy=(x[i], y[i]), xytext=(20, 20), textcoords="offset points",
                                      bbox=dict(boxstyle="round", fc="w"),
@@ -71,4 +80,5 @@ def plot_embeddings(textblocks: [TextBlock], persist_labels=False):
                     if vis:
                         annotation.set_visible(False)
                         fig.canvas.draw_idle()
+
         fig.canvas.mpl_connect("motion_notify_event", hover)
