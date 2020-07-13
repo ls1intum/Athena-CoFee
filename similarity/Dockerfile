@@ -1,5 +1,5 @@
 FROM python:3.7.7
-LABEL author="Jan Philip Bernius <janphilip.bernius@tum.de>"
+LABEL author="Clemens Zuck <clemens.zuck@tum.de>"
 
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -qr /tmp/requirements.txt
