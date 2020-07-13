@@ -7,21 +7,23 @@ import pymongo
 class Connection:
 
     def __init__(self):
-        self.client = pymongo.MongoClient('database', 27017, username=os.environ['MONGO_INITDB_ROOT_USERNAME'],
-                                          password=os.environ['MONGO_INITDB_ROOT_PASSWORD'],
-                                          authSource=os.environ['MONGO_INITDB_DATABASE'])
-        self.db = self.client[os.environ['MONGO_INITDB_DATABASE']]
+        # Get container variables for datbase connection
+        dbhost = str(os.environ['DATABASE_HOST']) if "DATABASE_HOST" in os.environ else "database"
+        dbport = int(os.environ['DATABASE_PORT']) if "DATABASE_PORT" in os.environ else 27017
+        dbname = str(os.environ['DATABASE_NAME']) if "DATABASE_NAME" in os.environ else "athene_db"
+        dbuser = str(os.environ['DATABASE_USER']) if "DATABASE_USER" in os.environ else "tracking"
+        dbpwd = str(os.environ['DATABASE_PWD']) if "DATABASE_PWD" in os.environ else "tracking_password"
+        self.client = pymongo.MongoClient(host=dbhost, port=dbport, username=dbuser, password=dbpwd,
+                                          authSource=dbname)
+        self.db = self.client[dbname]
         self.collection = None
 
     # inserts one document to a collection
     # collection {string} - collection name to store the document
     # document {field-value pairs} - e.g. {'x': 1, 'y': "apples"}
     def insert_document(self, collection: str, document: dict):
-        try:
-            self.collection = self.db[collection]
-            self.collection.insert_one(document)
-        except Exception as e:
-            print(e)
+        self.collection = self.db[collection]
+        self.collection.insert_one(document)
 
     # inserts an array of documents to a collection
     # collection {string} - collection name to store the document
