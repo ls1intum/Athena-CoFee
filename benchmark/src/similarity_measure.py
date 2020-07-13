@@ -45,7 +45,7 @@ class AdjustedRandIndexSimilarity(SimilarityMeasure):
     __logger = getLogger(__name__)
 
     def __init__(self, text_blocks):
-        self.text_blocks = text_blocks
+        self.text_blocks = [text_block for text_block in text_blocks if text_block.computed_cluster.id != -1]
         labels_true = [text_block.ground_truth_cluster for text_block in self.text_blocks]
         labels_pred = [text_block.computed_cluster.id for text_block in self.text_blocks]
         self.ARI = sklearn.metrics.adjusted_rand_score(labels_true, labels_pred)
