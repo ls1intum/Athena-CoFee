@@ -7,14 +7,14 @@ from benchmark.src.data.data_retriever import read_labeled_sentences_from_csv, r
 from benchmark.src.entities.cluster import Cluster
 from benchmark.src.entities.text_block import TextBlock
 from benchmark.src.networking.api_services import *
-from benchmark.src.plotting import plot_embeddings
+from benchmark.src.plotting import plot_embeddings, plot_cluster_sizes
 from benchmark.src.similarity_measure import PrecisionRecallSimilarity, L1Similarity, QWKSimilarity, \
     AdjustedRandIndexSimilarity
 
 __logger = getLogger(__name__)
 
 
-def process_text_blocks(text_blocks, courseId=None, plot=True, log_textblocks_to_clusters=False,
+def process_text_blocks(text_blocks, courseId=None, plot_emb=False, plot_cl_sizes=True, log_textblocks_to_clusters=False,
                         log_cluster_sizes=True):
     embeddings = embed(text_blocks, courseId=courseId)
     clusters = Cluster.clusters_from_network_response(cluster(embeddings))
@@ -22,8 +22,11 @@ def process_text_blocks(text_blocks, courseId=None, plot=True, log_textblocks_to
         text_block.extract_cluster(clusters)
         text_block.extract_embedding(embeddings)
 
-    if plot:
+    if plot_emb:
         plot_embeddings(text_blocks)
+
+    if plot_cl_sizes:
+        plot_cluster_sizes(clusters)
 
     if log_textblocks_to_clusters:
         cluster_to_text = ["cluster {}: {}".format(textblock.computed_cluster.id, textblock.original_text) for textblock in
@@ -60,7 +63,7 @@ def evaluate_by_artemis_data(courseId=None):
 
 def plot_sentences(sentences, courseId=None):
     text_blocks = [TextBlock(sentence) for sentence in sentences]
-    process_text_blocks(text_blocks, courseId, plot=True)
+    process_text_blocks(text_blocks, courseId, plot_embeddings=True)
 
 
 if __name__ == "__main__":
@@ -88,10 +91,31 @@ if __name__ == "__main__":
         "I booked first class seat on the train",
     ]
 
-    # plot_sentences(sentences, courseId="022")
     # plot_sentences(sentences)
-    evaluate_by_labeled_sentences(courseId="021")
-    evaluate_by_labeled_sentences( courseId="022")
-    evaluate_by_labeled_sentences()
 
+    # evaluate_by_labeled_sentences()
+    # evaluate_by_labeled_sentences(courseId="021")
+    # evaluate_by_labeled_sentences( courseId="022")
+    # evaluate_by_labeled_sentences( courseId="081")
+    # evaluate_by_labeled_sentences( courseId="082")
+    # evaluate_by_labeled_sentences(courseId="083")
+    # evaluate_by_labeled_sentences(courseId="0321")
+    # evaluate_by_labeled_sentences(courseId="0322")
+    # evaluate_by_labeled_sentences(courseId="0323")
+    # evaluate_by_labeled_sentences(courseId="0641")
+    # evaluate_by_labeled_sentences(courseId="0642")
+    # evaluate_by_labeled_sentences(courseId="0643")
+    #
+    # evaluate_by_artemis_data()
+    # evaluate_by_artemis_data(courseId="021")
+    # evaluate_by_artemis_data(courseId="022")
+    # evaluate_by_artemis_data(courseId="081")
+    # evaluate_by_artemis_data(courseId="082")
+    # evaluate_by_artemis_data(courseId="083")
+    # evaluate_by_artemis_data(courseId="0321")
+    # evaluate_by_artemis_data(courseId="0322")
+    # evaluate_by_artemis_data(courseId="0323")
+    # evaluate_by_artemis_data(courseId="0641")
+    # evaluate_by_artemis_data(courseId="0642")
+    # evaluate_by_artemis_data(courseId="0643")
     plt.show()
