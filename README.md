@@ -24,7 +24,7 @@ Using the `docker-compose.yml` file included in the root directory of the reposi
 docker-compose up -d
 ```
 
-will automatically build and start the Segmentation, the Embedding and the Clustering component (The `-d` parameter will run containers in the background). By default, the Segmentation component will listen on port 8000, the Embedding component on port 8001 and the Clustering component on port 8002 of your local machine. This means, the following API-routes will be available after start:  
+will automatically build and start the Segmentation, the Embedding, the Clustering and the Similarity component (The `-d` parameter will run containers in the background). By default, the Segmentation component will listen on port 8000, the Embedding component on port 8001, the Clustering component on port 8002 and the Similarity component on port 8003 of your local machine. This means, the following API-routes will be available after start:  
 [http://localhost:8000/segment](http://localhost:8000/segment)  
 [http://localhost:8001/embed](http://localhost:8001/embed)  
 [http://localhost:8001/upload](http://localhost:8001/upload)  
