@@ -1,11 +1,12 @@
 FROM python:3.7.7
 LABEL author="Jan Philip Bernius <janphilip.bernius@tum.de>"
 
-COPY requirements.txt /tmp/requirements.txt
+COPY ./embedding/requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -qr /tmp/requirements.txt
 
 WORKDIR /usr/src/app
-COPY src/ src/
+COPY ./embedding/src/ src/
+COPY ./text_preprocessing src/text_preprocessing
 RUN make -C src/resources/models
 RUN mkdir -p /usr/lib/nltk_data \
  && python -m nltk.downloader -d /usr/lib/nltk_data stopwords wordnet punkt

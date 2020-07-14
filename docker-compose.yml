@@ -5,14 +5,13 @@ services:
 # http://localhost:8000/segment
   segmentation:
     build:
-      context: ./segmentation
+      context: .
+      dockerfile: ./segmentation/Dockerfile
     image: athene-segmentation
     container_name: athene-segmentation
     ports:
       - 8000:8000
     working_dir: /usr/src/app
-    volumes:
-      - ./text_preprocessing:/usr/src/app/src/text_preprocessing
     networks:
       - athene
 
@@ -20,14 +19,13 @@ services:
 # http://localhost:8001/upload
   embedding:
     build:
-      context: ./embedding
+      context: .
+      dockerfile: ./embedding/Dockerfile
     image: athene-embedding
     container_name: athene-embedding
     ports:
       - 8001:8000
     working_dir: /usr/src/app
-    volumes:
-      - ./text_preprocessing:/usr/src/app/src/text_preprocessing
     networks:
       - athene
 
