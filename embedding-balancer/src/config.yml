@@ -1,0 +1,13 @@
+compute_nodes:
+  - name: athene01
+    url: athene01.ase.in.tum.de:8001/embed
+    compute_power: 1
+    communication_cost: 1
+  - name: athene02
+    url: athene02.ase.in.tum.de:8001/embed
+    compute_power: 1
+    communication_cost: 1
+  - name: athene03
+    url: athene03.ase.in.tum.de:8001/embed
+    compute_power: 1
+    communication_cost: 1

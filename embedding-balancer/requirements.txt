@@ -5,13 +5,5 @@ gunicorn==20.0.4
 #  - setuptools [required: >=3.0, installed: 46.1.3]
 joblib==0.14.1
 numpy==1.18.3
-pymongo==3.10.1
+PyYAML==5.3.1
 requests==2.24.0
-scikit-learn==0.22.2.post1
-#  - joblib [required: >=0.11, installed: 0.14.1]
-#  - numpy [required: >=1.11.0, installed: 1.18.3]
-#  - scipy [required: >=0.17.0, installed: 1.4.1]
-#    - numpy [required: >=1.13.3, installed: 1.18.3]
-scipy==1.4.1
-#    - numpy [required: >=1.13.3, installed: 1.18.3]
-pyocclient==0.4

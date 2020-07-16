@@ -3,11 +3,12 @@ from datetime import datetime
 from logging import getLogger
 import os.path
 from typing import List
-from falcon import Request, Response, HTTP_200
+from falcon import Request, Response, HTTP_200, HTTP_500
 from numpy import ndarray
 import requests
 from threading import Thread
-from .entities import Sentence, TextBlock, ElmoVector, Embedding
+import yaml
+from .entities import Embedding, ComputeNode
 from .errors import emptyBody, requireTwoBlocks
 
 class BalanceEmbedding:
@@ -18,8 +19,35 @@ class BalanceEmbedding:
         if isinstance(o, ndarray): return o.tolist()
         raise TypeError
 
+    def parseConfig(self):
+        # Read config.yml file
+        try:
+            filepath = str(os.environ['CONFIG_FILE_PATH']) if "CONFIG_FILE_PATH" in os.environ else "src/config.yml"
+            with open(filepath, 'r') as stream:
+                config = yaml.safe_load(stream)
+        except Exception as e:
+            self.__logger.error("Error reading config: " + str(e))
+            return
+
+        # Parse config
+        compute_nodes = list()
+        for node in config['compute_nodes']:
+            if 'name' not in node or 'url' not in node or 'compute_power' not in node or 'communication_cost' not in node:
+                self.__logger.warning("Skipping Compute Node definition. Not all required variables set")
+                continue
+            try:
+                new_node = ComputeNode(name=str(node['name']), url=str(node['url']),
+                                       compute_power=int(node['compute_power']),
+                                       communication_cost=int(node['communication_cost']))
+                compute_nodes.append(new_node)
+                self.__logger.info("Parsed Compute Node definition - " + str(new_node))
+            except Exception as e:
+                self.__logger.error("Error during config parsing: " + str(e))
+
+        return compute_nodes
+
     # Creates chunks of blocks
-    def createChunks(self, doc):
+    def createChunks(self, doc, compute_nodes):
         # TODO: Dynamic chunking dependent on target node settings
         # TODO: Calculate chunkSize for processing nodes
         # TODO: Balancing logic (communication cost)
@@ -65,7 +93,15 @@ class BalanceEmbedding:
         starttime = datetime.now()                  # Start timer
         computing_result = {}                       # Declare array for individual results
         thread_list = list()                        # Declare list for started threads
-        request_chunks = self.createChunks(doc)     # Split request into chunks
+
+        # Parse available compute nodes using config file
+        compute_nodes = self.parseConfig()
+        if not compute_nodes:
+            resp.status = HTTP_500
+            resp.body = "Error parsing compute node config"
+            return
+
+        request_chunks = self.createChunks(doc, compute_nodes)  # Split request into chunks
 
         # Function to process request chunk
         def threaded_request(thread_id, url, request, timeout):
