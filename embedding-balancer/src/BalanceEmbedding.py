@@ -21,11 +21,11 @@ class BalanceEmbedding:
     # Creates chunks of blocks
     def createChunks(self, doc):
         # TODO: Dynamic chunking dependent on target node settings
-        # TODO: Read chunkSize out of config
-        # TODO: Balancing logic
-        # TODO: Handle single block in a chunk (minimum of 2 required)
+        # TODO: Calculate chunkSize for processing nodes
+        # TODO: Balancing logic (communication cost)
+        # TODO: Handle single block in last chunk (minimum of 2 required) -> Include in previous chunk
         blockchunks = []
-        chunkSize = 2
+        chunkSize = 50
         blockcount = len(doc['blocks'])
         self.__logger.info("Chunk request of {} total blocks in chunks of size {} ...".format(blockcount, chunkSize))
         # Create equally sized chunks
@@ -50,7 +50,7 @@ class BalanceEmbedding:
         self.__logger.debug("-" * 80)
         self.__logger.info("Incoming Embedding Request")
 
-        # Error handling for wrong requests
+        # Error handling for faulty requests
         if req.content_length == 0:
             self.__logger.error("{} ({})".format(emptyBody.title, emptyBody.description))
             raise emptyBody
@@ -63,23 +63,25 @@ class BalanceEmbedding:
         # Computing preparation
         output = {"embeddings": []}                 # Declare output variable
         starttime = datetime.now()                  # Start timer
-        computing_result = {}                       # Declare list for individual results
+        computing_result = {}                       # Declare array for individual results
         thread_list = list()                        # Declare list for started threads
         request_chunks = self.createChunks(doc)     # Split request into chunks
 
         # Function to process request chunk
-        def threaded_request(thread_id, url, request):
+        def threaded_request(thread_id, url, request, timeout):
             self.__logger.info("Thread {} started processing ...".format(thread_id))
-            # TODO: Variable Timeout
-            computing_result[thread_id] = requests.post(url, data=json.dumps(request), timeout=60)
+            computing_result[thread_id] = requests.post(url, data=json.dumps(request), timeout=timeout)
             self.__logger.info("Thread {} finished processing.".format(thread_id))
 
         # Process chunks concurrently
         self.__logger.info("Start load balanced computation ...")
         for i, request in enumerate(request_chunks):
             # TODO: Distinguish between REST-call to processing-node or file-creation for GPU-node
+            # TODO: Variable url
             request_url = 'https://athene01.ase.in.tum.de/embed'
-            t = Thread(target=threaded_request, args=(i, request_url, request,))
+            # TODO: Variable Timeout and error handling for timeout
+            timeout = 60
+            t = Thread(target=threaded_request, args=(i, request_url, request, timeout))
             t.start()
             thread_list.append(t)
 
@@ -88,10 +90,11 @@ class BalanceEmbedding:
             thread.join()
             output['embeddings'].extend(computing_result[i].json()['embeddings'])
 
-        endtime = datetime.now()
-        processingtime = endtime - starttime
+        endtime = datetime.now()                    # Stop timer
+        processingtime = endtime - starttime        # Calculate processing time
         self.__logger.info("Processing took {} (h:mm:ss.ms)".format(processingtime))
 
+        # Write result to outfile for debugging
         with open("logs/embedding-{}.json".format(datetime.now()), 'w') as outfile:
             json.dump(output, outfile, ensure_ascii=False, default=self.__default)
 
