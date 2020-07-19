@@ -37,7 +37,8 @@ class FeedbackCommentResource:
 
         doc = {'_id': feedback_with_tb.id, 'submission_id': feedback_with_tb.submission_id,
                'cluster_id': feedback_with_tb.cluster_id,
-               'text': feedback_with_tb.text, 'feedback': {'feedback_id': feedback_with_tb.feedback.id,
+               'text': feedback_with_tb.text,
+               'text_embedding': pickle.dumps(np.array(feedback_with_tb.text_embedding).flatten().tolist()), 'feedback': {'feedback_id': feedback_with_tb.feedback.id,
                                                            'feedback_text': feedback_with_tb.feedback.text,
                                                            'feedback_score': feedback_with_tb.feedback.score,
                                                            'feedback_text_blocks': embeddings}}
@@ -70,10 +71,12 @@ class FeedbackCommentResource:
 
         return feedback_with_tb
 
-    def embed_feedback_text_blocks(self, text_blocks):
-        sentences: List[Sentence] = text_blocks
+    def embed_feedback_text_blocks(self, feedback_with_tb: list):
+        sentences: List[Sentence] = list(map(lambda b: b.text, feedback_with_tb))
         vectors: List[ElmoVector] = self.__embed_sentences(sentences)
-        return vectors
+        for fwt, vector in zip(feedback_with_tb, vectors):
+            fwt.text_embedding = vector
+        return feedback_with_tb
 
     def store_feedback(self, feedback_with_tb: list):
         self.__logger.info("Store Feedback.")

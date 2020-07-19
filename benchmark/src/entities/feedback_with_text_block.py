@@ -16,7 +16,7 @@ class FeedbackWithTextBlock:
         return {
             'id': self.id,
             'submission_id': str(self.submission_id),
-            'cluster_id': self.cluster_id,
+            'cluster_id': str(self.cluster_id),
             'text': self.text,
             'reference': self.reference
         }

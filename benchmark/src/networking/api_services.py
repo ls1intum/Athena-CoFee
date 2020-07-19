@@ -30,7 +30,7 @@ def check_feedback_consistency(feedback_with_text_blocks):
     for fwt in feedback_with_text_blocks:
         text_blocks = [block.json_rep_text_block() for block in fwt]
         feedback = [block.json_rep_feedback() for block in fwt]
-        return __check_feedback_consistency(text_blocks, feedback)
+        __check_feedback_consistency(text_blocks, feedback)
 
 
 def __embed(text_blocks, courseId=None):

@@ -55,6 +55,7 @@ class FeedbackWithTextBlock:
     submission_id: int
     cluster_id: int
     text: str
+    text_embedding: ElmoVector
     feedback: Feedback
 
     def __init__(self, _id: str, submission_id: int, cluster_id: int, text: str, feedback: Feedback):
