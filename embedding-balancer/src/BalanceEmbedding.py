@@ -33,8 +33,10 @@ class BalanceEmbedding:
         # Parse config
         compute_nodes = list()
         for node in config['compute_nodes']:
-            if 'name' not in node or 'url' not in node or 'chunk_size' not in node or 'compute_power' not in node or 'communication_cost' not in node:
+            required_variables = ('name', 'url', 'chunk_size', 'compute_power', 'communication_cost')
+            if not all(key in node for key in required_variables):
                 self.__logger.warning("Skipping Compute Node definition. Not all required variables set: " + str(node))
+                self.__logger.warning("Required variables are: " + str(required_variables))
                 continue
             try:
                 new_node = ComputeNode(name=str(node['name']), url=str(node['url']), chunk_size=int(node['chunk_size']),
@@ -47,20 +49,24 @@ class BalanceEmbedding:
 
         return compute_nodes
 
-    # Returns reduced doc and part of doc with length <size>
+    # Returns and part of doc with length <size> and the rest of doc
     def splitBlocks(self, doc, size):
+        # Minimum of 2 blocks is required to compute embeddings - prevent this case
+        if len(doc['blocks']) == (size + 1):
+            size += 1
+
         blockchunk = doc['blocks'][0:min(len(doc['blocks']), size)]
         rest = doc['blocks'][min(len(doc['blocks']), size):]
         # Pass through courseId if provided
         if "courseId" not in doc:
-            request_chunk = {
+            blockchunk = {
                 "blocks": blockchunk
             }
             rest = {
                 "blocks": rest
             }
         else:
-            request_chunk = {
+            blockchunk = {
                 "courseId": doc["courseId"],
                 "blocks": blockchunk
             }
@@ -68,25 +74,21 @@ class BalanceEmbedding:
                 "courseId": doc["courseId"],
                 "blocks": rest
             }
-        return request_chunk, rest
+        return blockchunk, rest
 
     # Creates chunks of blocks
     def createChunks(self, doc, compute_nodes):
+        # Evaluate total compute power of all parsed nodes
         total_compute_power = 0
         for node in compute_nodes:
             total_compute_power += node.compute_power
 
-        rest = doc
+        # Process whole doc and split according to compute power of nodes
         for node in compute_nodes:
+            # TODO: Balancing logic (communication cost)
             node.chunk_quantity = math.ceil(len(doc['blocks']) / total_compute_power * node.compute_power)
-            # Minimum of 2 blocks is required to compute embeddings - prevent this case
-            if len(rest['blocks']) == (node.chunk_quantity + 1):
-                node.blocks, rest = self.splitBlocks(rest, node.chunk_quantity + 1)
-            else:
-                node.blocks, rest = self.splitBlocks(rest, node.chunk_quantity)
-
+            node.blocks, doc = self.splitBlocks(doc, node.chunk_quantity)
             self.__logger.info("Node {} will process {} blocks".format(node.name, len(node.blocks['blocks'])))
-        # TODO: Balancing logic (communication cost)
 
     def on_post(self, req: Request, resp: Response) -> None:
         self.__logger.debug("-" * 80)
@@ -98,7 +100,7 @@ class BalanceEmbedding:
             raise emptyBody
 
         doc = json.load(req.stream)
-        if "blocks" not in doc:
+        if "blocks" not in doc or len(doc['blocks']) < 2:
             self.__logger.error("{} ({})".format(requireTwoBlocks.title, requireTwoBlocks.description))
             raise requireTwoBlocks
 
@@ -118,15 +120,20 @@ class BalanceEmbedding:
             resp.body = "Error parsing compute node config"
             return
 
-        #request_chunks = self.createChunks(doc, compute_nodes)  # Split request into chunks
-        self.createChunks(doc, compute_nodes)  # Split request into chunks
+        self.createChunks(doc, compute_nodes)  # Split request into chunks and assign to nodes
 
-        # Function to process request chunk
-        def threaded_request(thread_id, thread_name, url, request, timeout):
-            self.__logger.info("Thread {} ({}) started processing ...".format(thread_id, thread_name))
-            # TODO: Chunk according to compute node's chunkSize
-            computing_result[thread_id] = requests.post(url, data=json.dumps(request), timeout=timeout)
-            self.__logger.info("Thread {} ({}) finished processing.".format(thread_id, thread_name))
+        # Function to process request chunk of a node
+        def threaded_request(thread_id: int, node: ComputeNode, timeout):
+            self.__logger.info("Thread {} ({}) started processing ...".format(thread_id, node.name))
+            rest = node.blocks
+            thread_result = {"embeddings": []}
+            while len(rest['blocks']) != 0:
+                # Split request according to supported chunkSize of compute node
+                request_chunk, rest = self.splitBlocks(rest, node.chunk_size)
+                response = requests.post(node.url, data=json.dumps(request_chunk), timeout=timeout)
+                thread_result['embeddings'].extend(response.json()['embeddings'])
+            computing_result[thread_id] = thread_result
+            self.__logger.info("Thread {} ({}) finished processing.".format(thread_id, node.name))
 
         # Process chunks concurrently
         self.__logger.info("Start load balanced computation ...")
@@ -135,15 +142,15 @@ class BalanceEmbedding:
             # TODO: Variable Timeout and error handling for timeout
             timeout = 60
             if len(node.blocks['blocks']) != 0:
-                t = Thread(target=threaded_request, args=(i, node.name, node.url, node.blocks, timeout))
+                t = Thread(target=threaded_request, args=(i, node, timeout))
                 t.start()
                 thread_list.append(t)
 
         # Merge all computed embeddings together
         for i, thread in enumerate(thread_list):
             thread.join()
-            if 'embeddings' in computing_result[i].json():
-                output['embeddings'].extend(computing_result[i].json()['embeddings'])
+            if 'embeddings' in computing_result[i]:
+                output['embeddings'].extend(computing_result[i]['embeddings'])
             else:
                 # TODO: Resend blocks to another compute node if processing failed
                 self.__logger.error("Error while merging computed embeddings of thread {}: ".format(i))
