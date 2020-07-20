@@ -1,0 +1,7 @@
+compute_nodes:
+  - name: node1
+    # This url resolves to the embedding-container inside the docker-network
+    url: http://embedding:8000/embed
+    chunk_size: 50
+    compute_power: 1
+    communication_cost: 1
