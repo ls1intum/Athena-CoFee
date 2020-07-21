@@ -42,14 +42,13 @@ class FeedbackConsistency:
         self.__feedback_with_text_blocks = self.__feedback_comment_resource.embed_feedback(feedback_with_tb=feedback_with_text_blocks)
         # Find embeddings for each student text
         self.__feedback_with_text_blocks = self.__feedback_comment_resource.embed_feedback_text_blocks(feedback_with_tb=feedback_with_text_blocks)
-        doc = {}
+        doc = []
         # Compare each new assessment with the ones in the database
         for fwt in self.__feedback_with_text_blocks:
             feedback_vector_x = fwt.feedback.feedbackEmbeddings
             student_text_vector_x = fwt.text_embedding.reshape(1, -1).tolist()
             # Get the assessments which have same the same cluster id
             cluster = self.__feedback_comment_resource.get_feedback_in_same_cluster(cluster_id=fwt.cluster_id)
-            distances = []
             # Calculate distances between each feedback embeddings and text block embeddings(student answers)
             for item in cluster:
                 feedback_vector_y = list(map(lambda embedding: pickle.loads(embedding['embedding']),
@@ -59,11 +58,9 @@ class FeedbackConsistency:
                 text_block_distance = self.__calculate_mean_distance(x=student_text_vector_x, y=student_text_vector_y)
                 inconsistency = self.__get_inconsistency(score_diff=abs(fwt.feedback.score - item['feedback']['feedback_score']), comment_distance=feedback_distance, text_block_distance=text_block_distance)
                 if inconsistency:
-                    distances.append({"second_feedback_id": item['feedback']['feedback_id'], "inconsistency_type": inconsistency})
+                    doc.append({"first_feedback_id": fwt.feedback.id, "second_feedback_id": item['feedback']['feedback_id'], "inconsistency_type": inconsistency})
 
-            if distances:
-                doc.update({"first_feedback_id": fwt.feedback.id, "comparison": distances})
-        return None if not doc else doc
+        return None if not doc else {'feedbackConsistencies': doc}
 
     def store_feedback(self):
         self.__feedback_comment_resource.store_feedback(self.__feedback_with_text_blocks)
