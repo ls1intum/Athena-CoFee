@@ -21,7 +21,7 @@ class ConfigParser:
         compute_nodes = list()
         # Parse docker swarm nodes
         if 'docker_swarm_nodes' in config:
-            for node in config['docker_swarm_nodes']:
+            for node in config['docker_nodes']:
                 required_variables = ('traefik_service_api', 'embedding_route', 'chunk_size', 'compute_power', 'communication_cost')
                 if not all(key in node for key in required_variables):
                     self.__logger.warning("Skipping Docker Node definition. Not all required variables set: " + str(node))

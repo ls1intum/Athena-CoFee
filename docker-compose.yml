@@ -38,7 +38,10 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.segmentation.rule=Path(`/segment`)
-      - traefik.http.routers.segmentation.entrypoints=web,websecure
+      - traefik.http.routers.segmentation.entrypoints=web
+      - traefik.http.routers.segmentation-tls.rule=Path(`/segment`)
+      - traefik.http.routers.segmentation-tls.entrypoints=websecure
+      - traefik.http.routers.segmentation-tls.tls=true
 
 # http://localhost:8003/embed
   embedding-balancer:
@@ -60,7 +63,10 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.embedding.rule=Path(`/embed`)
-      - traefik.http.routers.embedding.entrypoints=web,websecure
+      - traefik.http.routers.embedding.entrypoints=web
+      - traefik.http.routers.embedding-tls.rule=Path(`/embed`)
+      - traefik.http.routers.embedding-tls.entrypoints=websecure
+      - traefik.http.routers.embedding-tls.tls=true
 
 # http://localhost:8001/embed
 # http://localhost:8001/upload
@@ -84,8 +90,12 @@ services:
       - athene
     labels:
       - traefik.enable=true
+      # Embedding is managed by embedding-balancer
       - traefik.http.routers.upload.rule=Path(`/upload`)
-      - traefik.http.routers.upload.entrypoints=web,websecure
+      - traefik.http.routers.upload.entrypoints=web
+      - traefik.http.routers.upload-tls.rule=Path(`/upload`)
+      - traefik.http.routers.upload-tls.entrypoints=websecure
+      - traefik.http.routers.upload-tls.tls=true
 
 # http://localhost:8002/cluster
   clustering:
@@ -109,7 +119,10 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.clustering.rule=Path(`/cluster`)
-      - traefik.http.routers.clustering.entrypoints=web,websecure
+      - traefik.http.routers.clustering.entrypoints=web
+      - traefik.http.routers.clustering-tls.rule=Path(`/cluster`)
+      - traefik.http.routers.clustering-tls.entrypoints=websecure
+      - traefik.http.routers.clustering-tls.tls=true
 
   database:
     image: mongo:latest
@@ -130,3 +143,4 @@ services:
 networks:
   athene:
     driver: bridge
+
