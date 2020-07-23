@@ -8,9 +8,9 @@ from falcon import Request, Response, HTTP_200, HTTP_500
 from numpy import ndarray
 import requests
 from threading import Thread
-import yaml
 from .entities import Embedding, ComputeNode
 from .errors import emptyBody, requireTwoBlocks
+from .ConfigParser import ConfigParser
 
 class BalanceEmbedding:
     __logger = getLogger(__name__)
@@ -19,35 +19,6 @@ class BalanceEmbedding:
         if isinstance(o, Embedding): return o.__dict__
         if isinstance(o, ndarray): return o.tolist()
         raise TypeError
-
-    def parseConfig(self):
-        # Read config.yml file
-        try:
-            filepath = str(os.environ['CONFIG_FILE_PATH']) if "CONFIG_FILE_PATH" in os.environ else "src/config.yml"
-            with open(filepath, 'r') as stream:
-                config = yaml.safe_load(stream)
-        except Exception as e:
-            self.__logger.error("Error reading config: " + str(e))
-            return
-
-        # Parse config
-        compute_nodes = list()
-        for node in config['compute_nodes']:
-            required_variables = ('name', 'url', 'chunk_size', 'compute_power', 'communication_cost')
-            if not all(key in node for key in required_variables):
-                self.__logger.warning("Skipping Compute Node definition. Not all required variables set: " + str(node))
-                self.__logger.warning("Required variables are: " + str(required_variables))
-                continue
-            try:
-                new_node = ComputeNode(name=str(node['name']), url=str(node['url']), chunk_size=int(node['chunk_size']),
-                                       compute_power=int(node['compute_power']),
-                                       communication_cost=int(node['communication_cost']))
-                compute_nodes.append(new_node)
-                self.__logger.info("Parsed Compute Node definition - " + str(new_node))
-            except Exception as e:
-                self.__logger.error("Error during config parsing: " + str(e))
-
-        return compute_nodes
 
     # Returns and part of doc with length <size> and the rest of doc
     def splitBlocks(self, doc, size):
@@ -114,7 +85,7 @@ class BalanceEmbedding:
         thread_list = list()                        # Declare list for started threads
 
         # Parse available compute nodes using config file
-        compute_nodes = self.parseConfig()
+        compute_nodes = ConfigParser().parseConfig()
         if not compute_nodes:
             resp.status = HTTP_500
             resp.body = "Error parsing compute node config"

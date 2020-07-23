@@ -1,16 +1,16 @@
-compute_nodes:
-  - name: athene01
-    url: http://athene01.ase.in.tum.de:8001/embed
+# Configure compute nodes being managed by docker swarm and registered to traefik
+docker_swarm_nodes:
+  #- traefik_service_api: http://tasks.traefik:8080/api/http/services/embedding@docker
+  - traefik_service_api: http://athene01.ase.in.tum.de:8080/api/http/services/embedding@docker
+    embedding_route: /embed
     chunk_size: 50
     compute_power: 1
     communication_cost: 1
-  - name: athene02
-    url: http://athene02.ase.in.tum.de:8001/embed
-    chunk_size: 50
-    compute_power: 1
-    communication_cost: 1
-  - name: athene03
-    url: http://athene03.ase.in.tum.de:8001/embed
-    chunk_size: 50
-    compute_power: 1
-    communication_cost: 1
+
+# Configure stand-alone compute nodes
+#compute_nodes:
+#  - name: athene01
+#    url: http://athene01.ase.in.tum.de:8001/embed
+#    chunk_size: 50
+#    compute_power: 1
+#    communication_cost: 1
