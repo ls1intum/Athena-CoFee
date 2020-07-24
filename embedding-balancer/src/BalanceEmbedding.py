@@ -105,7 +105,7 @@ class BalanceEmbedding:
                     response = requests.post(node.url, data=json.dumps(request_chunk), timeout=timeout)
                     thread_result['embeddings'].extend(response.json()['embeddings'])
                 except Exception as e:
-                    self.__logger.error("Thread {} had an error during processing: {}".format(thread_id,str(e)))
+                    self.__logger.error("Thread {} had an error during processing: {}".format(thread_id, str(e)))
                     return
             computing_result[thread_id] = thread_result
             self.__logger.info("Thread {} ({}) finished processing.".format(thread_id, node.name))
