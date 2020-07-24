@@ -101,8 +101,12 @@ class BalanceEmbedding:
             while len(rest['blocks']) != 0:
                 # Split request according to supported chunkSize of compute node
                 request_chunk, rest = self.splitBlocks(rest, node.chunk_size)
-                response = requests.post(node.url, data=json.dumps(request_chunk), timeout=timeout)
-                thread_result['embeddings'].extend(response.json()['embeddings'])
+                try:
+                    response = requests.post(node.url, data=json.dumps(request_chunk), timeout=timeout)
+                    thread_result['embeddings'].extend(response.json()['embeddings'])
+                except Exception as e:
+                    self.__logger.error("Thread {} had an error during processing: {}".format(thread_id,str(e)))
+                    return
             computing_result[thread_id] = thread_result
             self.__logger.info("Thread {} ({}) finished processing.".format(thread_id, node.name))
 
@@ -120,7 +124,7 @@ class BalanceEmbedding:
         # Merge all computed embeddings together
         for i, thread in enumerate(thread_list):
             thread.join()
-            if 'embeddings' in computing_result[i]:
+            if i in computing_result and 'embeddings' in computing_result[i]:
                 output['embeddings'].extend(computing_result[i]['embeddings'])
             else:
                 # TODO: Resend blocks to another compute node if processing failed
@@ -128,7 +132,7 @@ class BalanceEmbedding:
 
         endtime = datetime.now()                    # Stop timer
         processingtime = endtime - starttime        # Calculate processing time
-        self.__logger.info("Processing took {} (h:mm:ss.ms)".format(processingtime))
+        self.__logger.info("Processing took {} (h:mm:ss.µs) and includes {} embeddings".format(processingtime,len(output['embeddings'])))
 
         # Write result to outfile for debugging
         with open("logs/embedding-{}.json".format(datetime.now()), 'w') as outfile:
