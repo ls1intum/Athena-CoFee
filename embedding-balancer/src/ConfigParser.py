@@ -21,7 +21,7 @@ class ConfigParser:
             self.compute_nodes.append(compute_node)
             self.__logger.info("Parsed Compute Node definition - " + str(compute_node))
         else:
-            self.__logger.warning("Skipping Compute Node because it seems to be down - " + str(compute_node))
+            self.__logger.warning("Skipping Compute Node definition because it seems to be down - " + str(compute_node))
 
     def parseConfig(self):
         # Read config.yml file

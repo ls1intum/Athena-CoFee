@@ -88,7 +88,9 @@ class BalanceEmbedding:
         compute_nodes = ConfigParser().parseConfig()
         if not compute_nodes:
             resp.status = HTTP_500
-            resp.body = "Error parsing compute node config"
+            resp.body = "Error parsing compute node config or no available nodes"
+            self.__logger.error("No compute nodes. Abort Processing.")
+            self.__logger.debug("-" * 80)
             return
 
         self.createChunks(doc, compute_nodes)  # Split request into chunks and assign to nodes
