@@ -48,8 +48,8 @@ class ConfigParser:
                     for i, server in enumerate(traefik_services['loadBalancer']['servers']):
                         new_node = ComputeNode(name='traefik_'+str(i), url=str(server['url'])+str(node['embedding_route']),
                                                chunk_size=int(node['chunk_size']),
-                                               compute_power=int(node['compute_power']),
-                                               communication_cost=int(node['communication_cost']))
+                                               compute_power=float(node['compute_power']),
+                                               communication_cost=float(node['communication_cost']))
                         self.addComputeNode(new_node)
                 except Exception as e:
                     self.__logger.error("Error during config parsing: " + str(e))
@@ -63,9 +63,10 @@ class ConfigParser:
                     self.__logger.warning("Required variables are: " + str(required_variables))
                     continue
                 try:
-                    new_node = ComputeNode(name=str(node['name']), url=str(node['url']), chunk_size=int(node['chunk_size']),
-                                           compute_power=int(node['compute_power']),
-                                           communication_cost=int(node['communication_cost']))
+                    new_node = ComputeNode(name=str(node['name']), url=str(node['url']),
+                                           chunk_size=int(node['chunk_size']),
+                                           compute_power=float(node['compute_power']),
+                                           communication_cost=float(node['communication_cost']))
                     self.addComputeNode(new_node)
                 except Exception as e:
                     self.__logger.error("Error during config parsing: " + str(e))

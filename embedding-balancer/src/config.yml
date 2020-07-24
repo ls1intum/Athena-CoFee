@@ -4,7 +4,7 @@ docker_nodes:
   - traefik_service_api: http://athene01.ase.in.tum.de:8080/api/http/services/embedding@docker
     embedding_route: /embed
     chunk_size: 50
-    compute_power: 1
+    compute_power: 4
     communication_cost: 1
 
 # Configure stand-alone compute nodes
@@ -12,5 +12,5 @@ docker_nodes:
 #  - name: athene01
 #    url: http://athene01.ase.in.tum.de:8001/embed
 #    chunk_size: 50
-#    compute_power: 1
+#    compute_power: 4
 #    communication_cost: 1

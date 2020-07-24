@@ -96,7 +96,7 @@ class BalanceEmbedding:
         self.createChunks(doc, compute_nodes)  # Split request into chunks and assign to nodes
 
         # Function to process request chunk of a node
-        def threaded_request(thread_id: int, node: ComputeNode, timeout):
+        def threaded_request(thread_id: int, node: ComputeNode):
             self.__logger.info("Thread {} ({}) started processing ...".format(thread_id, node.name))
             rest = node.blocks
             thread_result = {"embeddings": []}
@@ -104,6 +104,8 @@ class BalanceEmbedding:
                 # Split request according to supported chunkSize of compute node
                 request_chunk, rest = self.splitBlocks(rest, node.chunk_size)
                 try:
+                    # 20 seconds static for ELMo initialization and model download (if required)
+                    timeout = 20 + (len(request_chunk['blocks']) / node.compute_power)
                     response = requests.post(node.url, data=json.dumps(request_chunk), timeout=timeout)
                     thread_result['embeddings'].extend(response.json()['embeddings'])
                 except Exception as e:
@@ -116,10 +118,8 @@ class BalanceEmbedding:
         self.__logger.info("Start load balanced computation ...")
         for i, node in enumerate(compute_nodes):
             # TODO: Distinguish between REST-call to processing-node or file-creation for GPU-node
-            # TODO: Variable Timeout and error handling for timeout
-            timeout = 60
             if len(node.blocks['blocks']) != 0:
-                t = Thread(target=threaded_request, args=(i, node, timeout))
+                t = Thread(target=threaded_request, args=(i, node))
                 t.start()
                 thread_list.append(t)
 
@@ -129,7 +129,6 @@ class BalanceEmbedding:
             if i in computing_result and 'embeddings' in computing_result[i]:
                 output['embeddings'].extend(computing_result[i]['embeddings'])
             else:
-                # TODO: Resend blocks to another compute node if processing failed
                 self.__logger.error("Error while merging computed embeddings of thread {}: ".format(i))
 
         endtime = datetime.now()                    # Stop timer
