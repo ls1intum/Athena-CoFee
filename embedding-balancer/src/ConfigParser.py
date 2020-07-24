@@ -1,4 +1,3 @@
-import json
 from logging import getLogger
 import yaml
 import os.path
@@ -7,6 +6,22 @@ from .entities import ComputeNode
 
 class ConfigParser:
     __logger = getLogger(__name__)
+    compute_nodes = list()
+
+    def checkComputeNode(self, url):
+        try:
+            requests.post(url, timeout=5)
+        except Exception as e:
+            #self.__logger.warning("Compute node did not respond: {}".format(str(e)))
+            return False
+        return True
+
+    def addComputeNode(self, compute_node):
+        if self.checkComputeNode(compute_node.url):
+            self.compute_nodes.append(compute_node)
+            self.__logger.info("Parsed Compute Node definition - " + str(compute_node))
+        else:
+            self.__logger.warning("Skipping Compute Node because it seems to be down - " + str(compute_node))
 
     def parseConfig(self):
         # Read config.yml file
@@ -18,8 +33,8 @@ class ConfigParser:
             self.__logger.error("Error reading config: " + str(e))
             return
 
-        compute_nodes = list()
-        # Parse docker swarm nodes
+        self.compute_nodes = list()
+        # Parse docker nodes
         if 'docker_nodes' in config:
             for node in config['docker_nodes']:
                 required_variables = ('traefik_service_api', 'embedding_route', 'chunk_size', 'compute_power', 'communication_cost')
@@ -35,8 +50,7 @@ class ConfigParser:
                                                chunk_size=int(node['chunk_size']),
                                                compute_power=int(node['compute_power']),
                                                communication_cost=int(node['communication_cost']))
-                        compute_nodes.append(new_node)
-                        self.__logger.info("Parsed Compute Node definition - " + str(new_node))
+                        self.addComputeNode(new_node)
                 except Exception as e:
                     self.__logger.error("Error during config parsing: " + str(e))
 
@@ -52,9 +66,8 @@ class ConfigParser:
                     new_node = ComputeNode(name=str(node['name']), url=str(node['url']), chunk_size=int(node['chunk_size']),
                                            compute_power=int(node['compute_power']),
                                            communication_cost=int(node['communication_cost']))
-                    compute_nodes.append(new_node)
-                    self.__logger.info("Parsed Compute Node definition - " + str(new_node))
+                    self.addComputeNode(new_node)
                 except Exception as e:
                     self.__logger.error("Error during config parsing: " + str(e))
 
-        return compute_nodes
+        return self.compute_nodes
