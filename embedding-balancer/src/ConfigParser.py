@@ -20,7 +20,7 @@ class ConfigParser:
 
         compute_nodes = list()
         # Parse docker swarm nodes
-        if 'docker_swarm_nodes' in config:
+        if 'docker_nodes' in config:
             for node in config['docker_nodes']:
                 required_variables = ('traefik_service_api', 'embedding_route', 'chunk_size', 'compute_power', 'communication_cost')
                 if not all(key in node for key in required_variables):

@@ -1,5 +1,5 @@
 # Configure compute nodes being managed by docker swarm and registered to traefik
-docker_swarm_nodes:
+docker_nodes:
   #- traefik_service_api: http://tasks.traefik:8080/api/http/services/embedding@docker
   - traefik_service_api: http://athene01.ase.in.tum.de:8080/api/http/services/embedding@docker
     embedding_route: /embed
