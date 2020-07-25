@@ -14,8 +14,8 @@ from benchmark.src.similarity_measure import PrecisionRecallSimilarity, L1Simila
 __logger = getLogger(__name__)
 
 
-def process_text_blocks(text_blocks, courseId=None, plot_emb=False, plot_cl_sizes=True, log_textblocks_to_clusters=False,
-                        log_cluster_sizes=True):
+def process_text_blocks(text_blocks, courseId=None, plot_emb=True, plot_cl_sizes=True, log_textblocks_to_clusters=False,
+                        log_cluster_sizes=False):
     embeddings = embed(text_blocks, courseId=courseId)
     clusters = Cluster.clusters_from_network_response(cluster(embeddings))
     for text_block in text_blocks:
@@ -47,6 +47,7 @@ def process_text_blocks(text_blocks, courseId=None, plot_emb=False, plot_cl_size
 
 def evaluate_by_labeled_sentences(courseId=None):
     text_blocks = read_labeled_sentences_from_csv()
+    text_blocks = [text_block for text_block in text_blocks if len(text_block.text) > 10]
     text_blocks = process_text_blocks(text_blocks, courseId)
     __logger.info("similarity labeled data for course {}".format(courseId))
     PrecisionRecallSimilarity(text_blocks).output_results()
@@ -54,7 +55,8 @@ def evaluate_by_labeled_sentences(courseId=None):
 
 
 def evaluate_by_artemis_data(courseId=None):
-    text_blocks = read_sentences_feedback_from_csv( num_sentences=750)
+    text_blocks = read_sentences_feedback_from_csv(num_sentences=750)
+    text_blocks = [text_block for text_block in text_blocks if len(text_block.text) > 10]
     text_blocks = process_text_blocks(text_blocks, courseId)
     __logger.info("similarity grade-based for course {}".format(courseId))
     L1Similarity(text_blocks).output_results()
@@ -63,7 +65,7 @@ def evaluate_by_artemis_data(courseId=None):
 
 def plot_sentences(sentences, courseId=None):
     text_blocks = [TextBlock(sentence) for sentence in sentences]
-    process_text_blocks(text_blocks, courseId, plot_embeddings=True)
+    process_text_blocks(text_blocks, courseId, plot_emb=True)
 
 
 if __name__ == "__main__":
@@ -91,7 +93,13 @@ if __name__ == "__main__":
         "I booked first class seat on the train",
     ]
 
+
+    # plot_sentences(sentences, courseId="022")
     # plot_sentences(sentences)
+    evaluate_by_artemis_data(courseId="022")
+    evaluate_by_artemis_data()
+    # evaluate_by_artemis_data()
+
 
     # evaluate_by_labeled_sentences()
     # evaluate_by_labeled_sentences(courseId="021")

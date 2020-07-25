@@ -89,10 +89,10 @@ class QWKSimilarity(SimilarityMeasure):
     def __init__(self, text_blocks):
         for text_block in text_blocks:
             text_block.compute_grade_from_cluster(text_blocks)
-        self.text_blocks = [text_block for text_block in text_blocks if text_block.computed_cluster.id != -1]
+        self.text_blocks = text_blocks
 
-        ground_truth_grades = [text_block.ground_truth_grade for text_block in text_blocks]
-        predicted_grades = [text_block.grade_from_cluster for text_block in text_blocks]
+        ground_truth_grades = [text_block.ground_truth_grade for text_block in self.text_blocks]
+        predicted_grades = [text_block.grade_from_cluster for text_block in self.text_blocks]
 
         avg_ground_truth_grades = sum(ground_truth_grades) / len(ground_truth_grades)
         avg_predicted_grades = sum(predicted_grades) / len(predicted_grades)
