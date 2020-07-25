@@ -17,13 +17,13 @@ class Embedding:
         return cls(dict['id'], dict['vector'])
 
 class ComputeNode:
-    name: str
-    url: str
-    chunk_size: int
-    chunk_quantity: int
-    blocks: []
-    compute_power: float
-    communication_cost: float
+    name: str                       # Can be chosen freely (Appears in log)
+    url: str                        # URL of the embedding-API
+    chunk_size: int                 # Maximum supported chunk size (normally limited by RAM/GPU-Memory)
+    chunk_quantity: int             # Amount of blocks being assigned to the compute node
+    blocks: []                      # Specific blocks which should be processed by the compute node
+    compute_power: float            # Influences the distribution of blocks (affecting calculation part)
+    communication_cost: float       # Influences the distribution of blocks (affecting overhead for computation)
 
     def __init__(self, name: str, url: str, chunk_size: int, compute_power: float, communication_cost: float):
         self.name = name

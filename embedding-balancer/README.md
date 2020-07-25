@@ -2,11 +2,10 @@ Service runs on port 8000
 
 Balances load for embedding requests to underlying processing nodes
 
-the following API-routes will be available after start:
-[http://localhost:8001/embed](http://localhost:8000/embed)  
-[http://localhost:8001/upload](http://localhost:8000/upload)
+the following API-route will be available after start:
+[http://localhost:8000/embed](http://localhost:8000/embed) or [http://localhost/embed](http://localhost/embed) if being run in combination with traefik and the docker-compose file.
 
-Input example JSON for POST on http://localhost:8000/embed
+Input example JSON for POST on http://localhost/embed
 
 ```json
 {
@@ -21,17 +20,6 @@ Input example JSON for POST on http://localhost:8000/embed
     "text" : "and this is the second one"
     }
   ]
- }
-```
-
-
-Input example JSON for POST on http://localhost:8000/upload
-
-```json
-{
-  "courseId" : "1234",
-  "fileName" : "file.pdf",
-  "fileData" : "a21s5d5sqa354a34575"
  }
 ```
 

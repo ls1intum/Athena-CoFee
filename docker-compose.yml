@@ -54,12 +54,12 @@ services:
     expose:
        - 8000
     environment:
-      - CONFIG_FILE_PATH=src/config.yml
+      - CONFIG_FILE_PATH=src/compute_node_config.yml
     working_dir: /usr/src/app
     networks:
       - athene
     volumes:
-      - ./embedding-balance.yml:/usr/src/app/src/config.yml:ro
+      - ./embedding-balance.yml:/usr/src/app/src/compute_node_config.yml:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.embedding.rule=Path(`/embed`)

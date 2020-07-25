@@ -2,8 +2,6 @@ import json
 from datetime import datetime
 from logging import getLogger
 import math
-import os.path
-from typing import List
 from falcon import Request, Response, HTTP_200, HTTP_500
 from numpy import ndarray
 import requests
@@ -22,7 +20,7 @@ class BalanceEmbedding:
 
     # Returns and part of doc with length <size> and the rest of doc
     def splitBlocks(self, doc, size):
-        # Minimum of 2 blocks is required to compute embeddings - prevent this case
+        # Minimum of 2 blocks is required to compute embeddings - prevent 1 single remaining block
         if len(doc['blocks']) == (size + 1):
             size += 1
 
@@ -81,7 +79,7 @@ class BalanceEmbedding:
         # Computing preparation
         output = {"embeddings": []}                 # Declare output variable
         starttime = datetime.now()                  # Start timer
-        computing_result = {}                       # Declare array for individual results
+        computing_result = {}                       # Declare array for thread results
         thread_list = list()                        # Declare list for started threads
 
         # Parse available compute nodes using config file
@@ -93,13 +91,15 @@ class BalanceEmbedding:
             self.__logger.debug("-" * 80)
             return
 
-        self.createChunks(doc, compute_nodes)  # Split request into chunks and assign to nodes
+        # Split request into chunks and assign to nodes
+        self.createChunks(doc, compute_nodes)
 
         # Function to process request chunk of a node
         def threaded_request(thread_id: int, node: ComputeNode):
             self.__logger.info("Thread {} ({}) started processing ...".format(thread_id, node.name))
             rest = node.blocks
             thread_result = {"embeddings": []}
+            # Process all blocks assigned to compute node
             while len(rest['blocks']) != 0:
                 # Split request according to supported chunkSize of compute node
                 request_chunk, rest = self.splitBlocks(rest, node.chunk_size)
@@ -111,10 +111,11 @@ class BalanceEmbedding:
                 except Exception as e:
                     self.__logger.error("Thread {} had an error during processing: {}".format(thread_id, str(e)))
                     return
+            # Write merged results into global result array
             computing_result[thread_id] = thread_result
             self.__logger.info("Thread {} ({}) finished processing.".format(thread_id, node.name))
 
-        # Process chunks concurrently
+        # Process chunks concurrently (one thread for each compute node)
         self.__logger.info("Start load balanced computation ...")
         for i, node in enumerate(compute_nodes):
             # TODO: Distinguish between REST-call to processing-node or file-creation for GPU-node

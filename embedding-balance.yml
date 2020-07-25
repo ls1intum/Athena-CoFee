@@ -1,10 +1,10 @@
 # Configure compute nodes being managed by docker compose/swarm and registered to traefik
 docker_nodes:
-  # This url resolves to the API of the traefik-container inside the docker-network
+  # This url resolves to the API of the traefik-container inside the docker-network started via docker-compose
   - traefik_service_api: http://athene-traefik:8080/api/http/services/embedding-athene@docker
     embedding_route: /embed
     chunk_size: 50
-    compute_power: 1
+    compute_power: 4
     communication_cost: 1
 
 # Configure stand-alone compute nodes
@@ -13,5 +13,5 @@ docker_nodes:
 #    # This url resolves to the embedding-container inside the docker-network
 #    url: http://athene-embedding:8000/embed
 #    chunk_size: 50
-#    compute_power: 1
+#    compute_power: 4
 #    communication_cost: 1
