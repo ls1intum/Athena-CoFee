@@ -1,5 +1,7 @@
 .venv
 .vscode
 .git
+.github
 .gitignore
+data
 logs/*
