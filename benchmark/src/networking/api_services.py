@@ -19,18 +19,17 @@ def segment(submissions, keywords=None):
     return post(SEGMENTATION_URL, request)
 
 
-def __check_feedback_consistency(text_blocks, feedback):
-    # request with {"text_blocks":[{'id':,'submission_id':,'cluster_id':,'text':,'reference':}]}
-    # {"feedback":[{'id':,'text':,'score':,'reference'}]} response with true and false at the moment
-    request = {"text_blocks": text_blocks, "feedback": feedback}
+def __check_feedback_consistency(feedback_with_text_block, exerciseId):
+    # request with {"feedbackWithTextBlock":[{'textBlockId':,'clusterId':,'text':,'feedbackId':,'feedbackText':,'credits':}]}
+    # {"feedbackInconsistencies":[{'firstFeedbackId':,'secondFeedbackId':,'type':]}
+    request = {"feedbackWithTextBlock": feedback_with_text_block, "exerciseId": exerciseId}
     return post(FEEDBACK_CONSISTENCY_URL, request)
 
 
 def check_feedback_consistency(feedback_with_text_blocks):
     for fwt in feedback_with_text_blocks:
-        text_blocks = [block.json_rep_text_block() for block in fwt]
-        feedback = [block.json_rep_feedback() for block in fwt]
-        __check_feedback_consistency(text_blocks, feedback)
+        feedback_with_text_block = [block.json_rep() for block in fwt]
+        print(__check_feedback_consistency(feedback_with_text_block, 1))
 
 
 def __embed(text_blocks, courseId=None):
