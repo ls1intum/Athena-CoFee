@@ -55,8 +55,3 @@ class TestClustering(TestCase):
         self.assertEqual(len(set(clusters_software)), 1)
         self.assertEqual(len(set(clusters_law)), 1)
 
-    def test_visualize_clusters(self):
-        embeddings = self.embeddings_flowers + self.embeddings_software + self.embeddings_law
-        self.clustering.visualize_tree(embeddings, show_clusters=True)
-        plt.show()
-
