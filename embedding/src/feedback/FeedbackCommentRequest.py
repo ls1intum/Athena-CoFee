@@ -1,7 +1,7 @@
 import json
 from logging import getLogger
 from falcon import Request, Response, HTTP_200, HTTP_204
-from src.errors import emptyBody, requireTextBlocks, requireFeedback
+from src.errors import emptyBody, requireFeedbackWithTextBlock, requireExerciseId
 from src.entities import FeedbackWithTextBlock, Feedback
 from src.feedback.FeedbackConsistency import FeedbackConsistency
 
@@ -17,28 +17,27 @@ class FeedbackCommentRequest:
             raise emptyBody
 
         doc = json.load(req.stream)
-        if "text_blocks" not in doc:
-            self.__logger.error("{} ({})".format(requireTextBlocks.title, requireTextBlocks.description))
-            raise requireTextBlocks
+        self.__logger.info("Request: {}".format(doc))
+        if "feedbackWithTextBlock" not in doc:
+            self.__logger.error("{} ({})".format(requireTextBlockWithFeedback.title, requireTextBlockWithFeedback.description))
+            raise requireTextBlockWithFeedback
 
-        if "feedback" not in doc:
-            self.__logger.error("{} ({})".format(requireFeedback.title, requireFeedback.description))
-            raise requireFeedback
+        if "exerciseId" not in doc:
+            self.__logger.error("{} ({})".format(requireExerciseId.title, requireExerciseId.description))
+            raise requireExerciseId
 
         blocks: list[FeedbackWithTextBlock] = []
 
-        for f in doc['feedback']:
-            for b in doc['text_blocks']:
-                if f['reference'] == b['reference']:
-                    blocks.append(FeedbackWithTextBlock.from_dict(b, Feedback.from_dict(f)))
-                    break
+        for fwt in doc['feedbackWithTextBlock']:
+            blocks.append(FeedbackWithTextBlock(fwt['textBlockId'], fwt['clusterId'], fwt['text'], Feedback(fwt['feedbackId'], fwt['feedbackText'], fwt['credits'])))
 
-        __fc = FeedbackConsistency()
+        __fc = FeedbackConsistency(doc['exerciseId'])
         response = __fc.check_consistency(feedback_with_text_blocks=blocks)
+        self.__logger.info("Response {}".format(response))
         resp.body = json.dumps(response, ensure_ascii=False)
         __fc.store_feedback()
 
-        resp.status = HTTP_200 if response else HTTP_204
+        resp.status = HTTP_200
 
         self.__logger.info("Completed Feedback Comment Embedding Request.")
         self.__logger.debug("-" * 80)

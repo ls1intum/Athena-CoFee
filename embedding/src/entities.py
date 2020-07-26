@@ -45,30 +45,20 @@ class Feedback:
         self.score = score
         self.feedbackEmbeddings = []
 
-    @classmethod
-    def from_dict(cls, _dict: dict) -> 'Feedback':
-        return cls(_dict['id'], _dict['text'], _dict['score'])
-
 
 class FeedbackWithTextBlock:
     id: str
-    submission_id: int
-    cluster_id: int
+    cluster_id: str
     text: str
     text_embedding: ElmoVector
     feedback: Feedback
 
-    def __init__(self, _id: str, submission_id: int, cluster_id: int, text: str, feedback: Feedback):
+    def __init__(self, _id: str, cluster_id: str, text: str, feedback: Feedback):
         self.id = _id
-        self.submission_id = submission_id
         self.cluster_id = cluster_id
         self.text = text
         self.feedback = feedback
 
     def add_feedback_embedding(self, embedding: ElmoVector):
         self.feedback.feedbackEmbeddings.append(embedding)
-
-    @classmethod
-    def from_dict(cls, _dict: dict, feedback: Feedback) -> 'FeedbackWithTextBlock':
-        return cls(_dict['id'], _dict['submission_id'], _dict['cluster_id'], _dict['text'], feedback)
 
