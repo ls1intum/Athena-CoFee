@@ -14,9 +14,10 @@ class FeedbackCommentResource:
     __logger = getLogger(__name__)
     __collection = 'feedback_consistency'
 
-    def __init__(self):
+    def __init__(self, exercise_id):
         self.__elmo = ELMo()
         self.__conn = Connection()
+        self.__collection = 'feedback_consistency_' + str(exercise_id)
 
     def __segment_feedback_comments(self, feedback_with_tb: list):
         self.__logger.info("Segment Feedback Comments.")
@@ -35,7 +36,7 @@ class FeedbackCommentResource:
         for embedding in feedback_with_tb.feedback.feedbackEmbeddings:
             embeddings.append({'embedding': pickle.dumps(np.array(embedding).flatten().tolist())})
 
-        doc = {'_id': feedback_with_tb.id, 'submission_id': feedback_with_tb.submission_id,
+        doc = {'_id': feedback_with_tb.id,
                'cluster_id': feedback_with_tb.cluster_id,
                'text': feedback_with_tb.text,
                'text_embedding': pickle.dumps(np.array(feedback_with_tb.text_embedding).flatten().tolist()), 'feedback': {'feedback_id': feedback_with_tb.feedback.id,

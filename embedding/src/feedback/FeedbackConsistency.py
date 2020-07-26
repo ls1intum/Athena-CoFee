@@ -9,17 +9,17 @@ class FeedbackConsistency:
     __logger = getLogger(__name__)
     __feedback_with_text_blocks: list = None
 
-    def __init__(self):
-        self.__feedback_comment_resource = FeedbackCommentResource()
+    def __init__(self, exercise_id):
+        self.__feedback_comment_resource = FeedbackCommentResource(exercise_id)
         self.__comment_threshold = 0.37
         self.__text_block_threshold = 0.21
 
     def __get_inconsistency(self, score_diff: float, comment_distance: float, text_block_distance: float):
         if text_block_distance < self.__text_block_threshold:
             if score_diff:
-                return 'inconsistent score' if comment_distance < self.__comment_threshold else 'inconsistent feedback'
+                return 'INCONSISTENT_SCORE' if comment_distance < self.__comment_threshold else 'INCONSISTENT_FEEDBACK'
             else:
-                return 'inconsistent comment' if comment_distance > self.__comment_threshold else None
+                return 'INCONSISTENT_COMMENT' if comment_distance > self.__comment_threshold else None
         else:
             return None
 
@@ -58,9 +58,9 @@ class FeedbackConsistency:
                 text_block_distance = self.__calculate_mean_distance(x=student_text_vector_x, y=student_text_vector_y)
                 inconsistency = self.__get_inconsistency(score_diff=abs(fwt.feedback.score - item['feedback']['feedback_score']), comment_distance=feedback_distance, text_block_distance=text_block_distance)
                 if inconsistency:
-                    doc.append({"first_feedback_id": fwt.feedback.id, "second_feedback_id": item['feedback']['feedback_id'], "inconsistency_type": inconsistency})
+                    doc.append({"firstFeedbackId": fwt.feedback.id, "secondFeedbackId": item['feedback']['feedback_id'], "type": inconsistency})
 
-        return None if not doc else {'feedbackConsistencies': doc}
+        return {'feedbackInconsistencies': doc}
 
     def store_feedback(self):
         self.__feedback_comment_resource.store_feedback(self.__feedback_with_text_blocks)
