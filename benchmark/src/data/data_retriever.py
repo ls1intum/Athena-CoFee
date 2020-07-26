@@ -6,7 +6,7 @@ from pandas import read_csv
 from benchmark.src.entities.text_block import TextBlock
 
 __cwd = Path.cwd()
-PATH_LABELED_SUBMISSIONS = (__cwd / "data/resources/text_block.csv").resolve()
+PATH_LABELED_SUBMISSIONS = (__cwd / "data/resources/clustered_text_blocks.csv").resolve()
 PATH_TEXT_BLOCKS = (__cwd / "data/resources/ArTEMiS_text_block.csv").resolve()
 PATH_FEEDBACK = (__cwd / "data/resources/ArTEMiS_feedback.csv").resolve()
 
