@@ -20,6 +20,7 @@ def segment(submissions, keywords=None):
 
 
 def __embed(text_blocks, courseId=None):
+    # embedding function without splitting of the sentences into smaller chunks
     # request with {'courseId': 25, 'blocks': [{'id': 1, 'text': 'this is the first block'}, {'id': 2, 'text': 'this is the second block'}]}
     # response with { 'embeddings': [{'id': , 'vector':[]}] }
     request = {"blocks": [text_block.json_rep() for text_block in text_blocks]}
@@ -27,8 +28,8 @@ def __embed(text_blocks, courseId=None):
         request["courseId"] = courseId
     return post(EMBEDDING_URL, request)['embeddings']
 
-
 def embed(text_blocks, courseId=None):
+    # splits the text_blocks into chunks of 50 blocks and embeds them
     split_text_blocks = [text_blocks]
     if len(text_blocks) > 50:
         split_text_blocks = np.array_split(np.array(text_blocks), len(text_blocks) / 50)
@@ -41,3 +42,5 @@ def cluster(embeddings):
     # response with {"clusters": {"-1": {"blocks": [{"id": 1}, {"id": 2}], "probabilities": [0.0, 0.0], "distanceMatrix": [[0.0, 0.22923004776660816], [0.22923004776660816, 0.0]]}}}
     request = {"embeddings": embeddings}
     return post(CLUSTERING_URL, request)['clusters']
+
+

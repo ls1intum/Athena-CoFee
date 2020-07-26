@@ -3,7 +3,7 @@ import sys
 
 import matplotlib.pyplot as plt
 
-from benchmark.src.data.data_retriever import read_labeled_sentences_from_csv, read_sentences_feedback_from_csv
+from benchmark.src.data.data_retriever import read_clustered_sentences_from_csv, read_graded_sentences_from_csv
 from benchmark.src.entities.cluster import Cluster
 from benchmark.src.entities.text_block import TextBlock
 from benchmark.src.networking.api_services import *
@@ -14,8 +14,19 @@ from benchmark.src.similarity_measure import PrecisionRecallSimilarity, L1Simila
 __logger = getLogger(__name__)
 
 
-def process_text_blocks(text_blocks, courseId=None, plot_emb=True, plot_cl_sizes=True, log_textblocks_to_clusters=False,
+def process_text_blocks(text_blocks, courseId=None, plot_emb=True, plot_cl_sizes=True, log_text_blocks_to_clusters=False,
                         log_cluster_sizes=False):
+    """ preprocesses the text_blocks (of type [TextBlock]) by embedding the text data and executing the clustering
+    for each TextBlock object the attributes computed_cluster and embedding are filled accordingly
+
+    :param text_blocks: the input sentences
+    :param courseId: the Id of the course in case a context-specific embedding is needed
+    :param plot_emb: if true, plots the embedding of the text blocks
+    :param plot_cl_sizes: if true, shows a histogram of cluster sizes
+    :param log_text_blocks_to_clusters:  if true, print the assignement of each text block to its cluster
+    :param log_cluster_sizes: if true, prints information about the cluster sizes
+    :return: the processed text blocks
+    """
     embeddings = embed(text_blocks, courseId=courseId)
     clusters = Cluster.clusters_from_network_response(cluster(embeddings))
     for text_block in text_blocks:
@@ -28,7 +39,7 @@ def process_text_blocks(text_blocks, courseId=None, plot_emb=True, plot_cl_sizes
     if plot_cl_sizes:
         plot_cluster_sizes(clusters)
 
-    if log_textblocks_to_clusters:
+    if log_text_blocks_to_clusters:
         cluster_to_text = ["cluster {}: {}".format(textblock.computed_cluster.id, textblock.original_text) for textblock in
                            text_blocks]
         cluster_to_text.sort()
@@ -45,8 +56,12 @@ def process_text_blocks(text_blocks, courseId=None, plot_emb=True, plot_cl_sizes
     return text_blocks
 
 
-def evaluate_by_labeled_sentences(courseId=None):
-    text_blocks = read_labeled_sentences_from_csv()
+def evaluate_with_ground_truth_clusters(courseId=None):
+    """
+    executes the evaluation using text_blocks grouped in ground-truth similarity clusters
+    :param courseId: the Id of the course in case a context-specific embedding is needed
+    """
+    text_blocks = read_clustered_sentences_from_csv()
     text_blocks = [text_block for text_block in text_blocks if len(text_block.text) > 10]
     text_blocks = process_text_blocks(text_blocks, courseId)
     __logger.info("similarity labeled data for course {}".format(courseId))
@@ -54,8 +69,12 @@ def evaluate_by_labeled_sentences(courseId=None):
     AdjustedRandIndexSimilarity(text_blocks).output_results()
 
 
-def evaluate_by_artemis_data(courseId=None):
-    text_blocks = read_sentences_feedback_from_csv(num_sentences=750)
+def evaluate_with_ground_truth_grades(courseId=None):
+    """
+    executes the evaluation using text_blocks labeled by ground-truth grades
+    :param courseId: the Id of the course in case a context-specific embedding is needed
+    """
+    text_blocks = read_graded_sentences_from_csv(num_sentences=750)
     text_blocks = [text_block for text_block in text_blocks if len(text_block.text) > 10]
     text_blocks = process_text_blocks(text_blocks, courseId)
     __logger.info("similarity grade-based for course {}".format(courseId))
@@ -94,36 +113,10 @@ if __name__ == "__main__":
     ]
 
 
-    # plot_sentences(sentences, courseId="022")
-    # plot_sentences(sentences)
-    evaluate_by_artemis_data(courseId="022")
-    evaluate_by_artemis_data()
-    # evaluate_by_artemis_data()
+    plot_sentences(sentences, courseId="022")
+    plot_sentences(sentences)
+    evaluate_with_ground_truth_grades(courseId="022")
+    evaluate_with_ground_truth_grades()
 
 
-    # evaluate_by_labeled_sentences()
-    # evaluate_by_labeled_sentences(courseId="021")
-    # evaluate_by_labeled_sentences( courseId="022")
-    # evaluate_by_labeled_sentences( courseId="081")
-    # evaluate_by_labeled_sentences( courseId="082")
-    # evaluate_by_labeled_sentences(courseId="083")
-    # evaluate_by_labeled_sentences(courseId="0321")
-    # evaluate_by_labeled_sentences(courseId="0322")
-    # evaluate_by_labeled_sentences(courseId="0323")
-    # evaluate_by_labeled_sentences(courseId="0641")
-    # evaluate_by_labeled_sentences(courseId="0642")
-    # evaluate_by_labeled_sentences(courseId="0643")
-    #
-    # evaluate_by_artemis_data()
-    # evaluate_by_artemis_data(courseId="021")
-    # evaluate_by_artemis_data(courseId="022")
-    # evaluate_by_artemis_data(courseId="081")
-    # evaluate_by_artemis_data(courseId="082")
-    # evaluate_by_artemis_data(courseId="083")
-    # evaluate_by_artemis_data(courseId="0321")
-    # evaluate_by_artemis_data(courseId="0322")
-    # evaluate_by_artemis_data(courseId="0323")
-    # evaluate_by_artemis_data(courseId="0641")
-    # evaluate_by_artemis_data(courseId="0642")
-    # evaluate_by_artemis_data(courseId="0643")
     plt.show()

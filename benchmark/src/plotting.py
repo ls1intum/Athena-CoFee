@@ -12,6 +12,10 @@ def reduce_dimensions(vectors):
 
 
 def plot_cluster_sizes(clusters):
+    """
+    plots a histogram of cluster sizes
+    :param clusters: the input clusters
+    """
     cluster_sizes = [len(cluster.block_ids) for cluster in clusters if cluster.id != -1]
     fig, ax = plt.subplots(1, 1)
     ax.hist(cluster_sizes, bins=max(cluster_sizes))
@@ -21,11 +25,16 @@ def plot_cluster_sizes(clusters):
 
 
 def plot_embeddings(textblocks: [TextBlock], persist_labels=False):
+    """
+    plots the embeddings on 2D plot after executing the dimension reduction using TSNE
+    :param textblocks: processed (embedded and clustered) text blocks
+    :param persist_labels: if true, persists for each point  the label containing the original text block,
+     otherwise: labels only on mouse hover
+    """
     textblocks = [textblock for textblock in textblocks if int(textblock.computed_cluster.id) > -1]
     vectors = [textblock.embedding for textblock in textblocks]
     texts = [textblock.original_text for textblock in textblocks]
     clusters = [int(textblock.computed_cluster.id) for textblock in textblocks]
-    # clusters = [int(textblock.ground_truth_cluster) for textblock in textblocks]
     probabilities = [textblock.probability_in_cluster for textblock in textblocks]
     vectors = reduce_dimensions(vectors)
 
@@ -44,8 +53,6 @@ def plot_embeddings(textblocks: [TextBlock], persist_labels=False):
     norm = plt.Normalize(1, 4)
     fig, ax = plt.subplots()
     sc = plt.scatter(x, y, c=colors, s=100, norm=norm)
-    # plt.xlim(-200, 250)
-    # plt.xlim(-200, 250)
 
     if persist_labels:
         for i in range(len(x)):

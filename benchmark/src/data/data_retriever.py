@@ -11,7 +11,7 @@ PATH_TEXT_BLOCKS = (__cwd / "data/resources/ArTEMiS_text_block.csv").resolve()
 PATH_FEEDBACK = (__cwd / "data/resources/ArTEMiS_feedback.csv").resolve()
 
 
-def read_labeled_sentences_from_csv(num_sentences=None):
+def read_clustered_sentences_from_csv(num_sentences=None):
     submissions = read_csv(PATH_LABELED_SUBMISSIONS)
     submissions = submissions[~submissions["manual_cluster_id"].isnull()]
     sentences = submissions[["text"]].values.flatten()
@@ -25,7 +25,7 @@ def read_labeled_sentences_from_csv(num_sentences=None):
             range(num_sentences)]
 
 
-def read_sentences_feedback_from_csv(num_sentences=None):
+def read_graded_sentences_from_csv(num_sentences=None):
     text_blocks_csv = read_csv(PATH_TEXT_BLOCKS)
     feedback_csv = read_csv(PATH_FEEDBACK)
     result = pd.merge(text_blocks_csv, feedback_csv, left_on="id",  right_on="reference")
