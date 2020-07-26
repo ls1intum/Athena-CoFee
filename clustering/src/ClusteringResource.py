@@ -47,6 +47,7 @@ class ClusteringResource:
             indices = [ i for i, x in enumerate(labels) if x == clusterLabel ]
             clusters[clusterLabel] = {
                 'blocks': [ TextBlock(embeddings[i].id) for i in indices ],
+                'treeId': self.__clustering.label_to_tree_id(clusterLabel)
             }
         doc = {'clusters': clusters, 'distanceMatrix': [], 'clusterTree': []}
 

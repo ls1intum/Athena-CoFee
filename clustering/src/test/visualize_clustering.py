@@ -118,31 +118,6 @@ def print_old_clustering_results():
             print('Number of blocks in cluster {}: {}'.format(i, len(old_cluster_list[i])))
 
 
-# Gets the id in the tree structure for given cluster label
-def label_to_tree_id(tree, labels, cluster_label):
-    points = []
-    for i in range(len(labels)):
-        if labels[i] == cluster_label:
-            points.append(i)
-    return trace_ancestor(points, tree)
-
-
-# For a given set of leaves in the given tree structure, finds and returns the first common ancestor
-def trace_ancestor(leaves, tree):
-    parents = []
-    leaf_tree = tree[tree['child'].isin(leaves)]
-    for parent in set(leaf_tree['parent'].values.tolist()):
-        parents.append(parent)
-    while len(parents) != 1:
-        current_parent = max(parents)
-        cell = tree[tree.child == current_parent]
-        new_parent = (cell['parent'].values.tolist())[0]
-        parents.remove(current_parent)
-        if new_parent not in parents:
-            parents.append(new_parent)
-    return parents[0]
-
-
 # Finds clusters that share the parent cluster with the given one
 def find_sibling_clusters(tree, cluster_id):
     # 6965 for the default setup
@@ -221,7 +196,7 @@ def perform_analysis(exercise_id, cluster_obj, visualise=False, print_old_result
     tree = cluster_obj.clusterer.condensed_tree_.to_pandas()
     labels = cluster_obj.clusterer.labels_
     # Tree id of the biggest cluster is 6967 for the default setup
-    current_cluster = label_to_tree_id(tree, labels, biggest_cluster)
+    current_cluster = cluster_obj.label_to_tree_id(biggest_cluster)
     merge_candidates = find_sibling_clusters(tree=tree, cluster_id=current_cluster)
     print(merge_candidates)
 
