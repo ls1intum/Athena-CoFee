@@ -39,10 +39,11 @@ class FeedbackCommentResource:
         doc = {'_id': feedback_with_tb.id,
                'cluster_id': feedback_with_tb.cluster_id,
                'text': feedback_with_tb.text,
-               'text_embedding': pickle.dumps(np.array(feedback_with_tb.text_embedding).flatten().tolist()), 'feedback': {'feedback_id': feedback_with_tb.feedback.id,
-                                                           'feedback_text': feedback_with_tb.feedback.text,
-                                                           'feedback_score': feedback_with_tb.feedback.score,
-                                                           'feedback_text_blocks': embeddings}}
+               'text_embedding': pickle.dumps(np.array(feedback_with_tb.text_embedding).flatten().tolist()),
+               'feedback': {'feedback_id': feedback_with_tb.feedback.id,
+                            'feedback_text': feedback_with_tb.feedback.text,
+                            'feedback_score': feedback_with_tb.feedback.score,
+                            'feedback_text_blocks': embeddings}}
 
         return doc
 
@@ -88,9 +89,9 @@ class FeedbackCommentResource:
 
         self.__replace_insert_documents(documents=docs)
 
-    def get_feedback_in_same_cluster(self, cluster_id: int):
+    def get_feedback_in_same_cluster(self, cluster_id: str, feedback_id: str):
         self.__logger.info("Get feedback with same cluster id.")
-        _filter = {'cluster_id': cluster_id}
+        _filter = {'$and': [{'cluster_id': cluster_id}, {'feedback.feedback_id': {'$ne': feedback_id}}]}
         try:
             result = self.__conn.find_documents(collection=self.__collection, filter_dict=_filter)
         except Exception as e:

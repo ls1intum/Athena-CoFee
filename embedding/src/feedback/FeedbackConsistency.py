@@ -48,7 +48,7 @@ class FeedbackConsistency:
             feedback_vector_x = fwt.feedback.feedbackEmbeddings
             student_text_vector_x = fwt.text_embedding.reshape(1, -1).tolist()
             # Get the assessments which have same the same cluster id
-            cluster = self.__feedback_comment_resource.get_feedback_in_same_cluster(cluster_id=fwt.cluster_id)
+            cluster = self.__feedback_comment_resource.get_feedback_in_same_cluster(cluster_id=fwt.cluster_id, feedback_id=fwt.feedback.id)
             # Calculate distances between each feedback embeddings and text block embeddings(student answers)
             for item in cluster:
                 feedback_vector_y = list(map(lambda embedding: pickle.loads(embedding['embedding']),
