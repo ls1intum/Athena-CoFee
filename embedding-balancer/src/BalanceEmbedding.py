@@ -85,6 +85,7 @@ class BalanceEmbedding:
         # Parse available compute nodes using config file
         compute_nodes = ConfigParser().parseConfig()
         if not compute_nodes:
+            # Override response status code
             resp.status = HTTP_500
             resp.body = "Error parsing compute node config or no available nodes"
             self.__logger.error("No compute nodes. Abort Processing.")
@@ -143,9 +144,6 @@ class BalanceEmbedding:
         # Create a JSON representation of the resource
         resp.body = json.dumps(output, ensure_ascii=False, default=self.__default)
 
-        # The following line can be omitted because 200 is the default
-        # status returned by the framework, but it is included here to
-        # illustrate how this may be overridden as needed.
-        resp.status = HTTP_200
+        # Default response status code is 200
         self.__logger.info("Completed Embedding Request.")
         self.__logger.debug("-" * 80)
