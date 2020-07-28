@@ -14,8 +14,9 @@ from benchmark.src.similarity_measure import PrecisionRecallSimilarity, L1Simila
 __logger = getLogger(__name__)
 
 
-def process_text_blocks(text_blocks, courseId=None, plot_emb=True, plot_cl_sizes=True, log_text_blocks_to_clusters=False,
-                        log_cluster_sizes=False):
+def process_text_blocks(text_blocks, courseId=None, plot_emb=False, plot_cl_sizes=True,
+                        log_text_blocks_to_clusters=False,
+                        log_cluster_sizes=True):
     """ preprocesses the text_blocks (of type [TextBlock]) by embedding the text data and executing the clustering
     for each TextBlock object the attributes computed_cluster and embedding are filled accordingly
 
@@ -40,7 +41,8 @@ def process_text_blocks(text_blocks, courseId=None, plot_emb=True, plot_cl_sizes
         plot_cluster_sizes(clusters)
 
     if log_text_blocks_to_clusters:
-        cluster_to_text = ["cluster {}: {}".format(textblock.computed_cluster.id, textblock.original_text) for textblock in
+        cluster_to_text = ["cluster {}: {}".format(textblock.computed_cluster.id, textblock.original_text) for textblock
+                           in
                            text_blocks]
         cluster_to_text.sort()
         for result in cluster_to_text:
@@ -74,9 +76,22 @@ def evaluate_with_ground_truth_grades(courseId=None):
     executes the evaluation using text_blocks labeled by ground-truth grades
     :param courseId: the Id of the course in case a context-specific embedding is needed
     """
-    text_blocks = read_graded_sentences_from_csv(num_sentences=750)
+    text_blocks = read_graded_sentences_from_csv()
     text_blocks = [text_block for text_block in text_blocks if len(text_block.text) > 10]
-    text_blocks = process_text_blocks(text_blocks, courseId)
+
+    # handle 1000 text blocks at a time
+    split_text_blocks = [text_blocks]
+    if len(text_blocks) > 1000:
+        split_text_blocks = np.array_split(np.array(text_blocks), len(text_blocks) / 1000)
+    text_blocks = [process_text_blocks(text_blocks_subset, courseId) for text_blocks_subset in split_text_blocks]
+
+    for text_block_subset in text_blocks:
+        for text_block in text_block_subset:
+            text_block.compute_grade_from_cluster(text_block_subset)
+
+    # flatten array of arrays
+    text_blocks = [text_block for text_block_list in text_blocks for text_block in text_block_list]
+
     __logger.info("similarity grade-based for course {}".format(courseId))
     L1Similarity(text_blocks).output_results()
     QWKSimilarity(text_blocks).output_results()
@@ -112,11 +127,8 @@ if __name__ == "__main__":
         "I booked first class seat on the train",
     ]
 
-
-    plot_sentences(sentences, courseId="022")
-    plot_sentences(sentences)
-    evaluate_with_ground_truth_grades(courseId="022")
+    # plot_sentences(sentences, courseId="924")
     evaluate_with_ground_truth_grades()
-
+    # evaluate_with_ground_truth_clusters()
 
     plt.show()
