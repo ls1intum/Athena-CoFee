@@ -53,9 +53,10 @@ class BalanceEmbedding:
             total_compute_power += node.compute_power
 
         # Process whole doc and split according to compute power of nodes
+        total_blocks = len(doc['blocks'])
         for node in compute_nodes:
             # TODO: Balancing logic (communication cost)
-            node.chunk_quantity = math.ceil(len(doc['blocks']) / total_compute_power * node.compute_power)
+            node.chunk_quantity = math.ceil(total_blocks / total_compute_power * node.compute_power)
             node.blocks, doc = self.splitBlocks(doc, node.chunk_quantity)
             self.__logger.info("Node {} will process {} blocks".format(node.name, len(node.blocks['blocks'])))
 
