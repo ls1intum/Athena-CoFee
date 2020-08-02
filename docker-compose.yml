@@ -35,6 +35,7 @@ services:
     working_dir: /usr/src/app
     networks:
       - athene
+    entrypoint: ["gunicorn", "-b", "0.0.0.0:8000", "--timeout", "600", "src.app"]
     labels:
       - traefik.enable=true
       - traefik.http.routers.segmentation.rule=Path(`/segment`)
@@ -60,6 +61,7 @@ services:
       - athene
     volumes:
       - ./embedding-balance.yml:/usr/src/app/src/compute_node_config.yml:ro
+    entrypoint: ["gunicorn", "-b", "0.0.0.0:8000", "--timeout", "1200", "src.app"]
     labels:
       - traefik.enable=true
       - traefik.http.routers.embedding.rule=Path(`/embed`)
@@ -88,6 +90,7 @@ services:
     working_dir: /usr/src/app
     networks:
       - athene
+    entrypoint: ["gunicorn", "-b", "0.0.0.0:8000", "--timeout", "180", "src.app"]
     labels:
       - traefik.enable=true
       # Embedding is managed by embedding-balancer
@@ -116,6 +119,7 @@ services:
     working_dir: /usr/src/app
     networks:
       - athene
+    entrypoint: ["gunicorn", "-b", "0.0.0.0:8000", "--timeout", "600", "src.app"]
     labels:
       - traefik.enable=true
       - traefik.http.routers.clustering.rule=Path(`/cluster`)
