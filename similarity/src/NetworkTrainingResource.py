@@ -1,4 +1,5 @@
 import json
+import os.path
 from datetime import datetime
 from logging import getLogger
 from typing import List
@@ -7,7 +8,7 @@ from falcon import Request, Response, HTTP_200
 from keras.callbacks import History
 from numpy import ndarray
 
-from .entities import Embedding, EmbeddingsPair
+from .entities import EmbeddingsPair
 from .errors import emptyBody, requireEmbeddingPairs
 from .siamese_network import SiameseNetwork
 
@@ -15,6 +16,7 @@ from .siamese_network import SiameseNetwork
 class NetworkTrainingResource:
     __logger = getLogger(__name__)
     __siameseNetwork: SiameseNetwork = SiameseNetwork()
+    __dimension = str(os.environ['INPUT_DIMENSION']) if "INPUT_DIMENSION" in os.environ else "(1024, 1)"
 
     def __default(self, o) -> int:
         if isinstance(o, EmbeddingsPair): return o.__dict__
@@ -40,7 +42,7 @@ class NetworkTrainingResource:
 
         #input dimension can be adapted here
         self.__logger.info("Building model.")
-        self.__siameseNetwork.build_siamese_model((1024, 1))
+        self.__siameseNetwork.build_siamese_model(self.__dimension)
 
         #train siamese network
         self.__logger.info("Start training on {} pairs.".format(len(embeddingPairs)))
