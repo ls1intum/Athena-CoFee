@@ -45,8 +45,11 @@ class ClusteringResource:
         clusters = {}
         for clusterLabel in clusterLabels:
             indices = [ i for i, x in enumerate(labels) if x == clusterLabel ]
+            clusterEmbeddings = [ embeddings[i].vector for i in indices ]
             clusters[clusterLabel] = {
                 'blocks': [ TextBlock(embeddings[i].id) for i in indices ],
+                'probabilities': [probabilities[i] for i in indices],
+                'distanceMatrix': self.__clustering.distances_within_cluster(clusterEmbeddings),
                 'treeId': self.__clustering.label_to_tree_id(clusterLabel)
             }
         doc = {'clusters': clusters, 'distanceMatrix': [], 'clusterTree': []}
