@@ -26,10 +26,14 @@ def __check_feedback_consistency(feedback_with_text_block, exerciseId):
     return post(FEEDBACK_CONSISTENCY_URL, request)
 
 
-def check_feedback_consistency(feedback_with_text_blocks):
+def check_feedback_consistency(feedback_with_text_blocks, exercise_id):
+    inconsistencies = []
     for fwt in feedback_with_text_blocks:
         feedback_with_text_block = [block.json_rep() for block in fwt]
-        print(__check_feedback_consistency(feedback_with_text_block, 1))
+        response = __check_feedback_consistency(feedback_with_text_block, exercise_id)
+        if response['feedbackInconsistencies']:
+            inconsistencies.append(response['feedbackInconsistencies'])
+    return np.array(inconsistencies).flatten().tolist()
 
 
 def __embed(text_blocks, courseId=None):

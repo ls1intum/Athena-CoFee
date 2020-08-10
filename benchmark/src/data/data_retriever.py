@@ -9,7 +9,9 @@ __cwd = Path.cwd()
 PATH_LABELED_SUBMISSIONS = (__cwd / "data/resources/text_block.csv").resolve()
 PATH_TEXT_BLOCKS = (__cwd / "data/resources/ArTEMiS_text_block.csv").resolve()
 PATH_FEEDBACK = (__cwd / "data/resources/ArTEMiS_feedback.csv").resolve()
-PATH_FEEDBACK_CONSISTENCY = (__cwd / "data/resources/feedback_comments.csv").resolve()
+PATH_FEEDBACK_CONSISTENCY = (__cwd / "data/resources/feedback.csv").resolve()
+PATH_FEEDBACK_CONSISTENCY_OUTPUT = (__cwd / "data/resources/feedback_inconsistencies.csv").resolve()
+
 
 def read_labeled_sentences_from_csv(num_sentences=None):
     submissions = read_csv(PATH_LABELED_SUBMISSIONS)
@@ -28,7 +30,7 @@ def read_labeled_sentences_from_csv(num_sentences=None):
 def read_sentences_feedback_from_csv(num_sentences=None):
     text_blocks_csv = read_csv(PATH_TEXT_BLOCKS)
     feedback_csv = read_csv(PATH_FEEDBACK)
-    result = pd.merge(text_blocks_csv, feedback_csv, left_on="id",  right_on="reference")
+    result = pd.merge(text_blocks_csv, feedback_csv, left_on="id", right_on="reference")
     result = result[~result["points"].isnull()]
     result = result[~result["text"].isnull()]
     ids = result[["id"]].values.flatten()
@@ -54,6 +56,13 @@ def read_feedback_consistency_from_csv():
     blocks = [FeedbackWithTextBlock(textblock_id=ids[i], submission_id=submission_ids[i], cluster_id=cluster_ids[i],
                                     text=texts[i], feedback_id=feedback_ids[i], feedback_score=feedback_scores[i],
                                     feedback_text=feedback_texts[i], reference=references[i]) for i in
-              range(len(data)) if feedback_texts[i] and cluster_ids[i] and texts[i]]
-    return [list(i) for j, i in itertools.groupby(sorted(blocks, key=lambda x: x.submission_id), lambda x: x.submission_id)]
+              range(len(data)) if feedback_texts[i] and cluster_ids[i] and texts[i] and not feedback_texts[i] == ' ']
+    return [list(i) for j, i in
+            itertools.groupby(sorted(blocks, key=lambda x: x.submission_id), lambda x: x.submission_id)]
+
+
+def write_feedback_inconsistencies_to_csv(inconsistencies):
+    df = pd.DataFrame(list(itertools.chain.from_iterable(inconsistencies)),
+                      columns=['firstFeedbackId', 'secondFeedbackId', 'type'])
+    df.to_csv(PATH_FEEDBACK_CONSISTENCY_OUTPUT, index=False, header=True)
 

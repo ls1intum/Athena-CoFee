@@ -39,24 +39,29 @@ class FeedbackConsistency:
     def check_consistency(self, feedback_with_text_blocks):
         self.__logger.info("Check Consistencies")
         # Find embeddings for each feedback comment
-        self.__feedback_with_text_blocks = self.__feedback_comment_resource.embed_feedback(feedback_with_tb=feedback_with_text_blocks)
+        self.__feedback_with_text_blocks = self.__feedback_comment_resource.embed_feedback(
+            feedback_with_tb=feedback_with_text_blocks)
         # Find embeddings for each student text
-        self.__feedback_with_text_blocks = self.__feedback_comment_resource.embed_feedback_text_blocks(feedback_with_tb=feedback_with_text_blocks)
+        self.__feedback_with_text_blocks = self.__feedback_comment_resource.embed_feedback_text_blocks(
+            feedback_with_tb=feedback_with_text_blocks)
         doc = []
         # Compare each new assessment with the ones in the database
         for fwt in self.__feedback_with_text_blocks:
             feedback_vector_x = fwt.feedback.feedbackEmbeddings
             student_text_vector_x = fwt.text_embedding.reshape(1, -1).tolist()
             # Get the assessments which have same the same cluster id
-            cluster = self.__feedback_comment_resource.get_feedback_in_same_cluster(cluster_id=fwt.cluster_id, feedback_id=fwt.feedback.id)
+            cluster = self.__feedback_comment_resource.get_feedback_in_same_cluster(cluster_id=fwt.cluster_id,
+                                                                                    feedback_id=fwt.feedback.id)
             # Calculate distances between each feedback embeddings and text block embeddings(student answers)
             for item in cluster:
                 feedback_vector_y = list(map(lambda embedding: pickle.loads(embedding['embedding']),
-                                    item['feedback']['feedback_text_blocks']))
+                                             item['feedback']['feedback_text_blocks']))
                 student_text_vector_y = np.array(pickle.loads(item['text_embedding'])).reshape(1, -1).tolist()
                 feedback_distance = self.__calculate_mean_distance(x=feedback_vector_x, y=feedback_vector_y)
                 text_block_distance = self.__calculate_mean_distance(x=student_text_vector_x, y=student_text_vector_y)
-                inconsistency = self.__get_inconsistency(score_diff=abs(fwt.feedback.score - item['feedback']['feedback_score']), comment_distance=feedback_distance, text_block_distance=text_block_distance)
+                inconsistency = self.__get_inconsistency(
+                    score_diff=abs(fwt.feedback.score - item['feedback']['feedback_score']),
+                    comment_distance=feedback_distance, text_block_distance=text_block_distance)
                 if inconsistency:
                     doc.append({"firstFeedbackId": fwt.feedback.id, "secondFeedbackId": item['feedback']['feedback_id'], "type": inconsistency})
 
