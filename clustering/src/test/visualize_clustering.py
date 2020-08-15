@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from glob import glob
 from os import getcwd
-from statistics import mode
+import statistics
 from math import isinf
 import json
 
@@ -149,6 +149,7 @@ def find_cousin_clusters(tree, cluster_id):
     return cousins
 
 
+# Exports clustering results in JSON format
 def export_json_files(cluster_obj, labels, tree, exercise_id, vectors):
     data = {'labels': [], 'distances': [], 'tree': []}
     matrix = cluster_obj.distances_within_cluster(vectors=vectors)
@@ -174,6 +175,56 @@ def export_json_files(cluster_obj, labels, tree, exercise_id, vectors):
         json.dump({'data': data}, outfile)
 
 
+# Calculates statistical values for a given exercise
+def calculate_statistics(exercise_id):
+    tree = pd.read_csv('exampleEmbeddings/condensed_tree_{}.csv'.format(exercise_id))
+    tree_list = tree.values.tolist()
+    lambda_list = []
+    for i in range(len(tree_list)):
+        if i > 0:
+            elem = tree_list[i]
+            prev_elem = tree_list[i - 1]
+            if not (elem[2] == prev_elem[2] and elem[0] == prev_elem[0]):
+                if not isinf(elem[2]):
+                    lambda_list.append(elem[2])
+        else:
+            lambda_list.append(tree_list[i][2])
+
+    median = statistics.median(lambda_list)
+    mean = statistics.mean(lambda_list)
+    stdev = statistics.stdev(lambda_list)
+    max_value = max(lambda_list)
+    outlier_size = len(list(filter(lambda x: median * 2 < x <= max_value, lambda_list)))
+
+    outliers_removed = list(filter(lambda x: x < median * 2, lambda_list))
+    modified_mean = statistics.mean(outliers_removed)
+    modified_stdev = statistics.stdev(outliers_removed)
+    return {'median': median, 'modified_mean': modified_mean, 'modified_stdev': modified_stdev}
+
+
+# Calculates the lambda threshold for the tree traversal
+def compute_lambda_threshold():
+    # exercise_id:  1211 - 1212  - 1213  - 1214
+    # blocks:       5918 - 10324 - 10374 - 6972
+    stats_1211 = calculate_statistics(1211)
+    stats_1212 = calculate_statistics(1212)
+    stats_1213 = calculate_statistics(1213)
+    stats_1214 = calculate_statistics(1214)
+
+    median = statistics.mean([stats_1211['median'], stats_1212['median'], stats_1213['median'], stats_1214['median']])
+    modified_mean = statistics.mean([stats_1211['modified_mean'], stats_1212['modified_mean'],
+                                     stats_1213['modified_mean'], stats_1214['modified_mean']])
+    modified_stdev = statistics.mean([stats_1211['modified_stdev'], stats_1212['modified_stdev'],
+                                      stats_1213['modified_stdev'], stats_1214['modified_stdev']])
+
+    print('Median:                          {}'.format(median))
+    print('Modified standard deviation:     {}'.format(modified_stdev))
+    print('Modified mean:                   {}'.format(modified_mean))
+    print('Threshold (1 / modified mean):   {}'.format(1 / modified_mean))
+    print('2 * threshold:                   {}'.format(2 * (1 / modified_mean)))
+    print('3 * threshold:                   {}'.format(3 * (1 / modified_mean)))
+    print('"Modified" = outlier points in (median * 2, Infinity) removed')
+
 # Performs the analysis. Optional flags can be set for additional behaviour:
 #   - visualise: Plots the condensed tree of the clustering
 #   - print_old_results: Prints the old clustering results for the same data set
@@ -189,7 +240,7 @@ def perform_analysis(exercise_id, cluster_obj, visualise=False, print_old_result
     print('Number of clusters: {}'.format(len(set(clusters)) - 1))
     no_noise = filter(lambda x: x != -1, clusters)
     # Cluster 522 has the most points with the default setup.
-    biggest_cluster = mode(no_noise)
+    biggest_cluster = statistics.mode(no_noise)
     biggest_cluster_size = len(list(filter(lambda x: x == biggest_cluster, clusters)))
     print('Biggest cluster is {} with size {}.'.format(biggest_cluster, biggest_cluster_size))
 
@@ -200,7 +251,7 @@ def perform_analysis(exercise_id, cluster_obj, visualise=False, print_old_result
     merge_candidates = find_sibling_clusters(tree=tree, cluster_id=current_cluster)
     print(merge_candidates)
 
-    # print_clusters(blocks, clusters)
+    print_clusters(blocks, clusters)
 
     if print_old_results:
         print_old_clustering_results()
@@ -210,7 +261,7 @@ def perform_analysis(exercise_id, cluster_obj, visualise=False, print_old_result
         plt.show()
 
     if export_condensed_tree:
-        tree.to_csv('condensed_tree.csv', index=False)
+        tree.to_csv('condensed_tree_{}.csv'.format(exercise_id), index=False)
 
     if export_json:
         export_json_files(cluster_obj=cluster_obj, labels=labels, tree=tree, exercise_id=exercise_id, vectors=vectors)
@@ -221,5 +272,6 @@ clustering = Clustering()
 clustering.clusterer.min_cluster_size = 2
 clustering.clusterer.min_samples = 2
 
+compute_lambda_threshold()
 perform_analysis(exercise_id=1211, cluster_obj=clustering)
 

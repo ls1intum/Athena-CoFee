@@ -75,12 +75,11 @@ class ClusteringResource:
             })
         # Add an artificial root node
         rootId = len(vectors)
-        rootChildSize = len(tree[tree.parent == rootId].values.tolist())
         doc['clusterTree'].append({
             'parent': int(-1),
             'child': int(rootId),
             'lambda_val': float(-1),
-            'child_size': int(rootChildSize)
+            'child_size': int(rootId)
         })
 
         with open("logs/clustering-{}.json".format(datetime.now()), 'w') as outfile:
