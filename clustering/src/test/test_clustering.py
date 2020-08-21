@@ -1,8 +1,7 @@
 from unittest import TestCase
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
+from collections import Counter
 
 from src.clustering import Clustering
 
@@ -54,4 +53,22 @@ class TestClustering(TestCase):
         self.assertEqual(len(set(clusters_flowers)), 1)
         self.assertEqual(len(set(clusters_software)), 1)
         self.assertEqual(len(set(clusters_law)), 1)
+
+    # tests the function label_to_tree_id
+    def test_tree_id(self):
+        embeddings = self.embeddings_flowers + self.embeddings_software + self.embeddings_law + self.embeddings_oose
+        clusters = self.clustering.cluster(embeddings)[0]
+        self.assertEqual(len(set(clusters)), 5)
+        counter = Counter(clusters)
+        tree = self.clustering.clusterer.condensed_tree_.to_pandas()
+        self.assertEqual(self.clustering.label_to_tree_id(-1), -1)
+        # test: child_size of the node found == number of blocks in the cluster
+        self.assertEqual(tree[tree.child == self.clustering.label_to_tree_id(0)]['child_size'].values.tolist()[0],
+                         counter[0])
+        self.assertEqual(tree[tree.child == self.clustering.label_to_tree_id(1)]['child_size'].values.tolist()[0],
+                         counter[1])
+        self.assertEqual(tree[tree.child == self.clustering.label_to_tree_id(2)]['child_size'].values.tolist()[0],
+                         counter[2])
+        self.assertEqual(tree[tree.child == self.clustering.label_to_tree_id(3)]['child_size'].values.tolist()[0],
+                         counter[3])
 
