@@ -28,6 +28,7 @@ class TestClustering(TestCase):
     embeddings_software = pd.read_csv('src/test/exampleEmbeddings/software_embeddings.csv').values.tolist()
     embeddings_law = pd.read_csv('src/test/exampleEmbeddings/law_embeddings.csv').values.tolist()
     embeddings_same = pd.read_csv('src/test/exampleEmbeddings/same_sentence_embeddings.csv').values.tolist()
+    embeddings_oose = pd.read_csv('src/test/exampleEmbeddings/example_embeddings.csv').values.tolist()
 
     def test_cluster_same_sentences(self):
         clusters = self.clustering.cluster(self.embeddings_same)[0]
