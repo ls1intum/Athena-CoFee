@@ -17,7 +17,7 @@ class FeedbackCommentResource:
     def __init__(self, exercise_id):
         self.__elmo = ELMo()
         self.__conn = Connection()
-        self.__collection = 'feedback_consistency_' + str(exercise_id)
+        self.__collection = 'feedback_consistency_' + (str(exercise_id) if exercise_id != -1 else 'test')
 
     def __segment_feedback_comments(self, feedback_with_tb: list):
         self.__logger.info("Segment Feedback Comments.")
