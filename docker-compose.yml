@@ -38,9 +38,6 @@ services:
     working_dir: /usr/src/app
     networks:
       - athene
-    volumes:
-      - ./clustering/src:/usr/src/app/src
-    command: gunicorn -b 0.0.0.0:8000 --reload src.app
 
   database:
     image: mongo:latest
