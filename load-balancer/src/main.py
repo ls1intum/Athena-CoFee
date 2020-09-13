@@ -52,6 +52,7 @@ async def submit_job(request: Request, response: Response):
         course_id = job["courseId"]
     else:
         course_id = -1
+    # TODO: Require callbackUrl
     if "callbackUrl" in job:
         callback_url = job["callbackUrl"]
     else:
