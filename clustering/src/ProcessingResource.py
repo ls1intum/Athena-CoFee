@@ -65,7 +65,7 @@ class ProcessingResource:
         self.__logger.error("Send back clustering-results")
         # Get container variable for load balancer url
         send_result_url = str(os.environ['BALANCER_SENDRESULT_URL']) if "BALANCER_SENDRESULT_URL" in os.environ else "http://localhost:8000/sendTaskResult"
-        response = requests.post(send_result_url, data=json.dumps(output, default=self.__default), timeout=5)
+        response = requests.post(send_result_url, data=json.dumps(output, default=self.__default), timeout=30)
         if response.status_code != 200:
             self.__logger.error("Sending back failed: {}".format(response.text))
 
@@ -74,7 +74,7 @@ class ProcessingResource:
         try:
             # Get container variable for load balancer url
             get_task_url = str(os.environ['BALANCER_GETTASK_URL']) if "BALANCER_GETTASK_URL" in os.environ else "http://localhost:8000/getTask"
-            task = requests.get(get_task_url, json={"taskType": "clustering"}, timeout=5)
+            task = requests.get(get_task_url, json={"taskType": "clustering"}, timeout=30)
         except Exception as e:
             self.__logger.error("getTask-API seems to be down: {}".format(str(e)))
             return None
