@@ -3,7 +3,7 @@ docker_nodes:
   # This url resolves to the API of the traefik-container inside the docker-network started in a docker swarm
   - traefik_service_api: http://tasks.traefik:8080/api/http/services/
     segmentation_service_name: segmentation@docker
-    embedding_service_name: embedding@docker
+    embedding_service_name: upload@docker
     clustering_service_name: clustering@docker
     trigger_route: /trigger
 

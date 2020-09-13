@@ -134,8 +134,8 @@ async def get_task(request: Request, response: Response):
                 job.blocks = rest
                 if len(job.blocks) == 0:
                     job.status = JobStatus.embedding_processing
-                logger.info("embedding-task for JobId {} created: taskId={}, size={}".format(job.id,
-                                                                                             new_task.id,
+                logger.info("embedding-task for JobId {} created: taskId={}, size={}/{} (actual/requested)".format(job.id,
+                                                                                             new_task.id,len(new_task.blocks),
                                                                                              task["chunkSize"]))
                 return {"jobId": job.id,
                         "taskId": new_task.id,
