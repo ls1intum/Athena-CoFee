@@ -1,10 +1,8 @@
 version: '3'
 
 services:
-# http://localhost/segment
-# http://localhost/embed
-# http://localhost/upload
-# http://localhost/cluster
+# http://localhost:8080/api
+# http://localhost:8080/dashboard
   traefik:
     image: traefik:v2.2.1
     container_name: athene-traefik
@@ -22,36 +20,17 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik.yml:/etc/traefik/traefik.yml
 
-# http://localhost:8000/segment
-  segmentation:
+# http://localhost/queueStatus
+# http://localhost/submit
+# http://localhost/getTask
+# http://localhost/sendTaskResult
+  load-balancer:
     build:
-      context: ./segmentation
-    image: athene-segmentation
-    container_name: athene-segmentation
+      context: ./load-balancer
+    image: athene-load-balancer
+    container_name: athene-load-balancer
 #    ports:
 #      - 8000:8000
-    expose:
-       - 8000
-    working_dir: /usr/src/app
-    networks:
-      - athene
-    entrypoint: ["gunicorn", "-b", "0.0.0.0:8000", "--timeout", "600", "src.app"]
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.segmentation.rule=Path(`/segment`)
-      - traefik.http.routers.segmentation.entrypoints=web
-      - traefik.http.routers.segmentation-tls.rule=Path(`/segment`)
-      - traefik.http.routers.segmentation-tls.entrypoints=websecure
-      - traefik.http.routers.segmentation-tls.tls=true
-
-# http://localhost:8003/embed
-  embedding-balancer:
-    build:
-      context: ./embedding-balancer
-    image: athene-embedding-balancer
-    container_name: athene-embedding-balancer
-#    ports:
-#      - 8003:8000
     expose:
        - 8000
     environment:
@@ -60,52 +39,40 @@ services:
     networks:
       - athene
     volumes:
-      - ./embedding-balance.yml:/usr/src/app/src/compute_node_config.yml:ro
-    entrypoint: ["gunicorn", "-b", "0.0.0.0:8000", "--timeout", "1200", "src.app"]
+      - ./load-balance.yml:/usr/src/app/src/compute_node_config.yml:ro
     labels:
       - traefik.enable=true
-      - traefik.http.routers.embedding.rule=Path(`/embed`)
-      - traefik.http.routers.embedding.entrypoints=web
-      - traefik.http.routers.embedding-tls.rule=Path(`/embed`)
-      - traefik.http.routers.embedding-tls.entrypoints=websecure
-      - traefik.http.routers.embedding-tls.tls=true
+      - traefik.http.routers.balancer.rule=Path(`/queueStatus`,`/submit`,`/getTask`,`/sendTaskResult`)
+      - traefik.http.routers.balancer.entrypoints=web
+      - traefik.http.routers.balancer-tls.rule=Path(`/queueStatus`,`/submit`,`/getTask`,`/sendTaskResult`)
+      - traefik.http.routers.balancer-tls.entrypoints=websecure
+      - traefik.http.routers.balancer-tls.tls=true
 
-# http://localhost:8001/embed
-# http://localhost:8001/upload
-  embedding:
+  segmentation:
     build:
-      context: ./embedding
-    image: athene-embedding
-    container_name: athene-embedding
+      context: ./segmentation
+    image: athene-segmentation
+    container_name: athene-segmentation
 #    ports:
 #      - 8001:8000
     expose:
        - 8000
     environment:
-      - DATABASE_HOST=database
-      - DATABASE_PORT=27017
-      - DATABASE_NAME=athene_db
-      - DATABASE_USER=embedding
-      - DATABASE_PWD=embedding_password
+      - BALANCER_QUEUE_FREQUENCY=600
+      - BALANCER_GETTASK_URL=http://load-balancer:8000/getTask
+      - BALANCER_SENDRESULT_URL=http://load-balancer:8000/sendTaskResult
     working_dir: /usr/src/app
     networks:
       - athene
-    entrypoint: ["gunicorn", "-b", "0.0.0.0:8000", "--timeout", "180", "src.app"]
     labels:
       - traefik.enable=true
-      # Embedding is managed by embedding-balancer
-      - traefik.http.routers.upload.rule=Path(`/upload`)
-      - traefik.http.routers.upload.entrypoints=web
-      - traefik.http.routers.upload-tls.rule=Path(`/upload`)
-      - traefik.http.routers.upload-tls.entrypoints=websecure
-      - traefik.http.routers.upload-tls.tls=true
 
-# http://localhost:8002/cluster
-  clustering:
+# http://localhost/upload
+  embedding:
     build:
-      context: ./clustering
-    image: athene-clustering
-    container_name: athene-clustering
+      context: ./embedding
+    image: athene-embedding
+    container_name: athene-embedding
 #    ports:
 #      - 8002:8000
     expose:
@@ -114,19 +81,46 @@ services:
       - DATABASE_HOST=database
       - DATABASE_PORT=27017
       - DATABASE_NAME=athene_db
-      - DATABASE_USER=clustering
-      - DATABASE_PWD=clustering_password
+      - DATABASE_USER=embedding
+      - DATABASE_PWD=embedding_password
+      - BALANCER_QUEUE_FREQUENCY=600
+      - BALANCER_GETTASK_URL=http://load-balancer:8000/getTask
+      - CHUNK_SIZE=50
+      - BALANCER_SENDRESULT_URL=http://load-balancer:8000/sendTaskResult
     working_dir: /usr/src/app
     networks:
       - athene
-    entrypoint: ["gunicorn", "-b", "0.0.0.0:8000", "--timeout", "600", "src.app"]
     labels:
       - traefik.enable=true
-      - traefik.http.routers.clustering.rule=Path(`/cluster`)
-      - traefik.http.routers.clustering.entrypoints=web
-      - traefik.http.routers.clustering-tls.rule=Path(`/cluster`)
-      - traefik.http.routers.clustering-tls.entrypoints=websecure
-      - traefik.http.routers.clustering-tls.tls=true
+      - traefik.http.routers.upload.rule=Path(`/upload`)
+      - traefik.http.routers.upload.entrypoints=web
+      - traefik.http.routers.upload-tls.rule=Path(`/upload`)
+      - traefik.http.routers.upload-tls.entrypoints=websecure
+      - traefik.http.routers.upload-tls.tls=true
+
+  clustering:
+    build:
+      context: ./clustering
+    image: athene-clustering
+    container_name: athene-clustering
+#    ports:
+#      - 8003:8000
+    expose:
+       - 8000
+    environment:
+      - DATABASE_HOST=database
+      - DATABASE_PORT=27017
+      - DATABASE_NAME=athene_db
+      - DATABASE_USER=clustering
+      - DATABASE_PWD=clustering_password
+      - BALANCER_QUEUE_FREQUENCY=600
+      - BALANCER_GETTASK_URL=http://load-balancer:8000/getTask
+      - BALANCER_SENDRESULT_URL=http://load-balancer:8000/sendTaskResult
+    working_dir: /usr/src/app
+    networks:
+      - athene
+    labels:
+      - traefik.enable=true
 
   database:
     image: mongo:latest
@@ -147,4 +141,3 @@ services:
 networks:
   athene:
     driver: bridge
-

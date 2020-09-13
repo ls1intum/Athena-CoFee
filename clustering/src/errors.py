@@ -1,5 +1,4 @@
-from falcon import HTTPBadRequest
+from fastapi import HTTPException
 
-emptyBody = HTTPBadRequest("Empty Requerst Body", "Cannot process request with empty body.")
-requireTwoBlocks = HTTPBadRequest("Need two or more blocks", "Must provide at least two text blocks.")
-requireTwoEmbeddings = HTTPBadRequest("Need two or more embeddings", "Most provide at least two embeddings.")
+emptyBody = HTTPException(status_code=400, detail="Empty Request Body - Cannot process request with empty body.")
+requireTwoEmbeddings = HTTPException(status_code=400, detail="Need two or more embeddings - Most provide at least two embeddings.")

@@ -1,0 +1,8 @@
+# Listed dependencies as of 2020-09-08
+fastapi==0.61.1
+uvicorn==0.11.8
+docutils==0.15.2
+gunicorn==20.0.4
+numpy==1.18.3
+PyYAML==5.3.1
+requests==2.24.0

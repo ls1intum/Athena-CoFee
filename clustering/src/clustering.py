@@ -1,9 +1,10 @@
-from typing import List, Tuple
-from numpy import array
-from joblib import Memory
-import hdbscan
-from sklearn.metrics import pairwise_distances
 from .entities import ElmoVector
+from joblib import Memory
+from numpy import array
+from sklearn.metrics import pairwise_distances
+from typing import List, Tuple
+import hdbscan
+
 
 class Clustering:
 

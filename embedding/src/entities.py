@@ -4,6 +4,7 @@ Word = str
 Sentence = str
 ElmoVector = array
 
+
 class TextBlock:
     id: str
     text: Sentence
@@ -16,6 +17,7 @@ class TextBlock:
     @classmethod
     def from_dict(cls, dict: dict) -> 'TextBlock':
         return cls(dict['id'], dict['text'])
+
 
 class Embedding:
     id: str

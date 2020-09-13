@@ -1,0 +1,25 @@
+# Configure compute nodes being managed by docker compose/swarm and registered to traefik
+docker_nodes:
+  # This url resolves to the API of the traefik-container inside the docker-network started via docker-compose
+  - traefik_service_api: http://athene-traefik:8080/api/http/services/
+    segmentation_service_name: segmentation-athene@docker
+    embedding_service_name: embedding-athene@docker
+    clustering_service_name: clustering-athene@docker
+    trigger_route: /trigger
+
+# Configure stand-alone compute nodes
+#compute_nodes:
+#  - name: segmentation-stand-alone
+#    # This url resolves to the segmentation-container inside the docker-compose network
+#    trigger_url: http://athene-segmentation:8000/trigger
+#    type: segmentation
+
+#  - name: embedding-stand-alone
+#    # This url resolves to the embedding-container inside the docker-compose network
+#    trigger_url: http://athene-embedding:8000/trigger
+#    type: embedding
+
+#  - name: clustering-stand-alone
+#    # This url resolves to the clustering-container inside the docker-compose network
+#    trigger_url: http://athene-clustering:8000/trigger
+#    type: clustering

@@ -1,8 +1,8 @@
-import falcon
+from src.errors import typeError, keyError
 
 
 def load_submissions_from_json(input_json):
-    """Converts submissions form json to python
+    """Converts submissions from json to python
 
     :param input_json: input with submissions, optionally with keywords
     :return:
@@ -13,11 +13,9 @@ def load_submissions_from_json(input_json):
             submissions_from_json[submission["id"]] = submission["text"]
         return submissions_from_json
     except TypeError:
-        raise falcon.HTTPBadRequest("TypeError: Could not deserialize to_segment",
-                                    "Provide array to_segment with {\"id\": ..., \"text\": ...}")
+        raise typeError
     except KeyError:
-        raise falcon.HTTPBadRequest("KeyError: Could not deserialize to_segment",
-                                    "Provide array to_segment with {\"id\": ..., \"text\": ...}")
+        raise keyError
 
 
 def load_keywords_from_json(input_json):

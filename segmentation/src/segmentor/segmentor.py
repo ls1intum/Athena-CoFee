@@ -1,7 +1,6 @@
-import re
-
-import nltk
 from nltk.stem.porter import PorterStemmer
+import nltk
+import re
 
 
 def segment_data(dataset, keywords):

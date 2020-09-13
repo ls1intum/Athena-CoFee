@@ -8,11 +8,10 @@ WORKDIR /usr/src/app
 COPY src/ src/
 
 # Run the image as a non-root user
-RUN groupadd -r textemb && useradd --no-log-init -r -g textemb textemb
-RUN mkdir -p /usr/src/app/logs/ && chown -R textemb:textemb /usr/src/app/
+RUN groupadd -r textbal && useradd --no-log-init -r -g textbal textbal
+RUN mkdir -p /usr/src/app/logs/ && chown -R textbal:textbal /usr/src/app/
 VOLUME ["/usr/src/app/logs"]
-USER textemb
+USER textbal
 
 EXPOSE 8000
-CMD gunicorn -b 0.0.0.0:8000 src.app
-
+CMD uvicorn --host 0.0.0.0 --port 8000 --reload src.main:app
