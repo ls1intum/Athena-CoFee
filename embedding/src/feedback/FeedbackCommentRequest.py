@@ -1,6 +1,6 @@
 import json
 from logging import getLogger
-from falcon import Request, Response, HTTP_200, HTTP_204
+from falcon import Request, Response, HTTP_200
 from src.errors import emptyBody, requireFeedbackWithTextBlock, requireExerciseId
 from src.entities import FeedbackWithTextBlock, Feedback
 from src.feedback.FeedbackConsistency import FeedbackConsistency
@@ -19,8 +19,8 @@ class FeedbackCommentRequest:
         doc = json.load(req.stream)
         self.__logger.info("Request: {}".format(doc))
         if "feedbackWithTextBlock" not in doc:
-            self.__logger.error("{} ({})".format(requireTextBlockWithFeedback.title, requireTextBlockWithFeedback.description))
-            raise requireTextBlockWithFeedback
+            self.__logger.error("{} ({})".format(requireFeedbackWithTextBlock.title, requireFeedbackWithTextBlock.description))
+            raise requireFeedbackWithTextBlock
 
         if "exerciseId" not in doc:
             self.__logger.error("{} ({})".format(requireExerciseId.title, requireExerciseId.description))
@@ -38,6 +38,5 @@ class FeedbackCommentRequest:
         __fc.store_feedback()
 
         resp.status = HTTP_200
-
         self.__logger.info("Completed Feedback Comment Embedding Request.")
         self.__logger.debug("-" * 80)
