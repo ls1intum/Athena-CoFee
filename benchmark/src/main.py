@@ -1,7 +1,8 @@
 import logging
 import sys
 import matplotlib.pyplot as plt
-from benchmark.src.data.data_retriever import read_labeled_sentences_from_csv, read_sentences_feedback_from_csv
+from benchmark.src.data.data_retriever import read_labeled_sentences_from_csv, read_sentences_feedback_from_csv, \
+    read_feedback_consistency_from_csv, write_feedback_inconsistencies_to_csv
 from benchmark.src.entities.cluster import Cluster
 from benchmark.src.entities.text_block import TextBlock
 from benchmark.src.networking.api_services import *
@@ -22,7 +23,8 @@ def process_text_blocks(text_blocks, courseId=None, plot=True, log_clusters=Fals
     if plot:
         plot_embeddings(text_blocks)
     if log_clusters:
-        cluster_to_text = ["cluster {}: {}".format(textblock.cluster.id, textblock.original_text) for textblock in text_blocks]
+        cluster_to_text = ["cluster {}: {}".format(textblock.cluster.id, textblock.original_text) for textblock in
+                           text_blocks]
         cluster_to_text.sort()
         for result in cluster_to_text:
             logger.info(result + "\n")
@@ -50,6 +52,12 @@ def plot_sentences(sentences, courseId=None):
     process_text_blocks(text_blocks, courseId, plot=True)
 
 
+def feedback_consistency_test(exercise_id):
+    data = read_feedback_consistency_from_csv()
+    inconsistencies = check_feedback_consistency(feedback_with_text_blocks=data, exercise_id=exercise_id)
+    write_feedback_inconsistencies_to_csv(inconsistencies)
+
+
 if __name__ == "__main__":
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
@@ -75,6 +83,7 @@ if __name__ == "__main__":
         "I booked first class seat on the train",
     ]
 
+    feedback_consistency_test('1')
 
     plot_sentences(sentences, courseId="022")
     plot_sentences(sentences)
