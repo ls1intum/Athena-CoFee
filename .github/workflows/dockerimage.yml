@@ -58,3 +58,20 @@ jobs:
       run: ./.github/workflows/scripts/dockerimage.sh "clustering"
     - name: Run unittests for clustering-component
       run: docker run -i --rm --entrypoint python docker.pkg.github.com/ls1intum/athene/athene-clustering:${GITHUB_REF##*/} -m unittest discover -p test_*.py
+
+  athene-tracking:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: azure/docker-login@v1
+      with:
+        login-server: docker.pkg.github.com
+        username: ${GITHUB_ACTOR}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - uses: azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      if: github.ref == 'refs/heads/master'
+    - name: Build and Push the athene-tracking Docker image
+      run: ./.github/workflows/scripts/dockerimage.sh "tracking"
