@@ -7,14 +7,12 @@ from benchmark.src.entities.cluster import Cluster
 from benchmark.src.entities.text_block import TextBlock
 from benchmark.src.networking.api_services import *
 from benchmark.src.plotting import plot_embeddings
-from benchmark.src.similarity_measure import SimilarityMeasure, PrecisionRecallSimilarity, GradeBasedSimilarity
+from benchmark.src.similarity_measure import PrecisionRecallSimilarity, GradeBasedSimilarity
 
 __logger = getLogger(__name__)
 
 
 def process_text_blocks(text_blocks, courseId=None, plot=True, log_clusters=False):
-    for text_block in text_blocks:
-        text_block.clean_text()
     embeddings = embed(text_blocks, courseId=courseId)
     clusters = Cluster.clusters_from_network_response(cluster(embeddings))
     for text_block in text_blocks:
@@ -85,9 +83,8 @@ if __name__ == "__main__":
 
     feedback_consistency_test('1')
 
-    plot_sentences(sentences, courseId="022")
-    plot_sentences(sentences)
-    evaluate_by_artemis_data(courseId="022")
-    evaluate_by_labeled_sentences(courseId="022")
+    evaluate_by_labeled_sentences(1478643)
+    evaluate_by_labeled_sentences(81)
+    evaluate_by_labeled_sentences()
 
     plt.show()

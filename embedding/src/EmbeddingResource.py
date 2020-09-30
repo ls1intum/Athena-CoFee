@@ -4,6 +4,8 @@ from logging import getLogger
 from typing import List
 from falcon import Request, Response, HTTP_200
 from numpy import ndarray
+
+from src.text_preprocessing.data_cleaner import clean_text
 from .elmo import ELMo
 from .entities import Sentence, TextBlock, ElmoVector, Embedding
 from .errors import emptyBody, requireTwoBlocks
@@ -38,6 +40,8 @@ class EmbeddingResource:
 
         blocks: List[TextBlock] = list(map(lambda dict: TextBlock.from_dict(dict), doc['blocks']))
         sentences: List[Sentence] = list(map(lambda b: b.text, blocks))
+
+        sentences = [clean_text(sentence, lemmatization=False) for sentence in sentences]
 
         if len(blocks) < 2:
             self.__logger.error("{} ({})".format(requireTwoBlocks.title, requireTwoBlocks.description))
