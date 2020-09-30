@@ -1,7 +1,6 @@
 import logging
 import sys
 import matplotlib.pyplot as plt
-from benchmark.src.data.data_retriever import read_labeled_sentences_from_csv, read_sentences_feedback_from_csv
 from benchmark.src.data.data_retriever import read_labeled_sentences_from_csv, read_sentences_feedback_from_csv, \
     read_feedback_consistency_from_csv, write_feedback_inconsistencies_to_csv
 from benchmark.src.entities.cluster import Cluster
