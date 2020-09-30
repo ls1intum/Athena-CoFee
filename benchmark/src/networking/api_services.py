@@ -1,5 +1,4 @@
 from logging import getLogger
-
 from benchmark.src.networking.api_requests import post
 import numpy as np
 
@@ -8,6 +7,7 @@ __logger = getLogger(__name__)
 SEGMENTATION_URL = "http://localhost:8000/segment"
 EMBEDDING_URL = "http://localhost:8001/embed"
 CLUSTERING_URL = "http://localhost:8002/cluster"
+FEEDBACK_CONSISTENCY_URL = "http://localhost:8001/feedback_consistency"
 
 
 def segment(submissions, keywords=None):
@@ -17,6 +17,23 @@ def segment(submissions, keywords=None):
     if keywords is not None:
         request["keywords"] = keywords
     return post(SEGMENTATION_URL, request)
+
+
+def __check_feedback_consistency(feedback_with_text_block, exerciseId):
+    # request with {"feedbackWithTextBlock":[{'textBlockId':,'clusterId':,'text':,'feedbackId':,'feedbackText':,'credits':}]}
+    # {"feedbackInconsistencies":[{'firstFeedbackId':,'secondFeedbackId':,'type':]}
+    request = {"feedbackWithTextBlock": feedback_with_text_block, "exerciseId": exerciseId}
+    return post(FEEDBACK_CONSISTENCY_URL, request)
+
+
+def check_feedback_consistency(feedback_with_text_blocks, exercise_id):
+    inconsistencies = []
+    for fwt in feedback_with_text_blocks:
+        feedback_with_text_block = [block.json_rep() for block in fwt]
+        response = __check_feedback_consistency(feedback_with_text_block, exercise_id)
+        if response['feedbackInconsistencies']:
+            inconsistencies.append(response['feedbackInconsistencies'])
+    return np.array(inconsistencies).flatten().tolist()
 
 
 def __embed(text_blocks, courseId=None):
