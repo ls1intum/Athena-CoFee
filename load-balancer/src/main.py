@@ -3,7 +3,9 @@ from .errors import *
 from fastapi import FastAPI, Request, Response, status
 from src.ConfigParser import ConfigParser
 import hashlib
+import json
 import logging
+import os
 import requests
 import sys
 
@@ -18,6 +20,26 @@ logger.addHandler(handler)
 app = FastAPI()
 queue = list()
 job_counter = 0
+
+
+def checkAuthorization(request: Request):
+    auth_secret = str(os.environ['AUTHORIZATION_SECRET']) if "AUTHORIZATION_SECRET" in os.environ else ""
+    if auth_secret == "":
+        logger.warning("No Authorization secret set")
+        return
+
+    if request.headers.get("Authorization") != auth_secret:
+        logger.error("Host {} placed a request with an invalid secret: {}".format(request.client.host,
+                                                                                  request.headers.get("Authorization")))
+        raise invalidAuthorization
+
+
+async def parseJson(request: Request):
+    try:
+        return await request.json()
+    except Exception as e:
+        logger.error("Exception while parsing json: {}".format(str(e)))
+        raise invalidJson
 
 
 def triggerNodes(node_type: str):
@@ -39,31 +61,26 @@ def triggerNodes(node_type: str):
 # This will create a new job and queue up the first task (segmentation)
 @app.post("/submit")
 async def submit_job(request: Request, response: Response):
-    # TODO: Authentication
-    # Parse json
-    try:
-        job = await request.json()
-    except Exception as e:
-        logger.error("Exception while parsing json: {}".format(str(e)))
-        raise invalidJson
+    checkAuthorization(request)
+
+    job = await parseJson(request)
 
     # Error handling
     if "courseId" in job:
         course_id = job["courseId"]
     else:
         course_id = -1
-    # TODO: Require callbackUrl
-    if "callbackUrl" in job:
-        callback_url = job["callbackUrl"]
-    else:
-        callback_url = ""
+
+    if "callbackUrl" not in job:
+        raise missingCallbackUrl
+
     if "submissions" not in job:
         raise missingSubmissions
 
     # Queue up new job
     global job_counter
     job_counter += 1
-    newJob = AtheneJob(id=job_counter, course_id=course_id, callback_url=callback_url, submissions=job["submissions"])
+    newJob = AtheneJob(id=job_counter, course_id=course_id, callback_url=job["callbackUrl"], submissions=job["submissions"])
     queue.append(newJob)
     logger.info("New Athene Job added: " + str(newJob))
     # Trigger segmentation nodes
@@ -88,13 +105,9 @@ def createEmbeddingChunk(blocks, size):
 # This will update the corresponding job and set the status to "processing"
 @app.get("/getTask")
 async def get_task(request: Request, response: Response):
-    # TODO: Authentication
-    # Parse json
-    try:
-        task = await request.json()
-    except Exception as e:
-        logger.error("Exception while parsing json: {}".format(str(e)))
-        raise invalidJson
+    checkAuthorization(request)
+
+    task = await parseJson(request)
 
     # Error handling
     if "taskType" not in task:
@@ -127,12 +140,12 @@ async def get_task(request: Request, response: Response):
                 return {"jobId": job.id, "submissions": job.submissions}
             elif task["taskType"] == "embedding":
                 # Create chunk of blocks for embedding node
-                chunk, rest = createEmbeddingChunk(job.blocks, task["chunkSize"])
+                chunk, rest = createEmbeddingChunk(job.blocks_to_embed, task["chunkSize"])
                 job.embedding_task_count += 1
                 new_task = EmbeddingTask(id=job.embedding_task_count, course_id=job.course_id, blocks=chunk)
                 job.embedding_tasks.append(new_task)
-                job.blocks = rest
-                if len(job.blocks) == 0:
+                job.blocks_to_embed = rest
+                if len(job.blocks_to_embed) == 0:
                     job.status = JobStatus.embedding_processing
                 logger.info("embedding-task for JobId {} created: taskId={}, size={}/{} (actual/requested)".format(job.id,
                                                                                              new_task.id,len(new_task.blocks),
@@ -155,13 +168,9 @@ async def get_task(request: Request, response: Response):
 # This will update the job and queue up the subsequent task
 @app.post("/sendTaskResult")
 async def send_result(request: Request, response: Response):
-    # TODO: Authentication
-    # Parse json
-    try:
-        result = await request.json()
-    except Exception as e:
-        logger.error("Exception while parsing json: {}".format(str(e)))
-        raise invalidJson
+    checkAuthorization(request)
+
+    result = await parseJson(request)
 
     # Error handling
     if "jobId" not in result:
@@ -198,11 +207,14 @@ async def send_result(request: Request, response: Response):
                                         + str(end_index) + ";"\
                                         + block_text
                             block_id = hashlib.sha1(id_string.encode()).hexdigest()
-                            job.blocks.append({"id": block_id,
-                                               "text": block_text,
-                                               "startIndex": start_index,
-                                               "endIndex": end_index,
-                                               "type": "AUTOMATIC"})
+                            new_block = {"id": block_id,
+                                        "submissionId": submission_id,
+                                        "text": block_text,
+                                        "startIndex": start_index,
+                                        "endIndex": end_index,
+                                        "type": "AUTOMATIC"}
+                            job.blocks.append(new_block)                # Will persist in job
+                            job.blocks_to_embed.append(new_block)       # Will get removed with embedding queries
                             break
                 job.status = JobStatus.embedding_queued
                 logger.info("JobId {} transitioned to status {}".format(job.id, job.status))
@@ -236,7 +248,7 @@ async def send_result(request: Request, response: Response):
                     raise noUpdateNeeded
 
                 # Check if all embeddings of job finished
-                if len(job.blocks) == 0 and len(job.embedding_tasks) == 0:
+                if len(job.blocks_to_embed) == 0 and len(job.embedding_tasks) == 0:
                     job.status = JobStatus.clustering_queued
                     logger.info("JobId {} transitioned to status {}".format(job.id, job.status))
                     # Trigger clustering nodes
@@ -248,8 +260,25 @@ async def send_result(request: Request, response: Response):
                 if "clusters" not in result:
                     raise missingClusters
                 job.clusters = result["clusters"]
+
+                # Send back results to Artemis via callback URL
                 logger.info("Sending back results for jobId {} to Artemis (URL: {})".format(job.id, job.callback_url))
-                # TODO: Send back results to Artemis via callback URL
+                final_result = json.dumps({"blocks": job.blocks, "clusters": job.clusters})
+                try:
+                    auth_secret = str(os.environ['AUTHORIZATION_SECRET']) if "AUTHORIZATION_SECRET" in os.environ else ""
+                    headers = {
+                        "Authorization": auth_secret,
+                        "Content-type": "application/json"
+                    }
+                    response = requests.post(job.callback_url, data=final_result, headers=headers, timeout=60)
+                    if response.status_code == status.HTTP_200_OK:
+                        logger.info("Callback successful")
+                    else:
+                        logger.error("Callback failed. Status Code {}: {}".format(str(response.status_code), str(response.content)))
+                except Exception as e:
+                    logger.error("Exception while sending back results: {}".format(str(e)))
+                    # TODO: Retry callback
+
                 logger.info("Athene Job finished: " + str(job))
                 queue.remove(job)
                 return {'Updated job: processed clustering results'}

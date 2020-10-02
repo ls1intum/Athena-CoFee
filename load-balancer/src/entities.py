@@ -63,6 +63,7 @@ class AtheneJob:
     submissions: dict               # Sent by Artemis
     submission_date: str            # Timestamp
     blocks: list                    # Blocks calculated from segmentation result
+    blocks_to_embed: list           # Blocks remaining for embedding
     embeddings: list                # Embedding results
     embedding_tasks: list           # List of pending embedding-tasks
     embedding_task_count: int       # Counter to assign taskId's
@@ -76,13 +77,14 @@ class AtheneJob:
         self.submissions = submissions
         self.submission_date = datetime.now()
         self.blocks = list()
+        self.blocks_to_embed = list()
         self.embeddings = list()
         self.embedding_tasks = list()
         self.embedding_task_count = 0
         self.status = JobStatus.segmentation_queued
 
     def __str__(self):
-        return "AtheneJob - ID: " + str(self.id) + ", courseId: " + str(self.course_id) + ", submission_date: " + str(self.submission_date)
+        return "AtheneJob - ID: " + str(self.id) + ", courseId: " + str(self.course_id) + ", CallbackURL: " + str(self.callback_url) + ", submission_date: " + str(self.submission_date)
 
 
 class ComputeNode:
