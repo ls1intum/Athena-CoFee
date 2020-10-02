@@ -1,6 +1,7 @@
 from .entities import AtheneJob, JobStatus, NodeType, EmbeddingTask
 from .errors import *
 from fastapi import FastAPI, Request, Response, status
+from requests.auth import HTTPBasicAuth
 from src.ConfigParser import ConfigParser
 import hashlib
 import json
@@ -55,7 +56,10 @@ def triggerNodes(node_type: str):
     # Trigger all parsed nodes
     logger.info("Triggering {} nodes".format(node_type))
     for node in nodes:
-        requests.post(node.url, timeout=5)
+        if node_type == NodeType.gpu:
+            requests.post(node.url, auth=HTTPBasicAuth(node.username, node.password))
+        else:
+            requests.post(node.url, timeout=5)
 
 # Endpoint for Artemis to submit a job
 # This will create a new job and queue up the first task (segmentation)

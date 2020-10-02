@@ -37,10 +37,6 @@ class ConfigParser:
             self.__logger.error("Error reading config: " + str(e))
             return
 
-        # TODO: Trigger bamboo buildplan
-        if node_type == NodeType.gpu:
-            return []
-
         self.compute_nodes = list()
         # Parse docker nodes using traefik API
         if 'docker_nodes' in config:
@@ -66,7 +62,10 @@ class ConfigParser:
         if 'compute_nodes' in config:
             for node in config['compute_nodes']:
                 # Check if config is valid
-                required_variables = ('name', 'type', 'trigger_url')
+                if node_type == NodeType.gpu:
+                    required_variables = ('name', 'type', 'trigger_url', 'trigger_username', 'trigger_password')
+                else:
+                    required_variables = ('name', 'type', 'trigger_url')
                 if not all(key in node for key in required_variables):
                     self.__logger.warning("Skipping Compute Node definition. Not all required variables set: " + str(node))
                     self.__logger.warning("Required variables are: " + str(required_variables))
@@ -76,6 +75,9 @@ class ConfigParser:
                 try:
                     if node['type'] == node_type:
                         new_node = ComputeNode(name=str(node['name']), type=node['type'], url=str(node['trigger_url']))
+                        if node_type == NodeType.gpu:
+                            new_node.username = node['trigger_username']
+                            new_node.password = node['trigger_password']
                         self.addComputeNode(new_node)
                 except Exception as e:
                     self.__logger.error("Error during config parsing (standalone nodes): " + str(e))

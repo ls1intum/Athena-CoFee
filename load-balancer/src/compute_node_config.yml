@@ -30,3 +30,9 @@ docker_nodes:
 #    # This url resolves to the clustering-container inside the docker-compose network
 #    trigger_url: http://athene-clustering:8000/trigger
 #    type: clustering
+
+#  - name: gpu-server
+#    trigger_username: athene_user
+#    trigger_password: athene_password
+#    trigger_url: https://bamboo.example.com/rest/api/latest/queue/PLAN-KEY?JOB1&ExecuteAllStages
+#    type: gpu

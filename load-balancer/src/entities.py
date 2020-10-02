@@ -91,6 +91,8 @@ class ComputeNode:
     name: str  # Can be chosen freely (Appears in log)
     type: str  # Defines NodeType
     url: str  # URL of the trigger-API
+    username: str      # Username for the trigger-API (only gpu-nodes)
+    password: str      # Password for the trigger-API (only gpu-nodes)
 
     def __init__(self, name: str, type: str, url: str):
         self.name = name
