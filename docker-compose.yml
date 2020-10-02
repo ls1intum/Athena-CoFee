@@ -11,9 +11,9 @@ services:
       - embedding
       - clustering
     ports:
-      - 8080:8080
-      - 80:80
-      - 443:443
+      - ${TRAEFIK_DASHBOARD_PORT}:8080
+      - ${TRAEFIK_HTTP_PORT}:80
+      - ${TRAEFIK_HTTPS_PORT}:443
     networks:
       - athene
     volumes:
@@ -34,12 +34,13 @@ services:
     expose:
        - 8000
     environment:
-      - CONFIG_FILE_PATH=src/compute_node_config.yml
+      - CONFIG_FILE_PATH=${LOAD_BALANCER_CONFIG_FILE_PATH}
+      - AUTHORIZATION_SECRET=${LOAD_BALANCER_AUTHORIZATION_SECRET}
     working_dir: /usr/src/app
     networks:
       - athene
     volumes:
-      - ./load-balance.yml:/usr/src/app/src/compute_node_config.yml:ro
+      - ./load-balance.yml:/usr/src/app/${LOAD_BALANCER_CONFIG_FILE_PATH}:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.balancer.rule=Path(`/queueStatus`,`/submit`,`/getTask`,`/sendTaskResult`)
@@ -58,9 +59,9 @@ services:
     expose:
        - 8000
     environment:
-      - BALANCER_QUEUE_FREQUENCY=600
-      - BALANCER_GETTASK_URL=http://load-balancer:8000/getTask
-      - BALANCER_SENDRESULT_URL=http://load-balancer:8000/sendTaskResult
+      - BALANCER_QUEUE_FREQUENCY=${BALANCER_QUEUE_FREQUENCY}
+      - BALANCER_GETTASK_URL=${BALANCER_GETTASK_URL}
+      - BALANCER_SENDRESULT_URL=${BALANCER_SENDRESULT_URL}
     working_dir: /usr/src/app
     networks:
       - athene
@@ -78,15 +79,15 @@ services:
     expose:
        - 8000
     environment:
-      - DATABASE_HOST=database
-      - DATABASE_PORT=27017
-      - DATABASE_NAME=athene_db
-      - DATABASE_USER=embedding
-      - DATABASE_PWD=embedding_password
-      - BALANCER_QUEUE_FREQUENCY=600
-      - BALANCER_GETTASK_URL=http://load-balancer:8000/getTask
-      - CHUNK_SIZE=50
-      - BALANCER_SENDRESULT_URL=http://load-balancer:8000/sendTaskResult
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USER=${EMBEDDING_DATABASE_USER}
+      - DATABASE_PWD=${EMBEDDING_DATABASE_PWD}
+      - BALANCER_QUEUE_FREQUENCY=${BALANCER_QUEUE_FREQUENCY}
+      - BALANCER_GETTASK_URL=${BALANCER_GETTASK_URL}
+      - CHUNK_SIZE=${EMBEDDING_CHUNK_SIZE}
+      - BALANCER_SENDRESULT_URL=${BALANCER_SENDRESULT_URL}
     working_dir: /usr/src/app
     networks:
       - athene
@@ -108,14 +109,14 @@ services:
     expose:
        - 8000
     environment:
-      - DATABASE_HOST=database
-      - DATABASE_PORT=27017
-      - DATABASE_NAME=athene_db
-      - DATABASE_USER=clustering
-      - DATABASE_PWD=clustering_password
-      - BALANCER_QUEUE_FREQUENCY=600
-      - BALANCER_GETTASK_URL=http://load-balancer:8000/getTask
-      - BALANCER_SENDRESULT_URL=http://load-balancer:8000/sendTaskResult
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USER=${CLUSTERING_DATABASE_USER}
+      - DATABASE_PWD=${CLUSTERING_DATABASE_PWD}
+      - BALANCER_QUEUE_FREQUENCY=${BALANCER_QUEUE_FREQUENCY}
+      - BALANCER_GETTASK_URL=${BALANCER_GETTASK_URL}
+      - BALANCER_SENDRESULT_URL=${BALANCER_SENDRESULT_URL}
     working_dir: /usr/src/app
     networks:
       - athene
@@ -129,9 +130,9 @@ services:
     expose:
       - 27017
     environment:
-      - MONGO_INITDB_DATABASE=athene_db
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=root_password
+      - MONGO_INITDB_DATABASE=${DATABASE_NAME}
+      - MONGO_INITDB_ROOT_USERNAME=${DATABASE_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD}
     volumes:
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - ./data/db:/data/db
