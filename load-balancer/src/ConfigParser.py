@@ -39,7 +39,7 @@ class ConfigParser:
 
         self.compute_nodes = list()
         # Parse docker nodes using traefik API
-        if 'docker_nodes' in config:
+        if 'docker_nodes' in config and node_type is not NodeType.gpu:
             for node in config['docker_nodes']:
                 # Check if config is valid
                 required_variables = ('traefik_service_api', 'trigger_route', node_type + '_service_name')
