@@ -18,3 +18,4 @@ invalidResults = HTTPException(status_code=400, detail="Invalid results - Provid
 noUpdateNeeded = HTTPException(status_code=400, detail="Provided jobId/taskId needs no (such) update")
 missingClusters = HTTPException(status_code=400, detail="clusters missing")
 invalidAuthorization = HTTPException(status_code=401, detail="Invalid Authorization Header")
+taskTypeError = HTTPException(status_code=500, detail="Error with taskType")

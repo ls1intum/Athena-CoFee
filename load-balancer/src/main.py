@@ -91,7 +91,7 @@ async def submit_job(request: Request, response: Response):
     triggerNodes(node_type=NodeType.segmentation)
     # Trigger GPU Server
     triggerNodes(node_type=NodeType.gpu)
-    return {'Submission successful'}
+    return {"detail": "Submission successful"}
 
 
 # Returns a chunk of size <size> of the blocks <blocks> and the rest of the blocks
@@ -162,10 +162,9 @@ async def get_task(request: Request, response: Response):
                 return {"jobId": job.id, "embeddings": job.embeddings}
             else:
                 logger.error("Error with taskType {}".format(task["taskType"]))
-                response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-                return {'Problem with taskType'}
+                raise taskTypeError
     response.status_code = status.HTTP_204_NO_CONTENT
-    return {'No {}-task available'.format(str(task["taskType"]))}
+    return {"detail": "No {}-task available".format(str(task["taskType"]))}
 
 
 # Endpoint for compute nodes to send back their task results
@@ -224,7 +223,7 @@ async def send_result(request: Request, response: Response):
                 logger.info("JobId {} transitioned to status {}".format(job.id, job.status))
                 # Trigger embedding nodes
                 triggerNodes(node_type=NodeType.embedding)
-                return {'Updated job: processed segmentation results'}
+                return {"detail": "Updated job: processed segmentation results"}
             # Embedding results
             elif (job.status == JobStatus.embedding_processing
                   or job.status == JobStatus.embedding_queued_and_processing)\
@@ -258,7 +257,7 @@ async def send_result(request: Request, response: Response):
                     # Trigger clustering nodes
                     triggerNodes(node_type=NodeType.clustering)
 
-                return {'Updated job: processed embedding results'}
+                return {"detail": "Updated job: processed embedding results"}
             # Clustering results
             elif job.status == JobStatus.clustering_processing and result["resultType"] == "clustering":
                 if "clusters" not in result:
@@ -285,7 +284,7 @@ async def send_result(request: Request, response: Response):
 
                 logger.info("Athene Job finished: " + str(job))
                 queue.remove(job)
-                return {'Updated job: processed clustering results'}
+                return {"detail": "Updated job: processed clustering results"}
             # No valid request
             else:
                 logger.info("No such update for jobId {} needed. Job status is {}".format(result["jobId"], job.status))
