@@ -1,5 +1,6 @@
 from datetime import datetime
 from logging import getLogger
+from math import isinf
 from numpy import int64, ndarray
 from src.clustering import Clustering
 from src.errors import requireTwoEmbeddings
