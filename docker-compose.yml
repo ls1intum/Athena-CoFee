@@ -130,14 +130,16 @@ services:
     labels:
       - traefik.enable=true
 
-# http://localhost:8003/tracking
+# http://localhost:8004/tracking
   tracking:
     build:
       context: tracking
     image: athene-tracking
     container_name: athene-tracking
-    ports:
-      - 8003:80
+#    ports:
+#      - 8004:80
+    expose:
+      - 80
     environment:
       - JWT_SECRET_BASE64=YWVuaXF1YWRpNWNlaXJpNmFlbTZkb283dXphaVF1b29oM3J1MWNoYWlyNHRoZWUzb2huZ2FpM211bGVlM0VpcAo=
       - DATABASE_HOST=database
@@ -150,6 +152,13 @@ services:
       - database
     networks:
       - athene
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.tracking.rule=Path(`/tracking)
+      - traefik.http.routers.tracking.entrypoints=web
+      - traefik.http.routers.tracking-tls.rule=Path(`/tracking`)
+      - traefik.http.routers.tracking-tls.entrypoints=websecure
+      - traefik.http.routers.tracking-tls.tls=true
 
   database:
     image: mongo:latest
