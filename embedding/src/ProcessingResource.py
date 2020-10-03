@@ -6,6 +6,7 @@ from logging import getLogger
 from datetime import datetime
 from numpy import ndarray
 
+from src.text_preprocessing.data_cleaner import clean_text
 from .elmo import ELMo
 from .entities import Sentence, TextBlock, ElmoVector, Embedding
 from .errors import requireTwoBlocks

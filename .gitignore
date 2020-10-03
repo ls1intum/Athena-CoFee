@@ -5,6 +5,10 @@
 ### Database ###
 data/
 
+### Shared code ###
+embedding/src/text_preprocessing
+segmentation/src/text_preprocessing
+
 ### PyCharm ###
 .idea/
 
