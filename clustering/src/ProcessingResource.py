@@ -62,7 +62,7 @@ class ProcessingResource:
 
         output["jobId"] = data["jobId"]
         output["resultType"] = "clustering"
-        self.__logger.error("Send back clustering-results")
+        self.__logger.info("Send back clustering-results")
         # Get container variable for load balancer url
         send_result_url = str(os.environ['BALANCER_SENDRESULT_URL']) if "BALANCER_SENDRESULT_URL" in os.environ else "http://localhost:8000/sendTaskResult"
         auth_secret = str(os.environ['BALANCER_AUTHORIZATION_SECRET']) if "BALANCER_AUTHORIZATION_SECRET" in os.environ else ""

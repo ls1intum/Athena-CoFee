@@ -33,7 +33,7 @@ class ProcessingResource:
                 output = load_result_to_json(keywords, segmentation_result)
         output["jobId"] = data["jobId"]
         output["resultType"] = "segmentation"
-        self.__logger.error("Send back segmentation-results")
+        self.__logger.info("Send back segmentation-results")
         # Get container variable for load balancer url
         send_result_url = str(os.environ['BALANCER_SENDRESULT_URL']) if "BALANCER_SENDRESULT_URL" in os.environ else "http://localhost:8000/sendTaskResult"
         auth_secret = str(os.environ['BALANCER_AUTHORIZATION_SECRET']) if "BALANCER_AUTHORIZATION_SECRET" in os.environ else ""
