@@ -1,5 +1,4 @@
 from numpy import array
-import json
 
 Word = str
 Sentence = str

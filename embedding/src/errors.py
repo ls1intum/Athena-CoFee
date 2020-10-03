@@ -10,6 +10,6 @@ requireFileData = HTTPException(status_code=400,
 requireFileName = HTTPException(status_code=400,
                                 detail="File name is not provided - Must provide file name to upload material")
 requireFeedbackWithTextBlock = HTTPException(status_code=400,
-	                                         detail="Need feedback with text blocks - Must provide feedbackWithTextBlock")
+                                             detail="Need feedback with text blocks - Must provide feedbackWithTextBlock")
 requireExerciseId = HTTPException(status_code=400,
-	                              detail="Need exercise id - Must provide exercise id")
+                                  detail="Need exercise id - Must provide exercise id")

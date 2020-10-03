@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI, Request, Response, BackgroundTasks
 from src.TimerHandler import TimerHandler
 from src import UploadingResource
-from src.feedback.FeedbackCommentRequest import FeedbackCommentRequest
+from src.feedback import FeedbackCommentRequest
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)

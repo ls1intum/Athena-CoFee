@@ -22,15 +22,15 @@ async def upload(request: Request):
         raise invalidJson
 
     if "courseId" not in doc:
-        logger.error("{} ({})".format(requireCourseId.title, requireCourseId.description))
+        logger.error("{}".format(requireCourseId.detail))
         raise requireCourseId
 
     if "fileName" not in doc:
-        logger.error("{} ({})".format(requireFileName.title, requireFileName.description))
+        logger.error("{}".format(requireFileName.detail))
         raise requireFileName
 
     if "fileData" not in doc:
-        logger.error("{} ({})".format(requireFileData.title, requireFileData.description))
+        logger.error("{}".format(requireFileData.detail))
         raise requireFileData
 
     decoded_file_data = base64.b64decode(doc["fileData"])
