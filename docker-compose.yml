@@ -91,6 +91,8 @@ services:
       - CHUNK_SIZE=${EMBEDDING_CHUNK_SIZE}
       - BALANCER_SENDRESULT_URL=${BALANCER_SENDRESULT_URL}
     working_dir: /usr/src/app
+    volumes:
+      - ${EMBEDDING_CLOUD_CONFIG_PATH}:/usr/src/app/src/cloud/config.py:ro
     networks:
       - athene
     labels:
