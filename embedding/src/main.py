@@ -1,8 +1,9 @@
-from src.TimerHandler import TimerHandler
-from fastapi import FastAPI, Request, Response, BackgroundTasks
-from src import UploadingResource
-import logging
 import sys
+import logging
+from fastapi import FastAPI, Request, Response, BackgroundTasks
+from src.TimerHandler import TimerHandler
+from src import UploadingResource
+from src.feedback.FeedbackCommentRequest import FeedbackCommentRequest
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -18,6 +19,7 @@ timer_handler.startTimerThread()
 
 app = FastAPI()
 app.include_router(UploadingResource.router)
+app.include_router(FeedbackCommentRequest.router)
 
 
 @app.post("/trigger")

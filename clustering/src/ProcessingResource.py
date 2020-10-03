@@ -46,10 +46,42 @@ class ProcessingResource:
             clusters[clusterLabel] = {
                 'blocks': [TextBlock(embeddings[i].id) for i in indices],
                 'probabilities': [probabilities[i] for i in indices],
-                'distanceMatrix': self.__clustering.distances_within_cluster(clusterEmbeddings)
+                'distanceMatrix': self.__clustering.distances_within_cluster(clusterEmbeddings),
+                'treeId': self.__clustering.label_to_tree_id(clusterLabel)
             }
 
-        output = {'clusters': clusters}
+        output = {'clusters': clusters, 'distanceMatrix': [], 'clusterTree': []}
+
+        matrix = self.__clustering.distances_within_cluster(vectors)
+        # Following loop removes duplicates in matrix
+        for i in range(len(matrix)):
+            for j in range(i):
+                matrix[i][j] = 0
+
+        for row in matrix:
+            output['distanceMatrix'].append(list([float(row[i]) for i in range(len(row))]))
+
+        tree = self.__clustering.clusterer.condensed_tree_.to_pandas()
+        # A row in the tree data frame has the following structure:
+        # [ parent, child, lambdaVal, childSize ]
+        for row in tree.values.tolist():
+            # Store infinite lambda values as -1
+            if isinf(float(row[2])):
+                row[2] = -1
+            output['clusterTree'].append({
+                'parent': int(row[0]),
+                'child': int(row[1]),
+                'lambdaVal': float(row[2]),
+                'childSize': int(row[3])
+            })
+        # Add an artificial root node
+        rootId = len(vectors)
+        output['clusterTree'].append({
+            'parent': int(-1),
+            'child': int(rootId),
+            'lambdaVal': float(-1),
+            'childSize': int(rootId)
+        })
 
         try:
             with open("logs/clustering-{}.json".format(datetime.now()), 'w') as outfile:

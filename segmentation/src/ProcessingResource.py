@@ -1,9 +1,9 @@
 from logging import getLogger
 from src.json_processor.serializer import load_result_to_json
 from src.text_processor.data_cleaner import clean_data
-from src.json_processor.deserialzer import load_submissions_from_json, load_keywords_from_json
+from src.json_processor.deserialzer import load_submissions_from_json, load_keywords_from_json, load_feedback_from_json
 from src.text_processor.keyword_extractor import get_top_n_words
-from src.segmentor.segmentor import segment_data
+from src.segmentor.segmentor import segment_data, segment_feedback_data
 from src.errors import tooFewSubmissions, noSubmissions
 import json
 import os
@@ -15,8 +15,12 @@ class ProcessingResource:
 
     # Starts processing of a queried task
     def processTask(self, data):
-        if "submissions" not in data:
+        if "feedback" not in data and "submissions" not in data:
             raise noSubmissions
+        elif "feedback" in data:
+            feedback = load_feedback_from_json(data)
+            segmentation_result = segment_feedback_data(feedback)
+            output = load_result_to_json("", segmentation_result)
         else:
             if "keywords" not in data:
                 submissions = load_submissions_from_json(data)

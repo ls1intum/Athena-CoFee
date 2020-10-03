@@ -41,9 +41,12 @@ async def upload(request: Request):
         'remotePath': remote_path
     }
 
-    with open("logs/uploading-{}.json".format(datetime.now()), 'w') as outfile:
-        json.dump(doc, outfile, ensure_ascii=False)
+    try:
+        with open("logs/uploading-{}.json".format(datetime.now()), 'w') as outfile:
+            json.dump(doc, outfile, ensure_ascii=False)
+    except Exception as e:
+        logger.error("Error while writing logfile: {}".format(str(e)))
 
     logger.info("Completed Uploading Request.")
     logger.debug("-" * 80)
-    return doc
+    return json.dumps(doc, ensure_ascii=False)

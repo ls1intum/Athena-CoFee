@@ -1,4 +1,3 @@
-from benchmark.src.data.data_cleaner import clean_data
 
 
 class TextBlock:
@@ -41,9 +40,6 @@ class TextBlock:
 
     def ground_truth_similar(self, other):
         return self.ground_truth_cluster == other.ground_truth_cluster
-
-    def clean_text(self):
-        self.text = clean_data(self.text)
 
     def compute_grade_from_cluster(self, text_blocks):
         if self.cluster is None:

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-COMPONENT=$1      # Parameter $1 (Component): either "load-balancer", "segmentation", "embedding" or "clustering"
+COMPONENT=$1      # Parameter $1 (Component): either "load-balancer", "segmentation", "embedding", "clustering" or "tracking"
 
 echo -e "INFO: Building ${COMPONENT}-component"
 

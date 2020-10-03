@@ -1,14 +1,15 @@
-from .entities import Sentence, TextBlock, ElmoVector, Embedding
-from .errors import requireTwoBlocks
-from .elmo import ELMo
-from typing import List
-from logging import getLogger
-from datetime import datetime
 import json
 import os
 import requests
+from typing import List
+from logging import getLogger
+from datetime import datetime
 from numpy import ndarray
 
+from src.text_preprocessing.data_cleaner import clean_text
+from .elmo import ELMo
+from .entities import Sentence, TextBlock, ElmoVector, Embedding
+from .errors import requireTwoBlocks
 
 class ProcessingResource:
     __logger = getLogger(__name__)
@@ -35,6 +36,8 @@ class ProcessingResource:
 
         blocks: List[TextBlock] = list(map(lambda dict: TextBlock.from_dict(dict), data['blocks']))
         sentences: List[Sentence] = list(map(lambda b: b.text, blocks))
+
+        sentences = [clean_text(sentence, lemmatization=False) for sentence in sentences]
 
         if len(blocks) < 2:
             self.__logger.error("{} ({})".format(requireTwoBlocks.title, requireTwoBlocks.description))

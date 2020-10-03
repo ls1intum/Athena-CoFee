@@ -18,6 +18,25 @@ def load_submissions_from_json(input_json):
         raise keyError
 
 
+def load_feedback_from_json(input_json):
+    """Converts feedback form json to python
+
+    :param input_json: input with feedback
+    :return:
+    """
+    try:
+        feedback_from_json = {}
+        for feedback in input_json['feedback']:
+            feedback_from_json[feedback["id"]] = feedback["text"]
+        return feedback_from_json
+    except TypeError:
+        raise falcon.HTTPBadRequest("TypeError: Could not deserialize to_segment",
+                                    "Provide array to_segment with {\"id\": ..., \"text\": ...}")
+    except KeyError:
+        raise falcon.HTTPBadRequest("KeyError: Could not deserialize to_segment",
+                                    "Provide array to_segment with {\"id\": ..., \"text\": ...}")
+
+
 def load_keywords_from_json(input_json):
     """Converts keywords from json to python
 
