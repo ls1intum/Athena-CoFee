@@ -5,7 +5,6 @@ COPY ./segmentation/requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 WORKDIR /usr/src/app
-VOLUME ["/usr/src/app/logs"]
 COPY ./segmentation/src/ src/
 COPY ./text_preprocessing src/text_preprocessing
 RUN mkdir -p /usr/lib/nltk_data \
