@@ -52,18 +52,20 @@ class ProcessingResource:
             'embeddings': embeddings
         }
 
-        try:
-            with open("logs/embedding-{}.json".format(datetime.now()), 'w') as outfile:
-                json.dump(output, outfile, ensure_ascii=False, default=self.__default)
-        except Exception as e:
-            self.__logger.error("Error while writing logfile: {}".format(str(e)))
-
         self.__logger.info("Completed Embedding Request.")
         self.__logger.debug("-" * 80)
 
         output["jobId"] = data["jobId"]
         output["taskId"] = data["taskId"]
         output["resultType"] = "embedding"
+
+        try:
+            self.__logger.info("Writing logfile")
+            with open("logs/embedding-{}.json".format(datetime.now()), 'w') as outfile:
+                json.dump(output, outfile, ensure_ascii=False, default=self.__default)
+        except Exception as e:
+            self.__logger.error("Error while writing logfile: {}".format(str(e)))
+
         self.__logger.info("Send back embedding-results")
         # Get container variable for load balancer url
         send_result_url = str(os.environ['BALANCER_SENDRESULT_URL']) if "BALANCER_SENDRESULT_URL" in os.environ else "http://localhost:8000/sendTaskResult"
