@@ -1,3 +1,4 @@
+from datetime import datetime
 from logging import getLogger
 from src.json_processor.serializer import load_result_to_json
 from src.text_preprocessing.data_cleaner import clean_data
