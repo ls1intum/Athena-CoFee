@@ -42,7 +42,7 @@ class ProcessingResource:
         try:
             self.__logger.info("Writing logfile")
             with open("logs/segmentation-{}.json".format(datetime.now()), 'w') as outfile:
-                json.dump(output, outfile, ensure_ascii=False, default=self.__default)
+                json.dump(output, outfile, ensure_ascii=False)
         except Exception as e:
             self.__logger.error("Error while writing logfile: {}".format(str(e)))
 
