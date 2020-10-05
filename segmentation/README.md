@@ -8,6 +8,6 @@ Note: In Artemis 8080 is written in configs
 
 Configurable environment variables:
 
-- BALANCER\_QUEUE\_FREQUENCY
-- BALANCER\_GETTASK\_URL
-- BALANCER\_SENDRESULT\_URL
+-  BALANCER\_QUEUE\_FREQUENCY
+-  BALANCER\_GETTASK\_URL
+-  BALANCER\_SENDRESULT\_URL

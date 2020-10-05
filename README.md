@@ -7,13 +7,13 @@ The approach is based on the paper:
 
 ## Components
 
-- **Load-balancer:**  
+-  **Load-balancer:**
   Provides API to submit an Athene job. This component will manage the work distribution to other components
-- **Segmentation:**  
+-  **Segmentation:**
   API for segmenting Student Answers based on Topic Modeling
-- **Embedding:**  
+-  **Embedding:**
   API for computing Language Embeddings using ELMo and uploading training material for ELMo
-- **Clustering:**  
+-  **Clustering:**
   API for clustering of ELMo Vectors using HDBSCAN
 
 ## Basic Usage
@@ -26,12 +26,12 @@ docker-compose up -d
 
 will automatically build and start the Load-balancer, Segmentation, the Embedding and the Clustering component (The `-d` parameter will run containers in the background). By default, a traefik-container will manage API-Endpoints and expose them on port 80 (default HTTP-port). This means, the following API-routes will be available after start:  
 
-* [http://localhost/submit](http://localhost/submit) - For Artemis to submit a job to the load-balancer
-* [http://localhost/queueStatus](http://localhost/queueStatus) - To monitor the queue Status of the load balancer
-* [http://localhost/getTask](http://localhost/getTask) - For the computation components to query tasks from the load balancer
-* [http://localhost/sendTaskResult](http://localhost/sendTaskResult) - For the computation components to send back results to the load balancer
-* [http://localhost/upload](http://localhost/upload) - For Artemis to upload course material
-* [http://localhost/tracking](http://localhost/tracking) - For Artemis to access tracking functionality
+-  [http://localhost/submit](http://localhost/submit) - For Artemis to submit a job to the load-balancer
+-  [http://localhost/queueStatus](http://localhost/queueStatus) - To monitor the queue Status of the load balancer
+-  [http://localhost/getTask](http://localhost/getTask) - For the computation components to query tasks from the load balancer
+-  [http://localhost/sendTaskResult](http://localhost/sendTaskResult) - For the computation components to send back results to the load balancer
+-  [http://localhost/upload](http://localhost/upload) - For Artemis to upload course material
+-  [http://localhost/tracking](http://localhost/tracking) - For Artemis to access tracking functionality
 
 In addition to that, traefik provides a dashboard to monitor the status of underlying components. This dashboard will be available on [http://localhost:8081/dashboard](http://localhost:8080/dashboard) by default.
 

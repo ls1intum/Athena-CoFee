@@ -89,7 +89,7 @@ class ProcessingResource:
 
         output["jobId"] = data["jobId"]
         output["resultType"] = "clustering"
-        
+
         try:
             self.__logger.info("Writing logfile")
             with open("logs/clustering-{}.json".format(datetime.now()), 'w') as outfile:

@@ -4,10 +4,10 @@ Balances load for incoming Artemis-requests to underlying compute nodes
 
 the following API-routes will be available after start:
 
-- [http://localhost:8000/queueStatus](http://localhost:8000/queueStatus) (GET) to get queue statistics
-- [http://localhost:8000/submit](http://localhost:8000/submit) (POST) for Artemis to submit a new Job
-- [http://localhost:8000/getTask](http://localhost:8000/getTask) (GET) to get a queued task out of the queue
-- [http://localhost:8000/sendTaskResult](http://localhost:8000/sendTaskResult) (POST) to send back the result of a task to the load balancer
+-  [http://localhost:8000/queueStatus](http://localhost:8000/queueStatus) (GET) to get queue statistics
+-  [http://localhost:8000/submit](http://localhost:8000/submit) (POST) for Artemis to submit a new Job
+-  [http://localhost:8000/getTask](http://localhost:8000/getTask) (GET) to get a queued task out of the queue
+-  [http://localhost:8000/sendTaskResult](http://localhost:8000/sendTaskResult) (POST) to send back the result of a task to the load balancer
 
 Input example JSON for POST on http://localhost:8000/submit
 

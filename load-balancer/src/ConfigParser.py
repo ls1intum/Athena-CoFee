@@ -13,8 +13,7 @@ class ConfigParser:
     def checkComputeNode(self, url):
         try:
             requests.get(url, timeout=5)
-        except Exception as e:
-            #self.__logger.warning("Compute node did not respond: {}".format(str(e)))
+        except Exception:
             return False
         return True
 
