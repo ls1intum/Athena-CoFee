@@ -28,6 +28,8 @@ class JobStatus:
     clustering_queued = "clustering_queued"
     # Clustering node got clustering task and is currently processing it
     clustering_processing = "clustering_processing"
+    # All calculation done, sending results back
+    sending_back = "sending_back"
 
 
 class Embedding:

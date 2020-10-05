@@ -1,6 +1,6 @@
 from .entities import AtheneJob, JobStatus, NodeType, EmbeddingTask
 from .errors import *
-from fastapi import FastAPI, Request, Response, status
+from fastapi import BackgroundTasks, FastAPI, Request, Response, status
 from requests.auth import HTTPBasicAuth
 from src.ConfigParser import ConfigParser
 import hashlib
@@ -61,6 +61,29 @@ def triggerNodes(node_type: str):
         else:
             requests.post(node.url, timeout=5)
 
+
+def sendBackResults(job: AtheneJob):
+    logger.info("Sending back results for jobId {} to Artemis (URL: {})".format(job.id, job.callback_url))
+    final_result = json.dumps({"blocks": job.blocks, "clusters": job.clusters})
+    try:
+        auth_secret = str(os.environ['AUTHORIZATION_SECRET']) if "AUTHORIZATION_SECRET" in os.environ else ""
+        headers = {
+            "Authorization": auth_secret,
+            "Content-type": "application/json"
+        }
+        response = requests.post(job.callback_url, data=final_result, headers=headers, timeout=180)
+        if response.status_code == status.HTTP_200_OK:
+            logger.info("Callback successful")
+            logger.info("Athene Job finished: " + str(job))
+            queue.remove(job)
+        else:
+            logger.error("Callback failed. Status Code {}: {}".format(str(response.status_code), str(response.content)))
+            # TODO: Retry callback
+    except Exception as e:
+        logger.error("Exception while sending back results: {}".format(str(e)))
+        # TODO: Retry callback
+
+
 # Endpoint for Artemis to submit a job
 # This will create a new job and queue up the first task (segmentation)
 @app.post("/submit")
@@ -84,9 +107,9 @@ async def submit_job(request: Request, response: Response):
     # Queue up new job
     global job_counter
     job_counter += 1
-    newJob = AtheneJob(id=job_counter, course_id=course_id, callback_url=job["callbackUrl"], submissions=job["submissions"])
-    queue.append(newJob)
-    logger.info("New Athene Job added: " + str(newJob))
+    new_job = AtheneJob(id=job_counter, course_id=course_id, callback_url=job["callbackUrl"], submissions=job["submissions"])
+    queue.append(new_job)
+    logger.info("New Athene Job added: " + str(new_job))
     # Trigger segmentation nodes
     triggerNodes(node_type=NodeType.segmentation)
     # Trigger GPU Server
@@ -170,7 +193,7 @@ async def get_task(request: Request, response: Response):
 # Endpoint for compute nodes to send back their task results
 # This will update the job and queue up the subsequent task
 @app.post("/sendTaskResult")
-async def send_result(request: Request, response: Response):
+async def send_result(request: Request, response: Response, background_tasks: BackgroundTasks):
     checkAuthorization(request)
 
     result = await parseJson(request)
@@ -264,26 +287,9 @@ async def send_result(request: Request, response: Response):
                     raise missingClusters
                 job.clusters = result["clusters"]
 
-                # Send back results to Artemis via callback URL
-                logger.info("Sending back results for jobId {} to Artemis (URL: {})".format(job.id, job.callback_url))
-                final_result = json.dumps({"blocks": job.blocks, "clusters": job.clusters})
-                try:
-                    auth_secret = str(os.environ['AUTHORIZATION_SECRET']) if "AUTHORIZATION_SECRET" in os.environ else ""
-                    headers = {
-                        "Authorization": auth_secret,
-                        "Content-type": "application/json"
-                    }
-                    response = requests.post(job.callback_url, data=final_result, headers=headers, timeout=60)
-                    if response.status_code == status.HTTP_200_OK:
-                        logger.info("Callback successful")
-                    else:
-                        logger.error("Callback failed. Status Code {}: {}".format(str(response.status_code), str(response.content)))
-                except Exception as e:
-                    logger.error("Exception while sending back results: {}".format(str(e)))
-                    # TODO: Retry callback
-
-                logger.info("Athene Job finished: " + str(job))
-                queue.remove(job)
+                # Send back results to Artemis via callback URL in the background
+                job.status = JobStatus.sending_back
+                background_tasks.add_task(sendBackResults, job)
                 return {"detail": "Updated job: processed clustering results"}
             # No valid request
             else:
@@ -304,6 +310,7 @@ def queueStatus():
         = embedding_processing\
         = clustering_queued\
         = clustering_processing\
+        = sending_back\
         = pending = 0
     for job in queue:
         pending += 1
@@ -323,6 +330,8 @@ def queueStatus():
             clustering_queued += 1
         elif job.status == JobStatus.clustering_processing:
             clustering_processing += 1
+        elif job.status == JobStatus.sending_back:
+            sending_back += 1
     total = job_counter
     finished = total - pending
     return {"segmentation_queued": segmentation_queued,
@@ -333,5 +342,6 @@ def queueStatus():
             "pending_embedding_tasks": pending_embedding_tasks,
             "clustering_queued": clustering_queued,
             "clustering_processing": clustering_processing,
+            "sending_back": sending_back,
             "finished": finished,
             "total": total}
