@@ -71,7 +71,7 @@ def sendBackResults(job: AtheneJob):
             "Authorization": auth_secret,
             "Content-type": "application/json"
         }
-        response = requests.post(job.callback_url, data=final_result, headers=headers, timeout=180)
+        response = requests.post(job.callback_url, data=final_result, headers=headers, timeout=600)
         if response.status_code == status.HTTP_200_OK:
             logger.info("Callback successful")
             logger.info("Athene Job finished: " + str(job))
