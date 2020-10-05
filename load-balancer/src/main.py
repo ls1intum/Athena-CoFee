@@ -50,11 +50,11 @@ def writeJsonToFile(job_id: int, filename: str, data):
     # Only write file if log-level is DEBUG
     if logger.level == logging.DEBUG:
         try:
-            directory = "job_" + str(job_id)
+            directory = "logs/job_" + str(job_id)
             if not os.path.exists(directory):
                 os.makedirs(directory)
             logger.debug("Writing data to logfile: {}".format(filename))
-            with open("logs/" + directory + "/" + filename + ".json", 'w') as outfile:
+            with open(directory + "/" + filename + ".json", 'w') as outfile:
                 json.dump(data, outfile, ensure_ascii=False)
         except Exception as e:
             logger.error("Error while writing logfile: {}".format(str(e)))
