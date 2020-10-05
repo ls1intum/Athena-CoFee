@@ -26,7 +26,8 @@ services:
 # http://localhost/sendTaskResult
   load-balancer:
     build:
-      context: ./load-balancer
+      context: .
+      dockerfile: ./load-balancer/Dockerfile
     image: athene-load-balancer
     container_name: athene-load-balancer
 #    ports:
@@ -107,7 +108,8 @@ services:
 
   clustering:
     build:
-      context: ./clustering
+      context: .
+      dockerfile: ./clustering/Dockerfile
     image: athene-clustering
     container_name: athene-clustering
 #    ports:
@@ -133,7 +135,8 @@ services:
 # http://localhost/tracking
   tracking:
     build:
-      context: tracking
+      context: .
+      dockerfile: ./tracking/Dockerfile
     image: athene-tracking
     container_name: athene-tracking
 #    ports:
