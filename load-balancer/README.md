@@ -2,7 +2,7 @@ Service runs on port 8000
 
 Balances load for incoming Artemis-requests to underlying compute nodes
 
-the following API-route will be available after start:
+the following API-routes will be available after start:
 
 - [http://localhost:8000/queueStatus](http://localhost:8000/queueStatus) (GET) to get queue statistics
 - [http://localhost:8000/submit](http://localhost:8000/submit) (POST) for Artemis to submit a new Job
@@ -14,6 +14,7 @@ Input example JSON for POST on http://localhost:8000/submit
 ```json
 {
   "courseId": 2,
+  "callbackUrl": "http://testurl"
   "submissions":[
       {
          "id":1,

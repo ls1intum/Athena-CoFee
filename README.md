@@ -7,6 +7,8 @@ The approach is based on the paper:
 
 ## Components
 
+- **Load-balancer:**  
+  Provides API to submit an Athene job. This component will manage the work distribution to other components
 - **Segmentation:**  
   API for segmenting Student Answers based on Topic Modeling
 - **Embedding:**  
@@ -22,11 +24,16 @@ Using the `docker-compose.yml` file included in the root directory of the reposi
 docker-compose up -d
 ```
 
-will automatically build and start the Segmentation, the Embedding and the Clustering component (The `-d` parameter will run containers in the background). By default, the Segmentation component will listen on port 8000, the Embedding component on port 8001 and the Clustering component on port 8002 of your local machine. This means, the following API-routes will be available after start:  
-[http://localhost:8000/segment](http://localhost:8000/segment)  
-[http://localhost:8001/embed](http://localhost:8001/embed)  
-[http://localhost:8001/upload](http://localhost:8001/upload)  
-[http://localhost:8002/cluster](http://localhost:8002/cluster)  
+will automatically build and start the Load-balancer, Segmentation, the Embedding and the Clustering component (The `-d` parameter will run containers in the background). By default, a traefik-container will manage API-Endpoints and expose them on port 80 (default HTTP-port). This means, the following API-routes will be available after start:  
+
+* [http://localhost/submit](http://localhost/submit) - For Artemis to submit a job to the load-balancer
+* [http://localhost/queueStatus](http://localhost/queueStatus) - To monitor the queue Status of the load balancer
+* [http://localhost/getTask](http://localhost/getTask) - For the computation components to query tasks from the load balancer
+* [http://localhost/sendTaskResult](http://localhost/sendTaskResult) - For the computation components to send back results to the load balancer
+* [http://localhost/upload](http://localhost/upload) - For Artemis to upload course material
+* [http://localhost/tracking](http://localhost/tracking) - For Artemis to access tracking functionality
+
+In addition to that, traefik provides a dashboard to monitor the status of underlying components. This dashboard will be available on [http://localhost:8081/dashboard](http://localhost:8080/dashboard) by default.
 
 For testing and development purposes, a single component can be re-built using e.g.
 
@@ -47,6 +54,10 @@ docker-compose down
 ```
 
 For further information have a look at the [Compose file reference](https://docs.docker.com/compose/compose-file/) and the [Compose command-line reference](https://docs.docker.com/compose/reference/overview/).
+
+## Configuration
+
+For configuration of the Athene-system you can make use of the `.env`-file in the repository. All variables in there are used in the `docker-compose.yml` to bring up the Athene system.
 
 ## Contributing
 

@@ -1,8 +1,8 @@
 version: '3'
 
 services:
-# http://localhost:8080/api
-# http://localhost:8080/dashboard
+# http://localhost:8081/api
+# http://localhost:8081/dashboard
   traefik:
     image: traefik:v2.2.1
     container_name: athene-traefik
@@ -130,7 +130,7 @@ services:
     labels:
       - traefik.enable=true
 
-# http://localhost:8004/tracking
+# http://localhost/tracking
   tracking:
     build:
       context: tracking
