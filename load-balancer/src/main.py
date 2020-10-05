@@ -320,7 +320,7 @@ async def send_result(request: Request, response: Response, background_tasks: Ba
                 if "clusters" not in result:
                     raise missingClusters
 
-                writeJsonToFile(job.id, "clustering_result_", result)
+                writeJsonToFile(job.id, "clustering_result", result)
 
                 job.clusters = result["clusters"]
 
