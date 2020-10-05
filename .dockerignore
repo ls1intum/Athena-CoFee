@@ -1,7 +1,17 @@
-.venv
-.vscode
+# This file is to reduce the build context of docker containers and speedup their build
+# Since we have shared code in the containers (e.g. text_preprocessing) the build context sometimes is the project root
+
+# files and directories only in project root
 .git
 .github
-.gitignore
+.venv
+.vscode
 data
-logs/*
+init-mongo.js
+
+# files and directories in the whole project
+**/.gitignore
+**/.idea
+**/logs
+**/venv
+**/models/*.hdf5

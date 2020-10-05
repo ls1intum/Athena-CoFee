@@ -10,7 +10,8 @@ TAG=$(git rev-parse --short "$GITHUB_SHA")              # Tag image with short c
 
 # Build and Push image
 echo -e "INFO: Build and Push ${IMAGE}:${TAG}"
-cd ${COMPONENT}; docker build . --file Dockerfile --tag ${IMAGE}:${TAG}
+if ! docker build . --file ${COMPONENT}/Dockerfile --tag ${IMAGE}:${TAG}; then
+	exit 1
 docker push ${IMAGE}:${TAG}
 
 # Tag and Push with branch-name
