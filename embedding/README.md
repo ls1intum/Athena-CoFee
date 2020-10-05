@@ -8,10 +8,10 @@ Note: In Artemis 8080 is written in configs
 
 Configurable environment variables:
 
-  - BALANCER\_QUEUE\_FREQUENCY
-  - BALANCER\_GETTASK\_URL
-  - CHUNK\_SIZE
-  - BALANCER\_SENDRESULT\_URL
+-   BALANCER\_QUEUE\_FREQUENCY
+-   BALANCER\_GETTASK\_URL
+-   CHUNK\_SIZE
+-   BALANCER\_SENDRESULT\_URL
 
 the following API-routes will be available after start:
 [http://localhost:8002/trigger](http://localhost:8002/trigger)
