@@ -11,9 +11,12 @@ import requests
 import sys
 
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+# Set log_level to logging.DEBUG to write log files with json contents (see writeJsonToFile())
+# Warning: This will produce a lot of data in production systems
+log_level = logging.INFO
+logger.setLevel(log_level)
 handler = logging.StreamHandler(sys.stdout)
-handler.setLevel(logging.DEBUG)
+handler.setLevel(log_level)
 formatter = logging.Formatter('[%(asctime)s] [%(process)d] [%(levelname)s] [%(name)s] %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
@@ -43,6 +46,17 @@ async def parseJson(request: Request):
         raise invalidJson
 
 
+def writeJsonToFile(filename: str, data):
+    # Only write file if log-level is DEBUG
+    if logger.level == logging.DEBUG:
+        try:
+            logger.debug("Writing data to logfile: {}".format(filename))
+            with open("logs/" + filename + ".json", 'w') as outfile:
+                json.dump(data, outfile, ensure_ascii=False)
+        except Exception as e:
+            logger.error("Error while writing logfile: {}".format(str(e)))
+
+
 def triggerNodes(node_type: str):
     node_types = (NodeType.segmentation, NodeType.embedding, NodeType.clustering, NodeType.gpu)
     if node_type not in node_types:
@@ -65,6 +79,7 @@ def triggerNodes(node_type: str):
 def sendBackResults(job: AtheneJob):
     logger.info("Sending back results for jobId {} to Artemis (URL: {})".format(job.id, job.callback_url))
     final_result = json.dumps({"blocks": job.blocks, "clusters": job.clusters})
+    writeJsonToFile("job_" + str(job.id) + "_final_result", final_result)
     try:
         auth_secret = str(os.environ['AUTHORIZATION_SECRET']) if "AUTHORIZATION_SECRET" in os.environ else ""
         headers = {
@@ -90,24 +105,28 @@ def sendBackResults(job: AtheneJob):
 async def submit_job(request: Request, response: Response):
     checkAuthorization(request)
 
-    job = await parseJson(request)
+    job_request = await parseJson(request)
 
     # Error handling
-    if "courseId" in job:
-        course_id = job["courseId"]
+    if "courseId" in job_request:
+        course_id = job_request["courseId"]
     else:
         course_id = -1
 
-    if "callbackUrl" not in job:
+    if "callbackUrl" not in job_request:
         raise missingCallbackUrl
 
-    if "submissions" not in job:
+    if "submissions" not in job_request:
         raise missingSubmissions
 
     # Queue up new job
     global job_counter
     job_counter += 1
-    new_job = AtheneJob(id=job_counter, course_id=course_id, callback_url=job["callbackUrl"], submissions=job["submissions"])
+    writeJsonToFile("job_" + str(job_counter) + "_submission", job_request)
+    new_job = AtheneJob(id=job_counter,
+                        course_id=course_id,
+                        callback_url=job_request["callbackUrl"],
+                        submissions=job_request["submissions"])
     queue.append(new_job)
     logger.info("New Athene Job added: " + str(new_job))
     # Trigger segmentation nodes
@@ -164,7 +183,9 @@ async def get_task(request: Request, response: Response):
             job.status = new_status
             logger.info("Host {} gets {}-task for JobId {}".format(request.client.host, task["taskType"], job.id))
             if task["taskType"] == "segmentation":
-                return {"jobId": job.id, "submissions": job.submissions}
+                response_json = {"jobId": job.id, "submissions": job.submissions}
+                writeJsonToFile("job_" + str(job.id) + "_segmentation_task", response_json)
+                return response_json
             elif task["taskType"] == "embedding":
                 # Create chunk of blocks for embedding node
                 chunk, rest = createEmbeddingChunk(job.blocks_to_embed, task["chunkSize"])
@@ -174,15 +195,22 @@ async def get_task(request: Request, response: Response):
                 job.blocks_to_embed = rest
                 if len(job.blocks_to_embed) == 0:
                     job.status = JobStatus.embedding_processing
-                logger.info("embedding-task for JobId {} created: taskId={}, size={}/{} (actual/requested)".format(job.id,
-                                                                                             new_task.id,len(new_task.blocks),
-                                                                                             task["chunkSize"]))
-                return {"jobId": job.id,
-                        "taskId": new_task.id,
-                        "courseId": new_task.course_id,
-                        "blocks": new_task.blocks}
+                logger.info("embedding-task for JobId {} created: "
+                            "taskId={}, size={}/{} (actual/requested)".format(job.id,
+                                                                              new_task.id,
+                                                                              len(new_task.blocks),
+                                                                              task["chunkSize"]))
+
+                response_json = {"jobId": job.id,
+                                 "taskId": new_task.id,
+                                 "courseId": new_task.course_id,
+                                 "blocks": new_task.blocks}
+                writeJsonToFile("job_" + str(job.id) + "_embedding_task_" + str(new_task.id), response_json)
+                return response_json
             elif task["taskType"] == "clustering":
-                return {"jobId": job.id, "embeddings": job.embeddings}
+                response_json = {"jobId": job.id, "embeddings": job.embeddings}
+                writeJsonToFile("job_" + str(job.id) + "_clustering_task", response_json)
+                return response_json
             else:
                 logger.error("Error with taskType {}".format(task["taskType"]))
                 raise taskTypeError
@@ -219,6 +247,7 @@ async def send_result(request: Request, response: Response, background_tasks: Ba
             if job.status == JobStatus.segmentation_processing and result["resultType"] == "segmentation":
                 if "textBlocks" not in result:
                     raise missingTextBlocks
+                writeJsonToFile("job_" + str(job.id) + "_segmentation_result", result)
                 # Transform segmentation result to blocks (embedding input)
                 for block in result["textBlocks"]:
                     submission_id = int(block["id"])
@@ -256,6 +285,8 @@ async def send_result(request: Request, response: Response, background_tasks: Ba
                 if "taskId" not in result:
                     raise missingTaskId
 
+                writeJsonToFile("job_" + str(job.id) + "_embedding_result_" + str(result["taskId"]), result)
+
                 # Add results to job and remove corresponding embedding-task out of queue
                 valid_results = False
                 for task in job.embedding_tasks:
@@ -285,6 +316,9 @@ async def send_result(request: Request, response: Response, background_tasks: Ba
             elif job.status == JobStatus.clustering_processing and result["resultType"] == "clustering":
                 if "clusters" not in result:
                     raise missingClusters
+
+                writeJsonToFile("job_" + str(job.id) + "_clustering_result_", result)
+
                 job.clusters = result["clusters"]
 
                 # Send back results to Artemis via callback URL in the background
