@@ -181,7 +181,7 @@ async def get_task(request: Request, response: Response):
     else:
         raise invalidTaskType
 
-    logger.debug("Host {} requested {}-task".format(request.client.host, task["taskType"]))
+    logger.info("Host {} requested {}-task".format(request.client.host, task["taskType"]))
 
     # TODO: Check for timed out jobs and put back in queue
     for job in queue:
@@ -242,7 +242,7 @@ async def send_result(request: Request, response: Response, background_tasks: Ba
     if result["resultType"] not in ["segmentation", "embedding", "clustering"]:
         raise invalidResultType
 
-    logger.debug("Host {} sent result for {}-task with jobId {}".format(request.client.host,
+    logger.info("Host {} sent result for {}-task with jobId {}".format(request.client.host,
                                                                         result["resultType"],
                                                                         result["jobId"]))
 
