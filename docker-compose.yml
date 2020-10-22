@@ -100,9 +100,9 @@ services:
       - athene
     labels:
       - traefik.enable=true
-      - traefik.http.routers.upload.rule=Path(`/upload`)
+      - traefik.http.routers.upload.rule=Path(`/upload`,`/feedback_consistency`)
       - traefik.http.routers.upload.entrypoints=web
-      - traefik.http.routers.upload-tls.rule=Path(`/upload`)
+      - traefik.http.routers.upload-tls.rule=Path(`/upload`,`/feedback_consistency`)
       - traefik.http.routers.upload-tls.entrypoints=websecure
       - traefik.http.routers.upload-tls.tls=true
 
