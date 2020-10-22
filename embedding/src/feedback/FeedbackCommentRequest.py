@@ -41,4 +41,4 @@ async def feedback(request: Request):
 
     logger.info("Completed Feedback Comment Embedding Request.")
     logger.debug("-" * 80)
-    return json.dumps(response, ensure_ascii=False)
+    return response
