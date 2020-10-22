@@ -157,9 +157,9 @@ services:
       - athene
     labels:
       - traefik.enable=true
-      - traefik.http.routers.tracking.rule=Path(`/tracking`)
+      - traefik.http.routers.tracking.rule=PathPrefix(`/tracking`)
       - traefik.http.routers.tracking.entrypoints=web
-      - traefik.http.routers.tracking-tls.rule=Path(`/tracking`)
+      - traefik.http.routers.tracking-tls.rule=PathPrefix(`/tracking`)
       - traefik.http.routers.tracking-tls.entrypoints=websecure
       - traefik.http.routers.tracking-tls.tls=true
 
