@@ -22,6 +22,8 @@ services:
       - ./embedding/src:/usr/src/app/src
       - ./text_preprocessing:/usr/src/app/src/text_preprocessing
       - ${EMBEDDING_CLOUD_CONFIG_PATH}:/usr/src/app/src/cloud/config.py:ro
+      # This will keep the subdirectory as it is in the container
+      - /usr/src/app/src/resources
 
   clustering:
     volumes:
