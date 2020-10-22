@@ -36,13 +36,16 @@ class ProcessingResource:
                 submissions = load_submissions_from_json(data)
                 segmentation_result = segment_data(submissions, keywords)
                 output = load_result_to_json(keywords, segmentation_result)
-        output["jobId"] = data["jobId"]
-        output["resultType"] = "segmentation"
+        return output
+
+    def sendBackResults(self, result, job_id):
+        result["jobId"] = job_id
+        result["resultType"] = "segmentation"
 
         try:
             self.__logger.info("Writing logfile")
             with open("logs/segmentation-{}.json".format(datetime.now()), 'w') as outfile:
-                json.dump(output, outfile, ensure_ascii=False)
+                json.dump(result, outfile, ensure_ascii=False)
         except Exception as e:
             self.__logger.error("Error while writing logfile: {}".format(str(e)))
 
@@ -53,7 +56,7 @@ class ProcessingResource:
         headers = {
             "Authorization": auth_secret
         }
-        response = requests.post(send_result_url, data=json.dumps(output), headers=headers, timeout=30)
+        response = requests.post(send_result_url, data=json.dumps(result), headers=headers, timeout=30)
         if response.status_code != 200:
             self.__logger.error("Sending back failed: {}".format(response.text))
 

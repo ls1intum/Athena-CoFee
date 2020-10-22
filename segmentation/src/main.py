@@ -1,5 +1,7 @@
 from src.TimerHandler import TimerHandler
+from src.ProcessingResource import ProcessingResource
 from fastapi import FastAPI, Request, Response, BackgroundTasks
+import json
 import logging
 import sys
 
@@ -24,3 +26,10 @@ async def trigger(request: Request, response: Response, background_tasks: Backgr
     # Restart Timer-Thread if needed to query for new Task instantly (will not stop a currently running computation)
     background_tasks.add_task(timer_handler.restartTimerThread)
     return {'Trigger received'}
+
+@app.post("/segment")
+async def segment(request: Request, response: Response):
+    logger.info("Direct segmentation call received")
+    processor = ProcessingResource()
+    result = processor.processTask(request)
+    return json.dumps(result)

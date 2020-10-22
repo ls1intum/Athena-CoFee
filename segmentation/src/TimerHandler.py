@@ -38,7 +38,8 @@ class TimerThread(threading.Thread):
                         is_killed = self._kill.wait(self._interval)
                     else:
                         self.__logger.info("Process new segmentation task")
-                        processor.processTask(task)
+                        result = processor.processTask(task)
+                        processor.sendBackResults(result, task["jobId"])
                         process_lock.release()
                         # Query task queue again without waiting after processing
                         is_killed = self._kill.wait(0)
