@@ -1,0 +1,37 @@
+version: '3'
+
+# This override file mounts all local code-directories into the containers
+# By that, rebuilding the containers is not needed for code changes locally as long as no requirements change
+
+services:
+  traefik:
+    # This component does not need to be changed
+
+  load-balancer:
+    volumes:
+      - ./load-balance.yml:/usr/src/app/${LOAD_BALANCER_CONFIG_FILE_PATH}:ro
+      - ./load-balancer/src:/usr/src/app/src
+
+  segmentation:
+    volumes:
+      - ./segmentation/src:/usr/src/app/src
+      - ./text_preprocessing:/usr/src/app/src/text_preprocessing
+
+  embedding:
+    volumes:
+      - ./embedding/src:/usr/src/app/src
+      - ./text_preprocessing:/usr/src/app/src/text_preprocessing
+      - ${EMBEDDING_CLOUD_CONFIG_PATH}:/usr/src/app/src/cloud/config.py:ro
+      # This will keep the subdirectory as it is in the container
+      - /usr/src/app/src/resources
+
+  clustering:
+    volumes:
+      - ./clustering/src:/usr/src/app/src
+
+  tracking:
+    volumes:
+      - ./tracking/src:/usr/src/app/src
+
+  database:
+    # This component does not need to be changed

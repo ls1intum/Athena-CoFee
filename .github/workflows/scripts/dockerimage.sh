@@ -1,6 +1,6 @@
 #!/bin/bash
 
-COMPONENT=$1      # Parameter $1 (Component): either "segmentation", "embedding", "tracking", or "clustering"
+COMPONENT=$1      # Parameter $1 (Component): either "load-balancer", "segmentation", "embedding", "clustering" or "tracking"
 
 echo -e "INFO: Building ${COMPONENT}-component"
 
@@ -10,7 +10,9 @@ TAG=$(git rev-parse --short "$GITHUB_SHA")              # Tag image with short c
 
 # Build and Push image
 echo -e "INFO: Build and Push ${IMAGE}:${TAG}"
-cd ${COMPONENT}; docker build . --file Dockerfile --tag ${IMAGE}:${TAG}
+if ! docker build . --file ${COMPONENT}/Dockerfile --tag ${IMAGE}:${TAG}; then
+	exit 1
+fi
 docker push ${IMAGE}:${TAG}
 
 # Tag and Push with branch-name

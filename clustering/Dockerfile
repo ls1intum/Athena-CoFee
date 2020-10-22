@@ -1,11 +1,11 @@
 FROM python:3.7.7
 LABEL author="Jan Philip Bernius <janphilip.bernius@tum.de>"
 
-COPY requirements.txt /tmp/requirements.txt
+COPY ./clustering/requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -qr /tmp/requirements.txt
 
 WORKDIR /usr/src/app
-COPY src/ src/
+COPY ./clustering/src/ src/
 
 # Run the image as a non-root user
 RUN groupadd -r textsim && useradd --no-log-init -r -g textsim textsim
@@ -14,4 +14,4 @@ VOLUME ["/usr/src/app/logs"]
 USER textsim
 
 EXPOSE 8000
-CMD gunicorn -b 0.0.0.0:8000 src.app
+CMD ["uvicorn", "--host", "0.0.0.0", "--port", "8000", "--reload", "src.main:app"]
