@@ -1,5 +1,6 @@
-import pickle
 import numpy as np
+import os
+import pickle
 import requests
 from logging import getLogger
 from typing import List
@@ -7,7 +8,8 @@ from src.elmo import ELMo
 from src.database.Connection import Connection
 from src.entities import FeedbackWithTextBlock, Feedback, Sentence, ElmoVector
 
-SEGMENTATION_URL = "http://segmentation:8000/segment"
+# Get container variable for segmentation url
+SEGMENTATION_URL = str(os.environ['SEGMENTATION_URL']) if "SEGMENTATION_URL" in os.environ else "http://segmentation:8000/segment"
 
 
 class FeedbackCommentResource:
