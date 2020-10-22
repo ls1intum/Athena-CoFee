@@ -52,6 +52,10 @@ class TimerThread(threading.Thread):
                 # Query task queue after timeout again
                 is_killed = self._kill.wait(self._interval)
 
+            # If no kill signal is set, sleep for the interval,
+            # If kill signal comes in while sleeping, immediately
+            # wake up and handle
+            #is_killed = self._kill.wait(self._interval)
             if is_killed:
                 break
 

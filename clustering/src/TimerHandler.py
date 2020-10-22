@@ -7,7 +7,6 @@ process_lock = threading.Lock()     # Lock to prevent multiple calculations and 
 # Interval to query task queue (in seconds)
 try:
     timer_frequency = int(os.environ['BALANCER_QUEUE_FREQUENCY']) if "BALANCER_QUEUE_FREQUENCY" in os.environ else 600
-    raise Exception
 except Exception:
     timer_frequency = 600
 timer_thread: threading.Thread      # Object holding the Timer-Thread
