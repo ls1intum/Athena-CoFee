@@ -1,11 +1,10 @@
 from src.TimerHandler import TimerHandler
 from fastapi import FastAPI, Request, Response, BackgroundTasks
-import sys
 import logging
+import sys
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-
 handler = logging.StreamHandler(sys.stdout)
 handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('[%(asctime)s] [%(process)d] [%(levelname)s] [%(name)s] %(message)s')
