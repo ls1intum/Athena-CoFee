@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import json
 import pickle
 import requests
 from logging import getLogger
@@ -120,4 +121,4 @@ class FeedbackCommentResource:
                                                                                          response.content))
             return None
 
-        return response.json()
+        return json.loads(response.json())

@@ -31,5 +31,5 @@ async def trigger(request: Request, response: Response, background_tasks: Backgr
 async def segment(request: Request, response: Response):
     logger.info("Direct segmentation call received")
     processor = ProcessingResource()
-    result = processor.processTask(request)
+    result = processor.processTask(await request.json())
     return json.dumps(result)
