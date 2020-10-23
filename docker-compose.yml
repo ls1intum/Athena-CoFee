@@ -72,6 +72,7 @@ services:
       - traefik.enable=true
 
 # http://localhost/upload
+# http://localhost/feedback_consistency
   embedding:
     build:
       context: .
