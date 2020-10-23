@@ -8,6 +8,9 @@ REGISTRY=docker.pkg.github.com                          # Address of Docker Regi
 IMAGE=${REGISTRY}/ls1intum/athene/athene-${COMPONENT}   # Name of the Docker image
 TAG=$(git rev-parse --short "$GITHUB_SHA")              # Tag image with short commit hash by default
 
+# Pull latest image to allow reusing existing image layers and reducing build time
+docker pull ${IMAGE}
+
 # Build and Push image
 echo -e "INFO: Build and Push ${IMAGE}:${TAG}"
 if ! docker build . --file ${COMPONENT}/Dockerfile --tag ${IMAGE}:${TAG}; then
