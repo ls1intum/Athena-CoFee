@@ -16,7 +16,7 @@ import sys
 logger = logging.getLogger()
 # Set log_level to logging.DEBUG to write log files with json contents (see writeJsonToFile())
 # Warning: This will produce a lot of data in production systems
-log_level = logging.DEBUG
+log_level = logging.INFO
 logger.setLevel(log_level)
 handler = logging.StreamHandler(sys.stdout)
 handler.setLevel(log_level)
