@@ -16,7 +16,7 @@ import sys
 logger = logging.getLogger()
 # Set log_level to logging.DEBUG to write log files with json contents (see writeJsonToFile())
 # Warning: This will produce a lot of data in production systems
-log_level = logging.INFO
+log_level = logging.DEBUG
 logger.setLevel(log_level)
 handler = logging.StreamHandler(sys.stdout)
 handler.setLevel(log_level)
@@ -58,7 +58,7 @@ def writeJsonToFile(job_id: int, filename: str, data):
                 os.makedirs(directory)
             logger.debug("Writing data to logfile: {}".format(filename))
             with open(directory + "/" + filename + ".json", 'w') as outfile:
-                json.dump(data, outfile, ensure_ascii=False)
+                outfile.write(data)
         except Exception as e:
             logger.error("Error while writing logfile: {}".format(str(e)))
 
