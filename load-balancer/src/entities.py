@@ -70,6 +70,8 @@ class AtheneJob:
     embedding_tasks: list           # List of pending embedding-tasks
     embedding_task_count: int       # Counter to assign taskId's
     clusters: dict                  # Clustering result
+    distanceMatrix: list            # distance Matrix for blocks
+    clusterTree: list               # cluster tree of the clusters
     status: str                     # See class JobStatus
 
     def __init__(self, id: int, course_id: int, callback_url: str, submissions: dict):

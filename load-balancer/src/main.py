@@ -2,7 +2,7 @@ from .entities import AtheneJob, JobStatus, NodeType, EmbeddingTask
 from .errors import invalidAuthorization, invalidJson, missingCallbackUrl, missingSubmissions, missingTaskType,\
     missingChunkSize, invalidChunkSize, invalidTaskType, taskTypeError, missingJobId, invalidJobId, missingResultType,\
     invalidResultType, missingTextBlocks, missingEmbeddings, missingTaskId, invalidResults, noUpdateNeeded,\
-    missingClusters
+    missingClusters, missingDistanceMatrix, missingClusterTree
 from fastapi import BackgroundTasks, FastAPI, Request, Response, status
 from requests.auth import HTTPBasicAuth
 from src.ConfigParser import ConfigParser
@@ -84,7 +84,10 @@ def triggerNodes(node_type: str):
 
 def sendBackResults(job: AtheneJob):
     logger.info("Sending back results for jobId {} to Artemis (URL: {})".format(job.id, job.callback_url))
-    final_result = json.dumps({"blocks": job.blocks, "clusters": job.clusters})
+    final_result = json.dumps({"blocks": job.blocks,
+                               "clusters": job.clusters,
+                               "distanceMatrix": job.distanceMatrix,
+                               "clusterTree": job.clusterTree})
     writeJsonToFile(job.id, "final_result", final_result)
     try:
         auth_secret = str(os.environ['AUTHORIZATION_SECRET']) if "AUTHORIZATION_SECRET" in os.environ else ""
@@ -322,10 +325,16 @@ async def send_result(request: Request, response: Response, background_tasks: Ba
             elif job.status == JobStatus.clustering_processing and result["resultType"] == "clustering":
                 if "clusters" not in result:
                     raise missingClusters
+                if "distanceMatrix" not in result:
+                    raise missingDistanceMatrix
+                if "clusterTree" not in result:
+                    raise missingClusterTree
 
                 writeJsonToFile(job.id, "clustering_result", result)
 
                 job.clusters = result["clusters"]
+                job.distanceMatrix = result["distanceMatrix"]
+                job.clusterTree = result["clusterTree"]
 
                 # Send back results to Artemis via callback URL in the background
                 job.status = JobStatus.sending_back
