@@ -6,6 +6,7 @@
 data/
 
 ### Shared code ###
+embedding-gpu/src/processing/text_preprocessing
 embedding/src/text_preprocessing
 segmentation/src/text_preprocessing
 
