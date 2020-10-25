@@ -6,6 +6,7 @@ services:
   traefik:
     image: traefik:v2.2.1
     container_name: athene-traefik
+    restart: unless-stopped
     depends_on:
       # These components have API endpoints managed by traefik
       - load-balancer
@@ -31,6 +32,7 @@ services:
       dockerfile: ./load-balancer/Dockerfile
     image: athene-load-balancer
     container_name: athene-load-balancer
+    restart: unless-stopped
 #    ports:
 #      - 8000:8000
     expose:
@@ -57,6 +59,7 @@ services:
       dockerfile: ./segmentation/Dockerfile
     image: athene-segmentation
     container_name: athene-segmentation
+    restart: unless-stopped
     depends_on:
       - load-balancer
 #    ports:
@@ -82,6 +85,7 @@ services:
       dockerfile: ./embedding/Dockerfile
     image: athene-embedding
     container_name: athene-embedding
+    restart: unless-stopped
     depends_on:
       - load-balancer
       - database
@@ -119,6 +123,7 @@ services:
       dockerfile: ./clustering/Dockerfile
     image: athene-clustering
     container_name: athene-clustering
+    restart: unless-stopped
     depends_on:
       - load-balancer
       - database
@@ -149,6 +154,7 @@ services:
       dockerfile: ./tracking/Dockerfile
     image: athene-tracking
     container_name: athene-tracking
+    restart: unless-stopped
     depends_on:
       - database
 #    ports:
@@ -175,8 +181,8 @@ services:
 
   database:
     image: mongo:latest
-    restart: always
     container_name: athene-mongodb
+    restart: unless-stopped
     expose:
       - 27017
     environment:
