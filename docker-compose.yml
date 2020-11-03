@@ -6,10 +6,12 @@ services:
   traefik:
     image: traefik:v2.2.1
     container_name: athene-traefik
+    restart: unless-stopped
     depends_on:
-      - segmentation
+      # These components have API endpoints managed by traefik
+      - load-balancer
       - embedding
-      - clustering
+      - tracking
     ports:
       - ${TRAEFIK_DASHBOARD_PORT}:8080
       - ${TRAEFIK_HTTP_PORT}:80
@@ -30,6 +32,7 @@ services:
       dockerfile: ./load-balancer/Dockerfile
     image: athene-load-balancer
     container_name: athene-load-balancer
+    restart: unless-stopped
 #    ports:
 #      - 8000:8000
     expose:
@@ -56,6 +59,9 @@ services:
       dockerfile: ./segmentation/Dockerfile
     image: athene-segmentation
     container_name: athene-segmentation
+    restart: unless-stopped
+    depends_on:
+      - load-balancer
 #    ports:
 #      - 8001:8000
     expose:
@@ -72,12 +78,17 @@ services:
       - traefik.enable=true
 
 # http://localhost/upload
+# http://localhost/feedback_consistency
   embedding:
     build:
       context: .
       dockerfile: ./embedding/Dockerfile
     image: athene-embedding
     container_name: athene-embedding
+    restart: unless-stopped
+    depends_on:
+      - load-balancer
+      - database
 #    ports:
 #      - 8002:8000
     expose:
@@ -112,6 +123,10 @@ services:
       dockerfile: ./clustering/Dockerfile
     image: athene-clustering
     container_name: athene-clustering
+    restart: unless-stopped
+    depends_on:
+      - load-balancer
+      - database
 #    ports:
 #      - 8003:8000
     expose:
@@ -139,8 +154,11 @@ services:
       dockerfile: ./tracking/Dockerfile
     image: athene-tracking
     container_name: athene-tracking
+    restart: unless-stopped
+    depends_on:
+      - database
 #    ports:
-#      - 8004:80
+#      - 8004:8000
     expose:
       - 80
     environment:
@@ -151,8 +169,6 @@ services:
       - DATABASE_USER=tracking
       - DATABASE_PWD=tracking_password
     working_dir: /usr/src/app
-    depends_on:
-      - database
     networks:
       - athene
     labels:
@@ -165,8 +181,8 @@ services:
 
   database:
     image: mongo:latest
-    restart: always
     container_name: athene-mongodb
+    restart: unless-stopped
     expose:
       - 27017
     environment:

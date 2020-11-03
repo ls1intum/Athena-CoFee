@@ -28,6 +28,7 @@ will automatically build and start the Load-balancer, Segmentation, the Embeddin
 -   [http://localhost/sendTaskResult](http://localhost/sendTaskResult) - For the computation components to send back results to the load balancer
 -   [http://localhost/upload](http://localhost/upload) - For Artemis to upload course material
 -   [http://localhost/tracking](http://localhost/tracking) - For Artemis to access tracking functionality
+-   [http://localhost/feedback_consistency](http://localhost/feedback_consistency) - For Artemis to access feedback_consistency functionality
 
 In addition to that, traefik provides a dashboard to monitor the status of underlying components. This dashboard will be available on [http://localhost:8081/dashboard](http://localhost:8080/dashboard) by default.
 
