@@ -2,7 +2,7 @@ FROM nvidia/cuda:10.1-runtime-ubuntu18.04
 LABEL author="Jan Philip Bernius <janphilip.bernius@tum.de>"
 
 RUN apt-get update && \
-    apt-get -y install python3 python3-pip curl && \
+    apt-get -y install python3 python3-pip curl pkg-config git cmake && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
