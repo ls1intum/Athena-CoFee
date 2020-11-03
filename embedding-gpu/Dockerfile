@@ -16,7 +16,7 @@ RUN mkdir -p /usr/lib/nltk_data \
  && python3 -m nltk.downloader -d /usr/lib/nltk_data stopwords wordnet punkt
 
 COPY ./embedding-gpu/src/ src/
-COPY ./text_preprocessing src/text_preprocessing
+COPY ./text_preprocessing src/processing/text_preprocessing
 
 # Run the image as a non-root user
 RUN groupadd -r textemb && useradd --no-log-init -r -g textemb textemb

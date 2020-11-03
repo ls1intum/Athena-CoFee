@@ -111,11 +111,11 @@ services:
       - athene
     labels:
       - traefik.enable=true
-      - traefik.http.routers.upload.rule=Path(`/upload`,`/feedback_consistency`)
-      - traefik.http.routers.upload.entrypoints=web
-      - traefik.http.routers.upload-tls.rule=Path(`/upload`,`/feedback_consistency`)
-      - traefik.http.routers.upload-tls.entrypoints=websecure
-      - traefik.http.routers.upload-tls.tls=true
+      - traefik.http.routers.embedding.rule=Path(`/upload`,`/feedback_consistency`)
+      - traefik.http.routers.embedding.entrypoints=web
+      - traefik.http.routers.embedding-tls.rule=Path(`/upload`,`/feedback_consistency`)
+      - traefik.http.routers.embedding-tls.entrypoints=websecure
+      - traefik.http.routers.embedding-tls.tls=true
 
   clustering:
     build:
@@ -160,7 +160,7 @@ services:
 #    ports:
 #      - 8004:8000
     expose:
-      - 80
+      - 8000
     environment:
       - JWT_SECRET_BASE64=YWVuaXF1YWRpNWNlaXJpNmFlbTZkb283dXphaVF1b29oM3J1MWNoYWlyNHRoZWUzb2huZ2FpM211bGVlM0VpcAo=
       - DATABASE_HOST=database
