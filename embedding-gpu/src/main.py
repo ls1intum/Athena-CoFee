@@ -10,7 +10,7 @@ logger = logging.getLogger()
 log_level = logging.INFO
 logger.setLevel(log_level)
 handler = logging.StreamHandler(sys.stdout)
-handler.setLevel(logging.DEBUG)
+handler.setLevel(log_level)
 formatter = logging.Formatter('[%(asctime)s] [%(process)d] [%(levelname)s] [%(name)s] %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
