@@ -90,8 +90,8 @@ class ProcessingResource:
         output["jobId"] = data["jobId"]
         output["resultType"] = "clustering"
 
-        # Only write file if log-level is DEBUG
-        if self.__logger.level == logging.DEBUG:
+        # Only write file if log-level of root logger is DEBUG
+        if logging.getLogger().level == logging.DEBUG:
             try:
                 self.__logger.debug("Writing logfile")
                 with open("logs/clustering-{}.json".format(datetime.now()), 'w') as outfile:

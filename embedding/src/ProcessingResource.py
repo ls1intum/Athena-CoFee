@@ -59,8 +59,8 @@ class ProcessingResource:
         output["taskId"] = data["taskId"]
         output["resultType"] = "embedding"
 
-        # Only write file if log-level is DEBUG
-        if self.__logger.level == logging.DEBUG:
+        # Only write file if log-level of root logger is DEBUG
+        if logging.getLogger().level == logging.DEBUG:
             try:
                 self.__logger.debug("Writing logfile")
                 with open("logs/embedding-{}.json".format(datetime.now()), 'w') as outfile:
