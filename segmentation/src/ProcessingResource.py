@@ -1,5 +1,4 @@
 from datetime import datetime
-from logging import getLogger
 from src.json_processor.serializer import load_result_to_json
 from src.text_preprocessing.data_cleaner import clean_data
 from src.json_processor.deserialzer import load_submissions_from_json, load_keywords_from_json, load_feedback_from_json
@@ -7,6 +6,7 @@ from src.text_preprocessing.keyword_extractor import get_top_n_words
 from src.segmentor.segmentor import segment_data, segment_feedback_data
 from src.errors import tooFewSubmissions, noSubmissions
 import json
+import logging
 import os
 import requests
 
@@ -42,12 +42,14 @@ class ProcessingResource:
         result["jobId"] = job_id
         result["resultType"] = "segmentation"
 
-        try:
-            self.__logger.info("Writing logfile")
-            with open("logs/segmentation-{}.json".format(datetime.now()), 'w') as outfile:
-                json.dump(result, outfile, ensure_ascii=False)
-        except Exception as e:
-            self.__logger.error("Error while writing logfile: {}".format(str(e)))
+        # Only write file if log-level is DEBUG
+        if self.__logger.level == logging.DEBUG:
+            try:
+                self.__logger.debug("Writing logfile")
+                with open("logs/segmentation-{}.json".format(datetime.now()), 'w') as outfile:
+                    json.dump(result, outfile, ensure_ascii=False)
+            except Exception as e:
+                self.__logger.error("Error while writing logfile: {}".format(str(e)))
 
         self.__logger.info("Send back segmentation-results")
         # Get container variable for load balancer url

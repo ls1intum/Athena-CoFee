@@ -111,7 +111,7 @@ def sendBackResults(job: AtheneJob):
 # Endpoint for Artemis to submit a job
 # This will create a new job and queue up the first task (segmentation)
 @app.post("/submit")
-async def submit_job(request: Request, response: Response):
+async def submit_job(request: Request, response: Response, background_tasks: BackgroundTasks):
     checkAuthorization(request)
 
     job_request = await parseJson(request)
@@ -131,7 +131,7 @@ async def submit_job(request: Request, response: Response):
     # Queue up new job
     global job_counter
     job_counter += 1
-    writeJsonToFile(job_counter, "submission", job_request)
+    background_tasks.add_task(writeJsonToFile, job_counter, "submission", job_request)
     new_job = AtheneJob(id=job_counter,
                         course_id=course_id,
                         callback_url=job_request["callbackUrl"],
@@ -159,7 +159,7 @@ def createEmbeddingChunk(blocks, size):
 # Endpoint for compute nodes to get a task
 # This will update the corresponding job and set the status to "processing"
 @app.get("/getTask")
-async def get_task(request: Request, response: Response):
+async def get_task(request: Request, response: Response, background_tasks: BackgroundTasks):
     checkAuthorization(request)
 
     task = await parseJson(request)
@@ -193,7 +193,7 @@ async def get_task(request: Request, response: Response):
             logger.info("Host {} gets {}-task for JobId {}".format(request.client.host, task["taskType"], job.id))
             if task["taskType"] == "segmentation":
                 response_json = {"jobId": job.id, "submissions": job.submissions}
-                writeJsonToFile(job.id, "segmentation_task", response_json)
+                background_tasks.add_task(writeJsonToFile, job.id, "segmentation_task", response_json)
                 return response_json
             elif task["taskType"] == "embedding":
                 # Create chunk of blocks for embedding node
@@ -214,11 +214,11 @@ async def get_task(request: Request, response: Response):
                                  "taskId": new_task.id,
                                  "courseId": new_task.course_id,
                                  "blocks": new_task.blocks}
-                writeJsonToFile(job.id, "embedding_task_" + str(new_task.id), response_json)
+                background_tasks.add_task(writeJsonToFile, job.id, "embedding_task_" + str(new_task.id), response_json)
                 return response_json
             elif task["taskType"] == "clustering":
                 response_json = {"jobId": job.id, "embeddings": job.embeddings}
-                writeJsonToFile(job.id, "clustering_task", response_json)
+                background_tasks.add_task(writeJsonToFile, job.id, "clustering_task", response_json)
                 return response_json
             else:
                 logger.error("Error with taskType {}".format(task["taskType"]))
@@ -256,7 +256,7 @@ async def send_result(request: Request, response: Response, background_tasks: Ba
             if job.status == JobStatus.segmentation_processing and result["resultType"] == "segmentation":
                 if "textBlocks" not in result:
                     raise missingTextBlocks
-                writeJsonToFile(job.id, "segmentation_result", result)
+                background_tasks.add_task(writeJsonToFile, job.id, "segmentation_result", result)
                 # Transform segmentation result to blocks (embedding input)
                 for block in result["textBlocks"]:
                     submission_id = int(block["id"])
@@ -294,7 +294,7 @@ async def send_result(request: Request, response: Response, background_tasks: Ba
                 if "taskId" not in result:
                     raise missingTaskId
 
-                writeJsonToFile(job.id, "embedding_result_" + str(result["taskId"]), result)
+                background_tasks.add_task(writeJsonToFile, job.id, "embedding_result_" + str(result["taskId"]), result)
 
                 # Add results to job and remove corresponding embedding-task out of queue
                 valid_results = False
@@ -330,7 +330,7 @@ async def send_result(request: Request, response: Response, background_tasks: Ba
                 if "clusterTree" not in result:
                     raise missingClusterTree
 
-                writeJsonToFile(job.id, "clustering_result", result)
+                background_tasks.add_task(writeJsonToFile, job.id, "clustering_result", result)
 
                 job.clusters = result["clusters"]
                 job.distanceMatrix = result["distanceMatrix"]

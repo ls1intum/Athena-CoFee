@@ -1,8 +1,8 @@
 import json
+import logging
 import os
 import requests
 from typing import List
-from logging import getLogger
 from datetime import datetime
 from numpy import ndarray
 
@@ -21,7 +21,7 @@ class ProcessingResource:
 
     # Starts processing of a queried task
     def processTask(self, data):
-        self.__logger.debug("-" * 80)
+        self.__logger.info("-" * 80)
         self.__logger.info("Start processing Embedding Request:")
 
         if "blocks" not in data:
@@ -53,18 +53,20 @@ class ProcessingResource:
         }
 
         self.__logger.info("Completed Embedding Request.")
-        self.__logger.debug("-" * 80)
+        self.__logger.info("-" * 80)
 
         output["jobId"] = data["jobId"]
         output["taskId"] = data["taskId"]
         output["resultType"] = "embedding"
 
-        try:
-            self.__logger.info("Writing logfile")
-            with open("logs/embedding-{}.json".format(datetime.now()), 'w') as outfile:
-                json.dump(output, outfile, ensure_ascii=False, default=self.__default)
-        except Exception as e:
-            self.__logger.error("Error while writing logfile: {}".format(str(e)))
+        # Only write file if log-level is DEBUG
+        if self.__logger.level == logging.DEBUG:
+            try:
+                self.__logger.debug("Writing logfile")
+                with open("logs/embedding-{}.json".format(datetime.now()), 'w') as outfile:
+                    json.dump(output, outfile, ensure_ascii=False, default=self.__default)
+            except Exception as e:
+                self.__logger.error("Error while writing logfile: {}".format(str(e)))
 
         self.__logger.info("Send back embedding-results")
         # Get container variable for load balancer url

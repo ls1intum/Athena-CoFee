@@ -1,5 +1,4 @@
 from datetime import datetime
-from logging import getLogger
 from math import isinf
 from numpy import int64, ndarray
 from src.clustering import Clustering
@@ -7,6 +6,7 @@ from src.errors import requireTwoEmbeddings
 from src.entities import TextBlock, ElmoVector, Embedding
 from typing import List
 import json
+import logging
 import os
 import requests
 
@@ -23,7 +23,7 @@ class ProcessingResource:
 
     # Starts processing of a queried task
     def processTask(self, data):
-        self.__logger.debug("-" * 80)
+        self.__logger.info("-" * 80)
         self.__logger.info("Start processing Clustering Request:")
 
         if "embeddings" not in data:
@@ -85,17 +85,19 @@ class ProcessingResource:
         })
 
         self.__logger.info("Completed Clustering Request.")
-        self.__logger.debug("-" * 80)
+        self.__logger.info("-" * 80)
 
         output["jobId"] = data["jobId"]
         output["resultType"] = "clustering"
 
-        try:
-            self.__logger.info("Writing logfile")
-            with open("logs/clustering-{}.json".format(datetime.now()), 'w') as outfile:
-                json.dump(output, outfile, ensure_ascii=False, default=self.__default)
-        except Exception as e:
-            self.__logger.error("Error while writing logfile: {}".format(str(e)))
+        # Only write file if log-level is DEBUG
+        if self.__logger.level == logging.DEBUG:
+            try:
+                self.__logger.debug("Writing logfile")
+                with open("logs/clustering-{}.json".format(datetime.now()), 'w') as outfile:
+                    json.dump(output, outfile, ensure_ascii=False, default=self.__default)
+            except Exception as e:
+                self.__logger.error("Error while writing logfile: {}".format(str(e)))
 
         self.__logger.info("Send back clustering-results")
         # Get container variable for load balancer url
