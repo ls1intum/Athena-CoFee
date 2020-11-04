@@ -12,7 +12,7 @@ import requests
 
 
 class ProcessingResource:
-    __logger = getLogger(__name__)
+    __logger = logging.getLogger(__name__)
 
     # Starts processing of a queried task
     def processTask(self, data):

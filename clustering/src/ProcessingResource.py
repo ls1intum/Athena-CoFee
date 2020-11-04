@@ -12,7 +12,7 @@ import requests
 
 
 class ProcessingResource:
-    __logger = getLogger(__name__)
+    __logger = logging.getLogger(__name__)
     __clustering: Clustering = Clustering()
 
     def __default(self, o) -> int :

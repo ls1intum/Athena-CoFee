@@ -12,7 +12,7 @@ from .entities import Sentence, TextBlock, ElmoVector, Embedding
 from .errors import requireTwoBlocks
 
 class ProcessingResource:
-    __logger = getLogger(__name__)
+    __logger = logging.getLogger(__name__)
 
     def __default(self, o) -> int:
         if isinstance(o, Embedding): return o.__dict__
