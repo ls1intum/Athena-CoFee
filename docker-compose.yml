@@ -160,7 +160,7 @@ services:
 #    ports:
 #      - 8004:8000
     expose:
-      - 80
+      - 8000
     environment:
       - JWT_SECRET_BASE64=YWVuaXF1YWRpNWNlaXJpNmFlbTZkb283dXphaVF1b29oM3J1MWNoYWlyNHRoZWUzb2huZ2FpM211bGVlM0VpcAo=
       - DATABASE_HOST=database
