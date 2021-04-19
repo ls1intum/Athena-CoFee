@@ -104,7 +104,7 @@ class ProcessingResource:
         headers = {
             "Authorization": auth_secret
         }
-        response = requests.post(send_result_url, data=json.dumps(output, default=self.__default), headers=headers, timeout=30)
+        response = requests.post(send_result_url, data=json.dumps(output, default=self.__default), headers=headers, timeout=90)
         if response.status_code != 200:
             self.__logger.error("Sending back failed: {}".format(response.text))
 
