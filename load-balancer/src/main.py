@@ -12,6 +12,7 @@ import logging
 import os
 import requests
 import sys
+import clustering_pb2 as Protobuf
 
 logger = logging.getLogger()
 # Set log_level to logging.DEBUG to write log files with json contents (see writeJsonToFile())
@@ -84,6 +85,29 @@ def triggerNodes(node_type: str):
 
 def sendBackResults(job: AtheneJob):
     logger.info("Sending back results for jobId {} to Artemis (URL: {})".format(job.id, job.callback_url))
+    response = Protobuf.AtheneResponse()
+
+    for block in job.blocks:
+        b = response.blocks.add()
+        b.id = block.id
+        b.submissionId = block.submissionId
+        b.startIndex = block.startIndex
+        b.endIndex = block.endIndex
+        b.text = block.text
+    
+    for cluster in job.clusters:
+        c = response.clusters.add()
+        c.treeId = cluster.treeId
+        [c.blocks.add().id = block.id for block in cluster.blocks]
+        dm = cluster.distanceMatrix
+        for i in range(len(dm)):
+            for j in range(len(dm[i])):
+                entry = c.distanceMatrix.add()
+                entry.x = i
+                entry.y = j
+                entry.value = dm[i][j]
+        
+
     final_result = json.dumps({"blocks": job.blocks,
                                "clusters": job.clusters,
                                "distanceMatrix": job.distanceMatrix,
