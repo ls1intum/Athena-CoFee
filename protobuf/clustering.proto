@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+// import "job.proto";
+
+message TextBlock {
+    string id = 1;
+    optional int32 submissionId = 2;
+    optional string text = 3;
+    optional int32 startIndex = 4;
+    optional int32 endIndex = 5;
+}
+
+message DistanceMatrixEntry {
+    int32 x = 1;
+    int32 y = 2;
+    float value = 3;
+}
+
+message Cluster {
+    int32 treeId = 1;
+    repeated TextBlock blocks = 2;
+    repeated DistanceMatrixEntry distanceMatrix = 3;
+}
+
+message ClusterNode {
+    int32 parent = 1;
+    int32 child = 2;
+    float lambdaVal = 3;
+    int32 childSize = 4;
+}
+
+/*
+message ClusteringRequest {}
+message ClusteringResponse {
+    Job job = 1;
+    repeated ClusterNode clusterTree = 2;
+    repeated DistanceMatrixEntry distanceMatrix = 3;
+    repeated Cluster clusters = 4;
+}
+
+service ClusteringService {
+    rpc cluster(ClusteringRequest) returns (ClusteringResponse) {}
+}
+*/
+
+message AtheneResponse {
+    repeated TextBlock blocks = 1;
+    repeated Cluster clusters = 2;
+    repeated DistanceMatrixEntry distanceMatrix = 3;
+    repeated ClusterNode clusterTree = 4;
+}
