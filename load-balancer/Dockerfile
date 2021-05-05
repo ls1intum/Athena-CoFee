@@ -15,5 +15,5 @@ USER textbal
 
 EXPOSE 8000
 
-# CMD uvicorn --host 0.0.0.0 --port 8000 --reload src.main:app
-CMD gunicorn -w 8 --timeout 240 -b 0.0.0.0:8000 -k uvicorn.workers.UvicornWorker src.main:app
+CMD uvicorn --host 0.0.0.0 --port 8000 --reload src.main:app
+# CMD gunicorn -w 8 --timeout 240 -b 0.0.0.0:8000 -k uvicorn.workers.UvicornWorker src.main:app
