@@ -2,6 +2,10 @@ syntax = "proto3";
 
 // import "job.proto";
 
+option java_multiple_files = true;
+option java_package = "de.tum.in.ase.athene.protobuf";
+option java_outer_classname = "AtheneClient";
+
 message TextBlock {
     string id = 1;
     optional int32 submissionId = 2;
