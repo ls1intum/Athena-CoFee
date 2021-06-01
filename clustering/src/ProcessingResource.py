@@ -42,6 +42,9 @@ class ProcessingResource:
         clusterLabels: List[int] = list(map(lambda i: int(i), set(labels)))
         clusters = {}
         for clusterLabel in clusterLabels:
+            # Skip cluster of unassgined elements
+            if clusterLabel == -1: continue
+
             indices = [i for i, x in enumerate(labels) if x == clusterLabel]
             clusterEmbeddings = [embeddings[i].vector for i in indices]
             clusters[clusterLabel] = {
