@@ -4,9 +4,8 @@ syntax = "proto3";
 
 option java_multiple_files = true;
 option java_package = "de.tum.in.ase.athene.protobuf";
-option java_outer_classname = "AtheneClient";
 
-message TextBlock {
+message Segment {
     string id = 1;
     optional int32 submissionId = 2;
     optional string text = 3;
@@ -22,7 +21,7 @@ message DistanceMatrixEntry {
 
 message Cluster {
     int32 treeId = 1;
-    repeated TextBlock blocks = 2;
+    repeated Segment segments = 2;
     repeated DistanceMatrixEntry distanceMatrix = 3;
 }
 
@@ -48,7 +47,7 @@ service ClusteringService {
 */
 
 message AtheneResponse {
-    repeated TextBlock blocks = 1;
+    repeated Segment segments = 1;
     repeated Cluster clusters = 2;
     repeated DistanceMatrixEntry distanceMatrix = 3;
     repeated ClusterNode clusterTree = 4;

@@ -88,20 +88,20 @@ def sendBackResults(job: AtheneJob):
     response = Protobuf.AtheneResponse()
 
     for block in job.blocks:
-        b = response.blocks.add()
-        b.id = block["id"]
-        b.submissionId = block["submissionId"]
-        b.startIndex = block["startIndex"]
-        b.endIndex = block["endIndex"]
-        b.text = block["text"]
+        segment = response.segments.add()
+        segment.id = block["id"]
+        segment.submissionId = block["submissionId"]
+        segment.startIndex = block["startIndex"]
+        segment.endIndex = block["endIndex"]
+        segment.text = block["text"]
     del job.blocks
 
     for cluster in job.clusters.values():
         c = response.clusters.add()
         c.treeId = cluster["treeId"]
         for block in cluster["blocks"]:
-            b = c.blocks.add()
-            b.id = block["id"]
+            segment = c.segments.add()
+            segment.id = block["id"]
         dm = cluster["distanceMatrix"]
         for i in range(len(dm)):
             for j in range(len(dm[i])):
