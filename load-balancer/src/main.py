@@ -7,7 +7,6 @@ from fastapi import BackgroundTasks, FastAPI, Request, Response, status
 from requests.auth import HTTPBasicAuth
 from src.ConfigParser import ConfigParser
 import hashlib
-import json
 import logging
 import os
 import requests
@@ -29,6 +28,11 @@ app = FastAPI()
 queue = list()
 job_counter = 0
 
+def sizeof(obj):
+    size = sys.getsizeof(obj)
+    if isinstance(obj, dict): return size + sum(map(sizeof, obj.keys())) + sum(map(sizeof, obj.values()))
+    if isinstance(obj, (list, tuple, set, frozenset)): return size + sum(map(sizeof, obj))
+    return size
 
 def checkAuthorization(request: Request):
     auth_secret = str(os.environ['AUTHORIZATION_SECRET']) if "AUTHORIZATION_SECRET" in os.environ else ""
@@ -86,7 +90,12 @@ def triggerNodes(node_type: str):
 def sendBackResults(job: AtheneJob):
     logger.info("Sending back results for jobId {} to Artemis (URL: {})".format(job.id, job.callback_url))
     response = Protobuf.AtheneResponse()
+    del job.distanceMatrix
+    del job.clusterTree
+    del job.embeddings
 
+    logger.info("Job has size {}.".format(sizeof(job)))
+    logger.info("Converting Segments into Protobuf format.")
     for block in job.blocks:
         segment = response.segments.add()
         segment.id = block["id"]
@@ -96,6 +105,7 @@ def sendBackResults(job: AtheneJob):
         segment.text = block["text"]
     del job.blocks
 
+    logger.info("Converting Clusters into Protobuf format.")
     for cluster in job.clusters.values():
         c = response.clusters.add()
         c.treeId = cluster["treeId"]
@@ -111,23 +121,30 @@ def sendBackResults(job: AtheneJob):
                 entry.value = dm[i][j]
     del job.clusters
 
-    for i in range(len(job.distanceMatrix)):
-        for j in range(len(job.distanceMatrix[i])):
-            entry = response.distanceMatrix.add()
-            entry.x = i
-            entry.y = j
-            entry.value = job.distanceMatrix[i][j]
-    del job.distanceMatrix
+    # Currently unused:
+    #
+    #
+    # for i in range(len(job.distanceMatrix)):
+    #     for j in range(len(job.distanceMatrix[i])):
+    #         entry = response.distanceMatrix.add()
+    #         entry.x = i
+    #         entry.y = j
+    #         entry.value = job.distanceMatrix[i][j]
+    # del job.distanceMatrix
+    #
+    # for leaf in job.clusterTree:
+    #     node = response.clusterTree.add()
+    #     node.parent = leaf["parent"]
+    #     node.child = leaf["child"]
+    #     node.lambdaVal = leaf["lambdaVal"]
+    #     node.childSize = leaf["childSize"]
+    # del job.clusterTree
+    #
 
-    for leaf in job.clusterTree:
-        node = response.clusterTree.add()
-        node.parent = leaf["parent"]
-        node.child = leaf["child"]
-        node.lambdaVal = leaf["lambdaVal"]
-        node.childSize = leaf["childSize"]
-    del job.clusterTree
-
+    logger.info("Protobuf builder has size {}.".format(sizeof(response)))
     final_result = response.SerializeToString()
+    del response;
+    logger.info("Serialized Protobuf has size {}.".format(sizeof(final_result)))
     try:
         auth_secret = str(os.environ['AUTHORIZATION_SECRET']) if "AUTHORIZATION_SECRET" in os.environ else ""
         headers = {
