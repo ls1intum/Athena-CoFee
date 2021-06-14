@@ -12,6 +12,7 @@ import logging
 import os
 import requests
 import sys
+import src.clustering_pb2 as Protobuf
 
 logger = logging.getLogger()
 # Set log_level to logging.DEBUG to write log files with json contents (see writeJsonToFile())
@@ -84,16 +85,54 @@ def triggerNodes(node_type: str):
 
 def sendBackResults(job: AtheneJob):
     logger.info("Sending back results for jobId {} to Artemis (URL: {})".format(job.id, job.callback_url))
-    final_result = json.dumps({"blocks": job.blocks,
-                               "clusters": job.clusters,
-                               "distanceMatrix": job.distanceMatrix,
-                               "clusterTree": job.clusterTree})
-    writeJsonToFile(job.id, "final_result", final_result)
+    response = Protobuf.AtheneResponse()
+
+    for block in job.blocks:
+        segment = response.segments.add()
+        segment.id = block["id"]
+        segment.submissionId = block["submissionId"]
+        segment.startIndex = block["startIndex"]
+        segment.endIndex = block["endIndex"]
+        segment.text = block["text"]
+    del job.blocks
+
+    for cluster in job.clusters.values():
+        c = response.clusters.add()
+        c.treeId = cluster["treeId"]
+        for block in cluster["blocks"]:
+            segment = c.segments.add()
+            segment.id = block["id"]
+        dm = cluster["distanceMatrix"]
+        for i in range(len(dm)):
+            for j in range(len(dm[i])):
+                entry = c.distanceMatrix.add()
+                entry.x = i
+                entry.y = j
+                entry.value = dm[i][j]
+    del job.clusters
+
+    for i in range(len(job.distanceMatrix)):
+        for j in range(len(job.distanceMatrix[i])):
+            entry = response.distanceMatrix.add()
+            entry.x = i
+            entry.y = j
+            entry.value = job.distanceMatrix[i][j]
+    del job.distanceMatrix
+
+    for leaf in job.clusterTree:
+        node = response.clusterTree.add()
+        node.parent = leaf["parent"]
+        node.child = leaf["child"]
+        node.lambdaVal = leaf["lambdaVal"]
+        node.childSize = leaf["childSize"]
+    del job.clusterTree
+
+    final_result = response.SerializeToString()
     try:
         auth_secret = str(os.environ['AUTHORIZATION_SECRET']) if "AUTHORIZATION_SECRET" in os.environ else ""
         headers = {
             "Authorization": auth_secret,
-            "Content-type": "application/json"
+            "Content-type": "application/x-protobuf"
         }
         response = requests.post(job.callback_url, data=final_result, headers=headers, timeout=600)
         if response.status_code == status.HTTP_200_OK:

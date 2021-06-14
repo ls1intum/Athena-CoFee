@@ -18,6 +18,14 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
       if: github.ref == 'refs/heads/master'
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v1
+      with:
+        version: '3.15.8'
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Compile Protobuf Spec
+      working-directory: ./protobuf/
+      run: protoc --python_out ../load-balancer/src/ clustering.proto
     - name: Build and Push the athene-load-balancer Docker image
       run: ./.github/workflows/scripts/dockerimage.sh "load-balancer"
 

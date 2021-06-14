@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message Job {
+    string jobId = 1;
+    optional string resultType = 2;
+}
