@@ -226,7 +226,7 @@ allennlp==0.9.0
   - tqdm [required: >=4.19, installed: 4.48.2]
   - unidecode [required: Any, installed: 1.1.1]
   - word2number [required: >=1.1, installed: 1.1]
-fastapi==0.61.1
+fastapi==0.65.2
   - pydantic [required: >=1.0.0,<2.0.0, installed: 1.6.1]
   - starlette [required: ==0.13.6, installed: 0.13.6]
 pymongo==3.10.1
