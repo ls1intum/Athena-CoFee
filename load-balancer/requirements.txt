@@ -1,5 +1,5 @@
 # Listed dependencies as of 2020-09-08
-fastapi==0.61.1
+fastapi==0.65.2
 uvicorn==0.11.8
 docutils==0.15.2
 gunicorn==20.0.4
