@@ -56,6 +56,35 @@ class ProcessingResource:
 
         output = {'clusters': clusters, 'distanceMatrix': [], 'clusterTree': []}
 
+        # For now, do not compute cluster tree.
+        # self.__computeClusterTree(vectors, output)
+
+        self.__logger.info("Completed Clustering Request.")
+        self.__logger.debug("-" * 80)
+
+        output["jobId"] = data["jobId"]
+        output["resultType"] = "clustering"
+
+        try:
+            self.__logger.info("Writing logfile")
+            with open("logs/clustering-{}.json".format(datetime.now()), 'w') as outfile:
+                json.dump(output, outfile, ensure_ascii=False, default=self.__default)
+        except Exception as e:
+            self.__logger.error("Error while writing logfile: {}".format(str(e)))
+
+        self.__logger.info("Send back clustering-results")
+        # Get container variable for load balancer url
+        send_result_url = str(os.environ['BALANCER_SENDRESULT_URL']) if "BALANCER_SENDRESULT_URL" in os.environ else "http://localhost:8000/sendTaskResult"
+        auth_secret = str(os.environ['BALANCER_AUTHORIZATION_SECRET']) if "BALANCER_AUTHORIZATION_SECRET" in os.environ else ""
+        headers = {
+            "Authorization": auth_secret
+        }
+        response = requests.post(send_result_url, data=json.dumps(output, default=self.__default), headers=headers, timeout=240)
+        if response.status_code != 200:
+            self.__logger.error("Sending back failed: {}".format(response.text))
+    
+    # Persist Cluster Structure as Cluster Tree and Distance Matrix between all blocks.
+    def __computeClusterTree(self, vectors, output):
         matrix = self.__clustering.distances_within_cluster(vectors)
         # Following loop removes duplicates in matrix
         for i in range(len(matrix)):
@@ -86,30 +115,6 @@ class ProcessingResource:
             'lambdaVal': float(-1),
             'childSize': int(rootId)
         })
-
-        self.__logger.info("Completed Clustering Request.")
-        self.__logger.debug("-" * 80)
-
-        output["jobId"] = data["jobId"]
-        output["resultType"] = "clustering"
-
-        try:
-            self.__logger.info("Writing logfile")
-            with open("logs/clustering-{}.json".format(datetime.now()), 'w') as outfile:
-                json.dump(output, outfile, ensure_ascii=False, default=self.__default)
-        except Exception as e:
-            self.__logger.error("Error while writing logfile: {}".format(str(e)))
-
-        self.__logger.info("Send back clustering-results")
-        # Get container variable for load balancer url
-        send_result_url = str(os.environ['BALANCER_SENDRESULT_URL']) if "BALANCER_SENDRESULT_URL" in os.environ else "http://localhost:8000/sendTaskResult"
-        auth_secret = str(os.environ['BALANCER_AUTHORIZATION_SECRET']) if "BALANCER_AUTHORIZATION_SECRET" in os.environ else ""
-        headers = {
-            "Authorization": auth_secret
-        }
-        response = requests.post(send_result_url, data=json.dumps(output, default=self.__default), headers=headers, timeout=240)
-        if response.status_code != 200:
-            self.__logger.error("Sending back failed: {}".format(response.text))
 
     # Queries the taskQueue and returns the task data (json)
     def getNewTask(self):
