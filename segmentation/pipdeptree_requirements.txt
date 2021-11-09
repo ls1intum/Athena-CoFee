@@ -2,7 +2,7 @@
 fastapi==0.61.1
   - pydantic [required: >=1.0.0,<2.0.0, installed: 1.6.1]
   - starlette [required: ==0.13.6, installed: 0.13.6]
-nltk==3.5
+nltk==3.6.5
   - click [required: Any, installed: 7.1.2]
   - joblib [required: Any, installed: 0.16.0]
   - regex [required: Any, installed: 2020.7.14]
