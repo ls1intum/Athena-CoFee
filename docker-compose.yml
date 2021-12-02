@@ -4,7 +4,7 @@ services:
 # http://localhost:8081/api
 # http://localhost:8081/dashboard
   traefik:
-    image: traefik:v2.2.1
+    image: traefik:local
     container_name: athene-traefik
     restart: unless-stopped
     depends_on:
@@ -14,13 +14,13 @@ services:
       - tracking
     ports:
       - ${TRAEFIK_DASHBOARD_PORT}:8080
-      - ${TRAEFIK_HTTP_PORT}:80
+      - 8888:80
       - ${TRAEFIK_HTTPS_PORT}:443
     networks:
       - athene
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik.yml:/etc/traefik/traefik.yml
+      - /usr/local/bin/docker:/usr/bin/docker
+    user: root
 
 # http://localhost/queueStatus
 # http://localhost/submit
@@ -43,8 +43,6 @@ services:
     working_dir: /usr/src/app
     networks:
       - athene
-    volumes:
-      - ./load-balance.yml:/usr/src/app/${LOAD_BALANCER_CONFIG_FILE_PATH}:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.balancer.rule=Path(`/queueStatus`,`/submit`,`/getTask`,`/sendTaskResult`)
@@ -105,8 +103,6 @@ services:
       - CHUNK_SIZE=${EMBEDDING_CHUNK_SIZE}
       - BALANCER_SENDRESULT_URL=${BALANCER_SENDRESULT_URL}
     working_dir: /usr/src/app
-    volumes:
-      - ${EMBEDDING_CLOUD_CONFIG_PATH}:/usr/src/app/src/cloud/config.py:ro
     networks:
       - athene
     labels:
@@ -189,12 +185,9 @@ services:
       - MONGO_INITDB_DATABASE=${DATABASE_NAME}
       - MONGO_INITDB_ROOT_USERNAME=${DATABASE_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD}
-    volumes:
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-      - ./data/db:/data/db
     networks:
       - athene
 
 networks:
   athene:
-    driver: bridge
+    driver: nat

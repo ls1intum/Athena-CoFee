@@ -3,6 +3,7 @@ from fastapi import HTTPException
 invalidJson = HTTPException(status_code=400, detail="Invalid JSON - No valid json provided.")
 missingCallbackUrl = HTTPException(status_code=400, detail="callbackUrl missing")
 missingSubmissions = HTTPException(status_code=400, detail="Submissions missing")
+missingExistingTextBlocks = HTTPException(status_code=400, detail="Existing TextBlocks missing")
 missingTaskType = HTTPException(status_code=400, detail="taskType missing")
 invalidTaskType = HTTPException(status_code=400, detail="Invalid taskType")
 missingChunkSize = HTTPException(status_code=400, detail="chunkSize missing")

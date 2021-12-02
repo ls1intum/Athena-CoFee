@@ -7,7 +7,6 @@
 .venv
 .vscode
 data
-init-mongo.js
 
 # files and directories in the whole project
 **/.gitignore

@@ -2,7 +2,7 @@ from .entities import AtheneJob, JobStatus, NodeType, EmbeddingTask
 from .errors import invalidAuthorization, invalidJson, missingCallbackUrl, missingSubmissions, missingTaskType,\
     missingChunkSize, invalidChunkSize, invalidTaskType, taskTypeError, missingJobId, invalidJobId, missingResultType,\
     invalidResultType, missingTextBlocks, missingEmbeddings, missingTaskId, invalidResults, noUpdateNeeded,\
-    missingClusters, missingDistanceMatrix, missingClusterTree
+    missingClusters, missingDistanceMatrix, missingClusterTree, missingExistingTextBlocks
 from fastapi import BackgroundTasks, FastAPI, Request, Response, status
 from requests.auth import HTTPBasicAuth
 from src.ConfigParser import ConfigParser
@@ -183,6 +183,9 @@ async def submit_job(request: Request, response: Response):
 
     if "submissions" not in job_request:
         raise missingSubmissions
+
+    if "existingTextBlocks" not in job_request:
+        raise missingExistingTextBlocks
 
     # Queue up new job
     global job_counter

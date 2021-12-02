@@ -74,14 +74,14 @@ class AtheneJob:
     clusterTree: list               # cluster tree of the clusters
     status: str                     # See class JobStatus
 
-    def __init__(self, id: int, course_id: int, callback_url: str, submissions: dict):
+    def __init__(self, id: int, course_id: int, callback_url: str, submissions: dict, existingBlocks: list):
         self.id = id
         self.course_id = course_id
         self.callback_url = callback_url
         self.submissions = submissions
         self.submission_date = datetime.now()
         self.blocks = list()
-        self.blocks_to_embed = list()
+        self.blocks_to_embed = existingBlocks
         self.embeddings = list()
         self.embedding_tasks = list()
         self.embedding_task_count = 0

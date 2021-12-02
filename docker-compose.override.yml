@@ -9,7 +9,6 @@ services:
 
   load-balancer:
     volumes:
-      - ./load-balance.yml:/usr/src/app/${LOAD_BALANCER_CONFIG_FILE_PATH}:ro
       - ./load-balancer/src:/usr/src/app/src
 
   segmentation:
@@ -21,7 +20,6 @@ services:
     volumes:
       - ./embedding/src:/usr/src/app/src
       - ./text_preprocessing:/usr/src/app/src/text_preprocessing
-      - ${EMBEDDING_CLOUD_CONFIG_PATH}:/usr/src/app/src/cloud/config.py:ro
       # This will keep the subdirectory as it is in the container
       - /usr/src/app/src/resources
 
@@ -35,3 +33,8 @@ services:
 
   database:
     # This component does not need to be changed
+    image: mongo:local
+    
+networks:
+  athene:
+    driver: nat
