@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "de.tum.in.ase.athene"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.1"
 
 tasks.register("version") {
     println("$version")
@@ -37,6 +37,7 @@ publishing {
             pom {
                 name.set("Athene Client")
                 url.set("https://github.com/ls1intum/Athene")
+                description.set("A system to support (semi-)automated assessment of textual exercises'.")
                 licenses {
                     license {
                         name.set("MIT License")
