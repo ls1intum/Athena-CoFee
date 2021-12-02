@@ -194,7 +194,8 @@ async def submit_job(request: Request, response: Response):
     new_job = AtheneJob(id=job_counter,
                         course_id=course_id,
                         callback_url=job_request["callbackUrl"],
-                        submissions=job_request["submissions"])
+                        submissions=job_request["submissions"],
+                        existing_blocks=job_request["existingTextBlocks"])
     queue.append(new_job)
     logger.info("New Athene Job added: " + str(new_job))
     # Trigger segmentation nodes
