@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "de.tum.in.ase.athene"
-version = "0.0.1"
+version = "0.0.2"
 
 tasks.register("version") {
     println("$version")
@@ -21,7 +21,7 @@ java {
     withJavadocJar()
     withSourcesJar()
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(16))
     }
 }
 
@@ -37,7 +37,7 @@ publishing {
             pom {
                 name.set("Athene Client")
                 url.set("https://github.com/ls1intum/Athene")
-                description.set("A system to support (semi-)automated assessment of textual exercises'.")
+                description.set("A system to support (semi-)automated assessment of textual exercises.")
                 licenses {
                     license {
                         name.set("MIT License")
