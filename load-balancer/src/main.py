@@ -2,7 +2,7 @@ from .entities import AtheneJob, JobStatus, NodeType, EmbeddingTask
 from .errors import invalidAuthorization, invalidJson, missingCallbackUrl, missingSubmissions, missingTaskType,\
     missingChunkSize, invalidChunkSize, invalidTaskType, taskTypeError, missingJobId, invalidJobId, missingResultType,\
     invalidResultType, missingTextBlocks, missingEmbeddings, missingTaskId, invalidResults, noUpdateNeeded,\
-    missingClusters, missingDistanceMatrix, missingClusterTree
+    missingClusters, missingDistanceMatrix, missingClusterTree, missingExistingTextBlocks
 from fastapi import BackgroundTasks, FastAPI, Request, Response, status
 from requests.auth import HTTPBasicAuth
 from src.ConfigParser import ConfigParser
@@ -183,6 +183,9 @@ async def submit_job(request: Request, response: Response):
 
     if "submissions" not in job_request:
         raise missingSubmissions
+        
+    if "existingTextBlocks" not in job_request:
+    	raise missingExistingTextBlocks
 
     # Queue up new job
     global job_counter
@@ -191,7 +194,8 @@ async def submit_job(request: Request, response: Response):
     new_job = AtheneJob(id=job_counter,
                         course_id=course_id,
                         callback_url=job_request["callbackUrl"],
-                        submissions=job_request["submissions"])
+                        submissions=job_request["submissions"],
+                        existing_blocks=job_request["existingTextBlocks"])
     queue.append(new_job)
     logger.info("New Athene Job added: " + str(new_job))
     # Trigger segmentation nodes
