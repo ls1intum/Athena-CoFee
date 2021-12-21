@@ -65,4 +65,3 @@ def write_feedback_inconsistencies_to_csv(inconsistencies):
     df = pd.DataFrame(list(itertools.chain.from_iterable(inconsistencies)),
                       columns=['firstFeedbackId', 'secondFeedbackId', 'type'])
     df.to_csv(PATH_FEEDBACK_CONSISTENCY_OUTPUT, index=False, header=True)
-

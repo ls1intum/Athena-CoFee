@@ -1,13 +1,6 @@
 # Listed dependencies as of 2020-04-22
-falcon==2.0.0
-gunicorn==20.0.4
-nltk==3.5
-#  - click [required: Any, installed: 7.1.1]
-#  - joblib [required: Any, installed: 0.14.1]
-#  - regex [required: Any, installed: 2020.4.4]
-#  - tqdm [required: Any, installed: 4.45.0]
+fastapi==0.65.2
+nltk==3.6.5
+requests==2.24.0
 scikit-learn==0.22.2.post1
-#  - joblib [required: >=0.11, installed: 0.14.1]
-#  - numpy [required: >=1.11.0, installed: 1.18.3]
-#  - scipy [required: >=0.17.0, installed: 1.4.1]
-#    - numpy [required: >=1.13.3, installed: 1.18.3]
+uvicorn==0.11.8

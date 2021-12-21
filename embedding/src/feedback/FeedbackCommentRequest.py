@@ -1,42 +1,44 @@
 import json
 from logging import getLogger
-from falcon import Request, Response, HTTP_200
-from src.errors import emptyBody, requireFeedbackWithTextBlock, requireExerciseId
+from fastapi import APIRouter, Request
+from src.errors import invalidJson, requireFeedbackWithTextBlock, requireExerciseId
 from src.entities import FeedbackWithTextBlock, Feedback
 from src.feedback.FeedbackConsistency import FeedbackConsistency
 
+logger = getLogger(name="FeedbackCommentRequest")
+router = APIRouter()
 
-class FeedbackCommentRequest:
-    __logger = getLogger(__name__)
+@router.post("/feedback_consistency")
+async def feedback(request: Request):
+    logger.debug("-" * 80)
+    logger.info("Start processing Feedback Comment Request:")
 
-    def on_post(self, req: Request, resp: Response) -> None:
-        self.__logger.debug("-" * 80)
-        self.__logger.info("Start processing Feedback Comment Request:")
-        if req.content_length == 0:
-            self.__logger.error("{} ({})".format(emptyBody.title, emptyBody.description))
-            raise emptyBody
+    # Parse json
+    try:
+        doc = await request.json()
+    except Exception as e:
+        logger.error("Exception while parsing json: {}".format(str(e)))
+        raise invalidJson
 
-        doc = json.load(req.stream)
-        self.__logger.info("Request: {}".format(doc))
-        if "feedbackWithTextBlock" not in doc:
-            self.__logger.error("{} ({})".format(requireFeedbackWithTextBlock.title, requireFeedbackWithTextBlock.description))
-            raise requireFeedbackWithTextBlock
+    logger.info("Request: {}".format(doc))
+    if "feedbackWithTextBlock" not in doc:
+        logger.error("{}".format(requireFeedbackWithTextBlock.detail))
+        raise requireFeedbackWithTextBlock
 
-        if "exerciseId" not in doc:
-            self.__logger.error("{} ({})".format(requireExerciseId.title, requireExerciseId.description))
-            raise requireExerciseId
+    if "exerciseId" not in doc:
+        logger.error("{}".format(requireExerciseId.detail))
+        raise requireExerciseId
 
-        blocks: list[FeedbackWithTextBlock] = []
+    blocks: list[FeedbackWithTextBlock] = []
 
-        for fwt in doc['feedbackWithTextBlock']:
-            blocks.append(FeedbackWithTextBlock(fwt['textBlockId'], fwt['clusterId'], fwt['text'], Feedback(fwt['feedbackId'], fwt['feedbackText'], fwt['credits'])))
+    for fwt in doc['feedbackWithTextBlock']:
+        blocks.append(FeedbackWithTextBlock(fwt['textBlockId'], fwt['clusterId'], fwt['text'], Feedback(fwt['feedbackId'], fwt['feedbackText'], fwt['credits'])))
 
-        __fc = FeedbackConsistency(doc['exerciseId'])
-        response = __fc.check_consistency(feedback_with_text_blocks=blocks)
-        self.__logger.info("Response {}".format(response))
-        resp.body = json.dumps(response, ensure_ascii=False)
-        __fc.store_feedback()
+    __fc = FeedbackConsistency(doc['exerciseId'])
+    response = __fc.check_consistency(feedback_with_text_blocks=blocks)
+    logger.info("Response {}".format(response))
+    __fc.store_feedback()
 
-        resp.status = HTTP_200
-        self.__logger.info("Completed Feedback Comment Embedding Request.")
-        self.__logger.debug("-" * 80)
+    logger.info("Completed Feedback Comment Embedding Request.")
+    logger.debug("-" * 80)
+    return response

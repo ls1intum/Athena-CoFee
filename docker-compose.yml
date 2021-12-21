@@ -1,54 +1,166 @@
 version: '3'
 
 services:
+# http://localhost:8081/api
+# http://localhost:8081/dashboard
+  traefik:
+    image: traefik:v2.2.1
+    container_name: athene-traefik
+    restart: unless-stopped
+    depends_on:
+      # These components have API endpoints managed by traefik
+      - load-balancer
+      - embedding
+      - tracking
+    ports:
+      - ${TRAEFIK_DASHBOARD_PORT}:8080
+      - ${TRAEFIK_HTTP_PORT}:80
+      - ${TRAEFIK_HTTPS_PORT}:443
+    networks:
+      - athene
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik.yml:/etc/traefik/traefik.yml
 
-# http://localhost:8000/segment
+# http://localhost/queueStatus
+# http://localhost/submit
+# http://localhost/getTask
+# http://localhost/sendTaskResult
+  load-balancer:
+    build:
+      context: .
+      dockerfile: ./load-balancer/Dockerfile
+    image: athene-load-balancer
+    container_name: athene-load-balancer
+    restart: unless-stopped
+#    ports:
+#      - 8000:8000
+    expose:
+       - 8000
+    environment:
+      - CONFIG_FILE_PATH=${LOAD_BALANCER_CONFIG_FILE_PATH}
+      - AUTHORIZATION_SECRET=${LOAD_BALANCER_AUTHORIZATION_SECRET}
+    working_dir: /usr/src/app
+    networks:
+      - athene
+    volumes:
+      - ./load-balance.yml:/usr/src/app/${LOAD_BALANCER_CONFIG_FILE_PATH}:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.balancer.rule=Path(`/queueStatus`,`/submit`,`/getTask`,`/sendTaskResult`)
+      - traefik.http.routers.balancer.entrypoints=web
+      - traefik.http.routers.balancer-tls.rule=Path(`/queueStatus`,`/submit`,`/getTask`,`/sendTaskResult`)
+      - traefik.http.routers.balancer-tls.entrypoints=websecure
+      - traefik.http.routers.balancer-tls.tls=true
+
   segmentation:
     build:
       context: .
       dockerfile: ./segmentation/Dockerfile
     image: athene-segmentation
     container_name: athene-segmentation
-    ports:
-      - 8000:8000
+    restart: unless-stopped
+    depends_on:
+      - load-balancer
+#    ports:
+#      - 8001:8000
+    expose:
+       - 8000
+    environment:
+      - BALANCER_AUTHORIZATION_SECRET=${LOAD_BALANCER_AUTHORIZATION_SECRET}
+      - BALANCER_QUEUE_FREQUENCY=${BALANCER_QUEUE_FREQUENCY}
+      - BALANCER_GETTASK_URL=${BALANCER_GETTASK_URL}
+      - BALANCER_SENDRESULT_URL=${BALANCER_SENDRESULT_URL}
     working_dir: /usr/src/app
     networks:
       - athene
+    labels:
+      - traefik.enable=true
 
-# http://localhost:8001/embed
-# http://localhost:8001/upload
+# http://localhost/upload
+# http://localhost/feedback_consistency
   embedding:
     build:
       context: .
       dockerfile: ./embedding/Dockerfile
     image: athene-embedding
     container_name: athene-embedding
-    ports:
-      - 8001:8000
+    restart: unless-stopped
+    depends_on:
+      - load-balancer
+      - database
+#    ports:
+#      - 8002:8000
+    expose:
+       - 8000
+    environment:
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USER=${EMBEDDING_DATABASE_USER}
+      - DATABASE_PWD=${EMBEDDING_DATABASE_PWD}
+      - BALANCER_AUTHORIZATION_SECRET=${LOAD_BALANCER_AUTHORIZATION_SECRET}
+      - BALANCER_QUEUE_FREQUENCY=${BALANCER_QUEUE_FREQUENCY}
+      - BALANCER_GETTASK_URL=${BALANCER_GETTASK_URL}
+      - CHUNK_SIZE=${EMBEDDING_CHUNK_SIZE}
+      - BALANCER_SENDRESULT_URL=${BALANCER_SENDRESULT_URL}
     working_dir: /usr/src/app
+    volumes:
+      - ${EMBEDDING_CLOUD_CONFIG_PATH}:/usr/src/app/src/cloud/config.py:ro
     networks:
       - athene
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.upload.rule=Path(`/upload`,`/feedback_consistency`)
+      - traefik.http.routers.upload.entrypoints=web
+      - traefik.http.routers.upload-tls.rule=Path(`/upload`,`/feedback_consistency`)
+      - traefik.http.routers.upload-tls.entrypoints=websecure
+      - traefik.http.routers.upload-tls.tls=true
 
-# http://localhost:8002/cluster
   clustering:
     build:
-      context: ./clustering
+      context: .
+      dockerfile: ./clustering/Dockerfile
     image: athene-clustering
     container_name: athene-clustering
-    ports:
-      - 8002:8000
+    restart: unless-stopped
+    depends_on:
+      - load-balancer
+      - database
+#    ports:
+#      - 8003:8000
+    expose:
+       - 8000
+    environment:
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USER=${CLUSTERING_DATABASE_USER}
+      - DATABASE_PWD=${CLUSTERING_DATABASE_PWD}
+      - BALANCER_AUTHORIZATION_SECRET=${LOAD_BALANCER_AUTHORIZATION_SECRET}
+      - BALANCER_QUEUE_FREQUENCY=${BALANCER_QUEUE_FREQUENCY}
+      - BALANCER_GETTASK_URL=${BALANCER_GETTASK_URL}
+      - BALANCER_SENDRESULT_URL=${BALANCER_SENDRESULT_URL}
     working_dir: /usr/src/app
     networks:
       - athene
+    labels:
+      - traefik.enable=true
 
-# http://localhost:8003/tracking
+# http://localhost/tracking
   tracking:
     build:
-      context: tracking
+      context: .
+      dockerfile: ./tracking/Dockerfile
     image: athene-tracking
     container_name: athene-tracking
-    ports:
-      - 8003:80
+    restart: unless-stopped
+    depends_on:
+      - database
+#    ports:
+#      - 8004:8000
+    expose:
+      - 8000
     environment:
       - JWT_SECRET_BASE64=YWVuaXF1YWRpNWNlaXJpNmFlbTZkb283dXphaVF1b29oM3J1MWNoYWlyNHRoZWUzb2huZ2FpM211bGVlM0VpcAo=
       - DATABASE_HOST=database
@@ -57,21 +169,26 @@ services:
       - DATABASE_USER=tracking
       - DATABASE_PWD=tracking_password
     working_dir: /usr/src/app
-    depends_on:
-      - database
     networks:
       - athene
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.tracking.rule=PathPrefix(`/tracking`)
+      - traefik.http.routers.tracking.entrypoints=web
+      - traefik.http.routers.tracking-tls.rule=PathPrefix(`/tracking`)
+      - traefik.http.routers.tracking-tls.entrypoints=websecure
+      - traefik.http.routers.tracking-tls.tls=true
 
   database:
     image: mongo:latest
-    restart: always
     container_name: athene-mongodb
+    restart: unless-stopped
     expose:
       - 27017
     environment:
-      - MONGO_INITDB_DATABASE=athene_db
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=root_password
+      - MONGO_INITDB_DATABASE=${DATABASE_NAME}
+      - MONGO_INITDB_ROOT_USERNAME=${DATABASE_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD}
     volumes:
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - ./data/db:/data/db
