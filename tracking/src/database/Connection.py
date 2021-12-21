@@ -1,5 +1,6 @@
 import os
 import pymongo
+import pandas as pd
 
 
 # this class contains most of the important collection level pymongo operations but not all of them
@@ -108,3 +109,41 @@ class Connection:
 
     def get_collection_names(self):
         return self.db.collection_names()
+
+    def get_data_for_evaluation(self, exercise_id: int):
+        try:
+            self.collection = self.db.feedback
+            pipeline = [
+                {'$match': {"participation.exercise.id": exercise_id}},
+                {"$unwind": {'path': '$participation.results', 'preserveNullAndEmptyArrays': True}},
+                {'$unwind': {'path': '$participation.results.feedbacks', 'preserveNullAndEmptyArrays': True}},
+                {'$project': {
+                    'ID': '$ID',
+                    'pID': '$participation.id',
+                    'feedbacks': '$participation.results.feedbacks'
+                }},
+            ]
+
+            # df = pd.json_normalize(collection.find({"participation.exercise.id": 1830}, {"participation.results": 1}))
+            query_result = self.collection.aggregate(pipeline)
+            query_result = list(query_result)
+            df = pd.json_normalize(query_result)
+
+            if len(df.index) == 0:
+                print(f'Exercise {exercise_id} was not tracked!')
+                return
+
+            # sort feedback by textblock reference
+            df = df.sort_values('feedbacks.reference')
+
+            # remove newline characters from feedbacks to prevent csv from breaking
+            df = df.replace('\n', ' ', regex=True)
+
+            # write dataframe to csv
+            pd.DataFrame.to_csv(df, './similarity.csv', ';')
+
+            return df
+        except Exception as e:
+            print(e)
+        else:
+            return result
