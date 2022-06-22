@@ -5,7 +5,7 @@ fastapi==0.61.1
   - starlette [required: ==0.13.6, installed: 0.13.6]
 gunicorn==20.0.4
   - setuptools [required: >=3.0, installed: 50.3.0]
-numpy==1.18.3
+numpy==1.22.0
 pipdeptree==1.0.0
   - pip [required: >=6.0.0, installed: 20.2.2]
 PyYAML==5.4
