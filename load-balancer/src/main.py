@@ -71,7 +71,6 @@ def checkAuthorization(request: Request):
         raise invalidAuthorization
 
 def triggerNodes(node_type: str):
-    #hier muss noch ein node type rein
     node_types = (NodeType.segmentation, NodeType.embedding, NodeType.clustering, NodeType.embedding_wmt, NodeType.gpu)
     if node_type not in node_types:
         logger.error('Invalid node_type: \'{}\''.format(node_type))
@@ -243,7 +242,6 @@ async def send_result(request: Request, response: Response, background_tasks: Ba
         raise invalidJobId
     if "resultType" not in result:
         raise missingResultType
-    #hier muss der result type noch rein
     if result["resultType"] not in ["segmentation", "embedding", "clustering", "embedding_wmt"]:
         raise invalidResultType
 

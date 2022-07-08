@@ -31,7 +31,6 @@ def sizeof(obj):
 
 
 def triggerNodes(node_type: str):
-        # hier muss noch ein node type rein
         node_types = (
             NodeType.segmentation, NodeType.embedding, NodeType.clustering, NodeType.embedding_wmt, NodeType.gpu)
         if node_type not in node_types:
@@ -88,7 +87,6 @@ class SegmentationResult(ResultJob):
         job.status = JobStatus.embedding_queued
         logger.info("JobId {} transitioned to status {}".format(job.id, job.status))
         # Trigger embedding nodes
-        # hier muss die Fallunterscheidung her!
         node_Type = Policy.define_embedding_type(job.multilingual)
         logging.info(node_Type)
         logger.info("Das ist der Node Type: " + node_Type)

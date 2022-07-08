@@ -10,7 +10,6 @@ class NodeType:
     segmentation = "segmentation"
     embedding = "embedding"
 
-    #hier muss ein neuer node type rein
     embedding_wmt = "embedding_wmt"
 
     clustering = "clustering"

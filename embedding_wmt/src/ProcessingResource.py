@@ -33,11 +33,7 @@ class ProcessingResource:
 
         blocks: List[TextBlock] = list(map(lambda dict: TextBlock.from_dict(dict), data['blocks']))
 
-        #sentences[i] = text des i'ten Text Block
         sentences: List[Sentence] = list(map(lambda b: b.text, blocks))
-
-        #Was wird hier genau gemacht? --> clean_Text wird erstmal nicht gebraucht
-        #sentences = [clean_text(sentence, lemmatization=False) for sentence in sentences]
 
         if len(blocks) < 2:
             self.__logger.error("{} ({})".format(requireTwoBlocks.title, requireTwoBlocks.description))
@@ -45,15 +41,7 @@ class ProcessingResource:
 
         self.__logger.info("Computing embeddings of {} blocks.".format(len(blocks)))
 
-        #Hier werden die einzelnen Sätze embeded
         vectors: List[List[int]] = self.__wmt.embed_sentences(sentences)
-
-        self.__logger.info("Hier sind die Vektoren")
-        self.__logger.info(vectors)
-
-
-
-        #Hier werden die embeddeden Sätze in Embeddingsblöcke geschrieben
         embeddings: List[Embedding] = [Embedding(block.id, vectors[i]) for i, block in enumerate(blocks)]
 
         output = {

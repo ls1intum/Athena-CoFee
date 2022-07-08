@@ -40,12 +40,9 @@ class ConfigParser:
 
         self.compute_nodes = list()
         # Parse docker nodes using traefik API
-        logging.info("Hier die config")
-        logging.info(config)
         if 'docker_nodes' in config and node_type is not NodeType.gpu:
             for node in config['docker_nodes']:
                 # Check if config is valid
-                logging.info(node_type)
                 required_variables = ('traefik_service_api', 'trigger_route', node_type + '_service_name')
                 if not all(key in node for key in required_variables):
                     self.__logger.warning("Skipping Docker Node definition. Not all required variables set: " + str(node))
@@ -56,8 +53,6 @@ class ConfigParser:
                 try:
                     # Query traefik API
                     traefik_services = requests.get(node['traefik_service_api'] + node[node_type + '_service_name'], timeout=5).json()
-                    logging.info("Hier die traefik")
-                    logging.info(traefik_services)
                     for i, server in enumerate(traefik_services['loadBalancer']['servers']):
                         new_node = ComputeNode(name='traefik_' + node_type + '_' + str(i), type=node_type, url=str(server['url'])+str(node['trigger_route']))
                         self.addComputeNode(new_node)

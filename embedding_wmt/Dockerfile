@@ -15,14 +15,6 @@ RUN apt-get -y install git-lfs
 RUN git clone https://huggingface.co/facebook/wmt19-de-en src/resources/models
 
 
-#RUN make -C src/resources/models
-
-#RUN mkdir -p /usr/lib/nltk_data \
-#&& python -m nltk.downloader -d /usr/lib/nltk_data stopwords wordnet punkt
-
-#COPY ./embedding_wmt/src/ src/
-#COPY ./text_preprocessing src/text_preprocessing
-
 # Run the image as a non-root user
 RUN groupadd -r textemb && useradd --no-log-init -r -g textemb textemb
 RUN mkdir -p /usr/src/app/logs/ &&  chown -R textemb:textemb /usr/src/app/

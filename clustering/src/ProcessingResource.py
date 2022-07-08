@@ -17,7 +17,6 @@ class ProcessingResource:
     __clustering: Clustering = Clustering()
     vocab_len = 42024
 
-
     def __default(self, o) -> int :
         if isinstance(o, int64): return int(o)
         if isinstance(o, ndarray): return o.tolist()
@@ -88,7 +87,7 @@ class ProcessingResource:
         headers = {
             "Authorization": auth_secret
         }
-        response = requests.post(send_result_url, data=json.dumps(output, default=self.__default), headers=headers, timeout=540)
+        response = requests.post(send_result_url, data=json.dumps(output, default=self.__default), headers=headers, timeout=240)
         if response.status_code != 200:
             self.__logger.error("Sending back failed: {}".format(response.text))
     
@@ -134,7 +133,7 @@ class ProcessingResource:
             headers = {
                 "Authorization": auth_secret
             }
-            task = requests.get(get_task_url, json={"taskType": "clustering"}, headers=headers, timeout=1200)
+            task = requests.get(get_task_url, json={"taskType": "clustering"}, headers=headers, timeout=300)
         except Exception as e:
             self.__logger.error("getTask-API seems to be down: {}".format(str(e)))
             return None
@@ -149,9 +148,7 @@ class ProcessingResource:
             return None
 
     def one_hot_encode(self, vector):
-        ret = np.zeros(self.vocab_len)
+        encoded_vector = np.zeros(self.vocab_len)
         for count, i in enumerate(vector):
-            ret[int(i)] = 1 if i < self.vocab_len else 0
-        return ret
-
-
+            encoded_vector[int(i)] = 1 if i < self.vocab_len else 0
+        return encoded_vector
