@@ -259,8 +259,6 @@ async def send_result(request: Request, response: Response, background_tasks: Ba
 
             result_type.send_result(job, result)
 
-            logging.info("Das ist der Type des Result: " + str(type(result_type)))
-
             if isinstance(result_type, ClusteringResult):
                 background_tasks.add_task(sendBackResults, job)
 

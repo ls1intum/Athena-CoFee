@@ -116,8 +116,8 @@ class Policy:
     def __init__(self):
         pass
 
-    def define_embedding_type(multilingual: str):
-        if multilingual == "true":
+    def define_embedding_type(multilingual: bool):
+        if multilingual:
             return NodeType.embedding_wmt
         else:
             return NodeType.embedding
