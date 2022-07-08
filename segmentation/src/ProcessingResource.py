@@ -16,6 +16,7 @@ class ProcessingResource:
 
     # Starts processing of a queried task
     def processTask(self, data):
+        print("test")
         if "feedback" not in data and "submissions" not in data:
             raise noSubmissions
         elif "feedback" in data:

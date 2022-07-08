@@ -1,4 +1,3 @@
-# Downlaad ELMo model from AllenNLP
 # https://allennlp.org/elmo
 
 deps: elmo_2x4096_512_2048cnn_2xhighway_5.5B

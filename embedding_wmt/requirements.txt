@@ -1,0 +1,12 @@
+# Listed dependencies as of 2021-02-16
+transformers==4.16.1
+docutils==0.18.1
+fastapi==0.73.0
+joblib==1.1.0
+numpy==1.22.1
+requests==2.27.1
+scikit-learn==1.0.2
+scipy==1.7.3
+uvicorn==0.17.1
+torch==1.8.0
+sentencepiece==0.1.96

@@ -14,7 +14,7 @@ Input example JSON for POST on http://localhost:8000/submit
 ```json
 {
   "courseId": 2,
-  "callbackUrl": "http://testurl"
+  "callbackUrl": "http://testurl",
   "submissions":[
       {
          "id":1,

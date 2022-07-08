@@ -9,11 +9,14 @@ from typing import List
 import json
 import os
 import requests
+import numpy as np
 
 
 class ProcessingResource:
     __logger = getLogger(__name__)
     __clustering: Clustering = Clustering()
+    vocab_len = 42024
+
 
     def __default(self, o) -> int :
         if isinstance(o, int64): return int(o)
@@ -31,12 +34,18 @@ class ProcessingResource:
             raise requireTwoEmbeddings
 
         embeddings: List[Embedding] = list(map(lambda dict: Embedding.from_dict(dict), data['embeddings']))
+
         if len(embeddings) < 2:
             self.__logger.error("{} ({})".format(requireTwoEmbeddings.title, requireTwoEmbeddings.description))
             raise requireTwoEmbeddings
 
         self.__logger.info("Computing clusters of {} embeddings.".format(len(embeddings)))
         vectors: List[ElmoVector] = list(map(lambda e: e.vector, embeddings))
+
+        if data["multilingual"]:
+            vectors = list(map(lambda v: self.one_hot_encode(v), vectors))
+            embeddings: List[Embedding] = list(map(lambda e : Embedding.from_wmt_embedding(e.id, self.one_hot_encode(e.vector)), embeddings))
+
         labels, probabilities = self.__clustering.cluster(vectors)
 
         clusterLabels: List[int] = list(map(lambda i: int(i), set(labels)))
@@ -79,7 +88,7 @@ class ProcessingResource:
         headers = {
             "Authorization": auth_secret
         }
-        response = requests.post(send_result_url, data=json.dumps(output, default=self.__default), headers=headers, timeout=240)
+        response = requests.post(send_result_url, data=json.dumps(output, default=self.__default), headers=headers, timeout=540)
         if response.status_code != 200:
             self.__logger.error("Sending back failed: {}".format(response.text))
     
@@ -125,7 +134,7 @@ class ProcessingResource:
             headers = {
                 "Authorization": auth_secret
             }
-            task = requests.get(get_task_url, json={"taskType": "clustering"}, headers=headers, timeout=30)
+            task = requests.get(get_task_url, json={"taskType": "clustering"}, headers=headers, timeout=1200)
         except Exception as e:
             self.__logger.error("getTask-API seems to be down: {}".format(str(e)))
             return None
@@ -138,3 +147,11 @@ class ProcessingResource:
         except Exception as e:
             self.__logger.error("Exception while parsing json: {}".format(str(e)))
             return None
+
+    def one_hot_encode(self, vector):
+        ret = np.zeros(self.vocab_len)
+        for count, i in enumerate(vector):
+            ret[int(i)] = 1 if i < self.vocab_len else 0
+        return ret
+
+

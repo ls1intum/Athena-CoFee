@@ -1,4 +1,4 @@
-from .entities import AtheneJob, JobStatus, NodeType, EmbeddingTask
+from .entities import AtheneJob, JobStatus, NodeType, Policy
 from .errors import invalidAuthorization, invalidJson, missingCallbackUrl, missingSubmissions, missingTaskType,\
     missingChunkSize, invalidChunkSize, invalidTaskType, taskTypeError, missingJobId, invalidJobId, missingResultType,\
     invalidResultType, missingTextBlocks, missingEmbeddings, missingTaskId, invalidResults, noUpdateNeeded,\
@@ -6,12 +6,17 @@ from .errors import invalidAuthorization, invalidJson, missingCallbackUrl, missi
 from fastapi import BackgroundTasks, FastAPI, Request, Response, status
 from requests.auth import HTTPBasicAuth
 from src.ConfigParser import ConfigParser
+from src.TaskFactory import TaskFactory
+from src.JSONHandler import JSONHandler
+from src.ResultJob import ClusteringResult
 import hashlib
 import logging
 import os
 import requests
 import sys
 import src.clustering_pb2 as Protobuf
+
+
 
 logger = logging.getLogger()
 # Set log_level to logging.DEBUG to write log files with json contents (see writeJsonToFile())
@@ -25,8 +30,28 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 app = FastAPI()
-queue = list()
-job_counter = 0
+
+
+class JobQueue:
+
+    def __init__(self):
+        self.queue = list()
+        self.job_counter = 0
+
+    def get_queue(self):
+        return self.queue
+
+    def get_job_counter(self):
+        return self.job_counter
+
+
+jsonHandler = JSONHandler()
+policy = Policy()
+job_queue = JobQueue()
+queue = job_queue.get_queue()
+job_counter = job_queue.get_job_counter()
+
+
 
 def sizeof(obj):
     size = sys.getsizeof(obj)
@@ -45,31 +70,9 @@ def checkAuthorization(request: Request):
                                                                                   request.headers.get("Authorization")))
         raise invalidAuthorization
 
-
-async def parseJson(request: Request):
-    try:
-        return await request.json()
-    except Exception as e:
-        logger.error("Exception while parsing json: {}".format(str(e)))
-        raise invalidJson
-
-
-def writeJsonToFile(job_id: int, filename: str, data):
-    # Only write file if log-level is DEBUG
-    if logger.level == logging.DEBUG:
-        try:
-            directory = "logs/job_" + str(job_id)
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-            logger.debug("Writing data to logfile: {}".format(filename))
-            with open(directory + "/" + filename + ".json", 'w') as outfile:
-                outfile.write(data)
-        except Exception as e:
-            logger.error("Error while writing logfile: {}".format(str(e)))
-
-
 def triggerNodes(node_type: str):
-    node_types = (NodeType.segmentation, NodeType.embedding, NodeType.clustering, NodeType.gpu)
+    #hier muss noch ein node type rein
+    node_types = (NodeType.segmentation, NodeType.embedding, NodeType.clustering, NodeType.embedding_wmt, NodeType.gpu)
     if node_type not in node_types:
         logger.error('Invalid node_type: \'{}\''.format(node_type))
 
@@ -151,7 +154,7 @@ def sendBackResults(job: AtheneJob):
             "Authorization": auth_secret,
             "Content-type": "application/x-protobuf"
         }
-        response = requests.post(job.callback_url, data=final_result, headers=headers, timeout=600)
+        response = requests.post(job.callback_url, data=final_result, headers=headers, timeout=1800)
         if response.status_code == status.HTTP_200_OK:
             logger.info("Callback successful")
             logger.info("Athene Job finished: " + str(job))
@@ -170,7 +173,7 @@ def sendBackResults(job: AtheneJob):
 async def submit_job(request: Request, response: Response):
     checkAuthorization(request)
 
-    job_request = await parseJson(request)
+    job_request = await JSONHandler.parseJson(request)
 
     # Error handling
     if "courseId" in job_request:
@@ -187,11 +190,13 @@ async def submit_job(request: Request, response: Response):
     # Queue up new job
     global job_counter
     job_counter += 1
-    writeJsonToFile(job_counter, "submission", job_request)
+
+    JSONHandler.writeJsonToFile(job_counter, "submission", job_request)
     new_job = AtheneJob(id=job_counter,
                         course_id=course_id,
                         callback_url=job_request["callbackUrl"],
-                        submissions=job_request["submissions"])
+                        submissions=job_request["submissions"],
+                        multilingual=job_request["multilingual"])
     queue.append(new_job)
     logger.info("New Athene Job added: " + str(new_job))
     # Trigger segmentation nodes
@@ -201,45 +206,15 @@ async def submit_job(request: Request, response: Response):
     return {"detail": "Submission successful"}
 
 
-# Returns a chunk of size <size> of the blocks <blocks> and the rest of the blocks
-def createEmbeddingChunk(blocks, size):
-    # Minimum of 2 blocks is required to compute embeddings - prevent 1 single remaining block
-    if len(blocks) == (size + 1):
-        size += 1
-
-    blockchunk = blocks[0:min(len(blocks), size)]
-    rest = blocks[min(len(blocks), size):]
-    return blockchunk, rest
-
-
 # Endpoint for compute nodes to get a task
 # This will update the corresponding job and set the status to "processing"
+
 @app.get("/getTask")
 async def get_task(request: Request, response: Response):
     checkAuthorization(request)
+    task = await JSONHandler.parseJson(request)
 
-    task = await parseJson(request)
-
-    # Error handling
-    if "taskType" not in task:
-        raise missingTaskType
-
-    if task["taskType"] == "segmentation":
-        required_status = JobStatus.segmentation_queued
-        new_status = JobStatus.segmentation_processing
-    elif task["taskType"] == "embedding":
-        if "chunkSize" not in task:
-            raise missingChunkSize
-        if int(task["chunkSize"]) < 2:
-            raise invalidChunkSize
-        required_status = [JobStatus.embedding_queued, JobStatus.embedding_queued_and_processing]
-        new_status = JobStatus.embedding_queued_and_processing
-    elif task["taskType"] == "clustering":
-        required_status = JobStatus.clustering_queued
-        new_status = JobStatus.clustering_processing
-    else:
-        raise invalidTaskType
-
+    required_status, new_status = TaskFactory.set_status(task)
     logger.info("Host {} requested {}-task".format(request.client.host, task["taskType"]))
 
     # TODO: Check for timed out jobs and put back in queue
@@ -247,38 +222,8 @@ async def get_task(request: Request, response: Response):
         if hasattr(job, 'status') and job.status in required_status:
             job.status = new_status
             logger.info("Host {} gets {}-task for JobId {}".format(request.client.host, task["taskType"], job.id))
-            if task["taskType"] == "segmentation":
-                response_json = {"jobId": job.id, "submissions": job.submissions}
-                writeJsonToFile(job.id, "segmentation_task", response_json)
-                return response_json
-            elif task["taskType"] == "embedding":
-                # Create chunk of blocks for embedding node
-                chunk, rest = createEmbeddingChunk(job.blocks_to_embed, task["chunkSize"])
-                job.embedding_task_count += 1
-                new_task = EmbeddingTask(id=job.embedding_task_count, course_id=job.course_id, blocks=chunk)
-                job.embedding_tasks.append(new_task)
-                job.blocks_to_embed = rest
-                if len(job.blocks_to_embed) == 0:
-                    job.status = JobStatus.embedding_processing
-                logger.info("embedding-task for JobId {} created: "
-                            "taskId={}, size={}/{} (actual/requested)".format(job.id,
-                                                                              new_task.id,
-                                                                              len(new_task.blocks),
-                                                                              task["chunkSize"]))
-
-                response_json = {"jobId": job.id,
-                                 "taskId": new_task.id,
-                                 "courseId": new_task.course_id,
-                                 "blocks": new_task.blocks}
-                writeJsonToFile(job.id, "embedding_task_" + str(new_task.id), response_json)
-                return response_json
-            elif task["taskType"] == "clustering":
-                response_json = {"jobId": job.id, "embeddings": job.embeddings}
-                writeJsonToFile(job.id, "clustering_task", response_json)
-                return response_json
-            else:
-                logger.error("Error with taskType {}".format(task["taskType"]))
-                raise taskTypeError
+            defined_job = TaskFactory.define_job(task, job)
+            return defined_job.perform_task()
     response.status_code = status.HTTP_204_NO_CONTENT
     return {"detail": "No {}-task available".format(str(task["taskType"]))}
 
@@ -289,7 +234,7 @@ async def get_task(request: Request, response: Response):
 async def send_result(request: Request, response: Response, background_tasks: BackgroundTasks):
     checkAuthorization(request)
 
-    result = await parseJson(request)
+    result = await JSONHandler.parseJson(request)
 
     # Error handling
     if "jobId" not in result:
@@ -298,109 +243,30 @@ async def send_result(request: Request, response: Response, background_tasks: Ba
         raise invalidJobId
     if "resultType" not in result:
         raise missingResultType
-    if result["resultType"] not in ["segmentation", "embedding", "clustering"]:
+    #hier muss der result type noch rein
+    if result["resultType"] not in ["segmentation", "embedding", "clustering", "embedding_wmt"]:
         raise invalidResultType
+
 
     logger.info("Host {} sent result for {}-task with jobId {}".format(request.client.host,
                                                                         result["resultType"],
-                                                                        result["jobId"]))
+                                                                        result["jobId"],
+                                                                        ))
 
     # Search for job with provided jobId
     for job in queue:
         if job.id == int(result["jobId"]):
-            # Segmentation results
-            if job.status == JobStatus.segmentation_processing and result["resultType"] == "segmentation":
-                if "textBlocks" not in result:
-                    raise missingTextBlocks
-                writeJsonToFile(job.id, "segmentation_result", result)
-                # Transform segmentation result to blocks (embedding input)
-                for block in result["textBlocks"]:
-                    submission_id = int(block["id"])
-                    start_index = int(block["startIndex"])
-                    end_index = int(block["endIndex"])
-                    # Search for the corresponding submission and create block out of segmentation result information
-                    for submission in job.submissions:
-                        if submission["id"] == submission_id:
-                            block_text = submission["text"][start_index:end_index]
-                            id_string = str(submission_id) + ";"\
-                                        + str(start_index) + "-"\
-                                        + str(end_index) + ";"\
-                                        + block_text
-                            block_id = hashlib.sha1(id_string.encode()).hexdigest()
-                            new_block = {"id": block_id,
-                                        "submissionId": submission_id,
-                                        "text": block_text,
-                                        "startIndex": start_index,
-                                        "endIndex": end_index,
-                                        "type": "AUTOMATIC"}
-                            job.blocks.append(new_block)                # Will persist in job
-                            job.blocks_to_embed.append(new_block)       # Will get removed with embedding queries
-                            break
-                job.status = JobStatus.embedding_queued
-                logger.info("JobId {} transitioned to status {}".format(job.id, job.status))
-                # Trigger embedding nodes
-                triggerNodes(node_type=NodeType.embedding)
-                return {"detail": "Updated job: processed segmentation results"}
-            # Embedding results
-            elif (job.status == JobStatus.embedding_processing
-                  or job.status == JobStatus.embedding_queued_and_processing)\
-                    and result["resultType"] == "embedding":
-                if "embeddings" not in result:
-                    raise missingEmbeddings
-                if "taskId" not in result:
-                    raise missingTaskId
 
-                writeJsonToFile(job.id, "embedding_result_" + str(result["taskId"]), result)
+            result_type = TaskFactory.define_result(job, result)
 
-                # Add results to job and remove corresponding embedding-task out of queue
-                valid_results = False
-                for task in job.embedding_tasks:
-                    if str(task.id) == str(result["taskId"]):
-                        # Check if number of embeddings is correct
-                        if not len(task.blocks) == len(result["embeddings"]):
-                            raise invalidResults
-                        for embedding in result["embeddings"]:
-                            job.embeddings.append(embedding)
-                        valid_results = True
-                        logger.info("embedding-task {} of JobId {} finished".format(task.id, job.id))
-                        job.embedding_tasks.remove(task)
-                        break
+            result_type.send_result(job, result)
 
-                if not valid_results:
-                    raise noUpdateNeeded
+            logging.info("Das ist der Type des Result: " + str(type(result_type)))
 
-                # Check if all embeddings of job finished
-                if len(job.blocks_to_embed) == 0 and len(job.embedding_tasks) == 0:
-                    job.status = JobStatus.clustering_queued
-                    logger.info("JobId {} transitioned to status {}".format(job.id, job.status))
-                    # Trigger clustering nodes
-                    triggerNodes(node_type=NodeType.clustering)
-
-                return {"detail": "Updated job: processed embedding results"}
-            # Clustering results
-            elif job.status == JobStatus.clustering_processing and result["resultType"] == "clustering":
-                if "clusters" not in result:
-                    raise missingClusters
-                if "distanceMatrix" not in result:
-                    raise missingDistanceMatrix
-                if "clusterTree" not in result:
-                    raise missingClusterTree
-
-                writeJsonToFile(job.id, "clustering_result", result)
-
-                job.clusters = result["clusters"]
-                job.distanceMatrix = result["distanceMatrix"]
-                job.clusterTree = result["clusterTree"]
-
-                # Send back results to Artemis via callback URL in the background
-                job.status = JobStatus.sending_back
+            if isinstance(result_type, ClusteringResult):
                 background_tasks.add_task(sendBackResults, job)
-                return {"detail": "Updated job: processed clustering results"}
-            # No valid request
-            else:
-                logger.info("No such update for jobId {} needed. Job status is {}".format(result["jobId"], job.status))
-                raise noUpdateNeeded
-    raise invalidJobId
+
+
 
 
 # Provides statistics about the number of jobs summarized by their status

@@ -4,7 +4,7 @@ services:
 # http://localhost:8081/api
 # http://localhost:8081/dashboard
   traefik:
-    image: traefik:v2.2.1
+    image: "traefik:v2.2.1"
     container_name: athene-traefik
     restart: unless-stopped
     depends_on:
@@ -83,7 +83,8 @@ services:
     build:
       context: .
       dockerfile: ./embedding/Dockerfile
-    image: athene-embedding
+    image: "ghcr.io/ls1intum/athene/athene-embedding:94b958a"
+    #image: embedding_wmt
     container_name: athene-embedding
     restart: unless-stopped
     depends_on:
@@ -105,8 +106,8 @@ services:
       - CHUNK_SIZE=${EMBEDDING_CHUNK_SIZE}
       - BALANCER_SENDRESULT_URL=${BALANCER_SENDRESULT_URL}
     working_dir: /usr/src/app
-    volumes:
-      - ${EMBEDDING_CLOUD_CONFIG_PATH}:/usr/src/app/src/cloud/config.py:ro
+    #volumes:
+    #  - ${EMBEDDING_CLOUD_CONFIG_PATH}:/usr/src/app/src/cloud/config.py:ro
     networks:
       - athene
     labels:
@@ -116,6 +117,40 @@ services:
       - traefik.http.routers.upload-tls.rule=Path(`/upload`,`/feedback_consistency`)
       - traefik.http.routers.upload-tls.entrypoints=websecure
       - traefik.http.routers.upload-tls.tls=true
+
+  embedding-wmt:
+    build:
+      context: .
+      dockerfile: ./embedding_wmt/Dockerfile
+    #image: "ghcr.io/ls1intum/athene/athene-embedding:94b958a"
+    image: embedding_wmt
+    container_name: athene-embedding-wmt
+    restart: unless-stopped
+    depends_on:
+      - load-balancer
+      - database
+#    ports:
+#      - 8002:8000
+    expose:
+       - 8000
+    environment:
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USER=${EMBEDDING_DATABASE_USER}
+      - DATABASE_PWD=${EMBEDDING_DATABASE_PWD}
+      - BALANCER_AUTHORIZATION_SECRET=${LOAD_BALANCER_AUTHORIZATION_SECRET}
+      - BALANCER_QUEUE_FREQUENCY=${BALANCER_QUEUE_FREQUENCY}
+      - BALANCER_GETTASK_URL=${BALANCER_GETTASK_URL}
+      - CHUNK_SIZE=${EMBEDDING_CHUNK_SIZE}
+      - BALANCER_SENDRESULT_URL=${BALANCER_SENDRESULT_URL}
+    working_dir: /usr/src/app
+    #volumes:
+    #  - ${EMBEDDING_CLOUD_CONFIG_PATH}:/usr/src/app/src/cloud/config.py:ro
+    networks:
+      - athene
+    labels:
+      - traefik.enable=true
 
   clustering:
     build:
