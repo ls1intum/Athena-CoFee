@@ -17,6 +17,7 @@ class TextBlock:
     def from_dict(cls, dict: dict) -> 'TextBlock':
         return cls(dict['id'], dict['text'])
 
+
 class Embedding:
     id: str
     vector: ElmoVector
@@ -28,3 +29,7 @@ class Embedding:
     @classmethod
     def from_dict(cls, dict: dict) -> 'Embedding':
         return cls(dict['id'], dict['vector'])
+
+    @classmethod
+    def from_wmt_embedding(cls, id, vector):
+        return cls(id, vector)

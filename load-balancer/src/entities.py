@@ -9,6 +9,9 @@ ElmoVector = array
 class NodeType:
     segmentation = "segmentation"
     embedding = "embedding"
+
+    embedding_wmt = "embedding_wmt"
+
     clustering = "clustering"
     gpu = "gpu"
 
@@ -74,7 +77,7 @@ class AtheneJob:
     clusterTree: list               # cluster tree of the clusters
     status: str                     # See class JobStatus
 
-    def __init__(self, id: int, course_id: int, callback_url: str, submissions: dict):
+    def __init__(self, id: int, course_id: int, callback_url: str, submissions: dict, multilingual: bool):
         self.id = id
         self.course_id = course_id
         self.callback_url = callback_url
@@ -86,9 +89,10 @@ class AtheneJob:
         self.embedding_tasks = list()
         self.embedding_task_count = 0
         self.status = JobStatus.segmentation_queued
+        self.multilingual = multilingual
 
     def __str__(self):
-        return "AtheneJob - ID: " + str(self.id) + ", courseId: " + str(self.course_id) + ", CallbackURL: " + str(self.callback_url) + ", submission_date: " + str(self.submission_date)
+        return "AtheneJob - ID: " + str(self.id) + ", courseId: " + str(self.course_id) + ", CallbackURL: " + str(self.callback_url) + ", submission_date: " + str(self.submission_date) + ", multilingual: " + str(self.multilingual)
 
 
 class ComputeNode:
@@ -105,3 +109,18 @@ class ComputeNode:
 
     def __str__(self):
         return "Name: " + self.name + ", Type: " + self.type + ", URL: " + self.url
+
+
+class Policy:
+
+    def __init__(self):
+        pass
+
+    def define_embedding_type(multilingual: bool):
+        if multilingual:
+            return NodeType.embedding_wmt
+        else:
+            return NodeType.embedding
+
+
+

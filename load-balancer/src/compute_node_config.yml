@@ -11,6 +11,7 @@ docker_nodes:
   - traefik_service_api: http://athene-traefik:8080/api/http/services/
     segmentation_service_name: segmentation-athene@docker
     embedding_service_name: embedding-athene@docker
+    embedding_wmt_service_name: embedding-wmt-athene@docker
     clustering_service_name: clustering-athene@docker
     trigger_route: /trigger
 
@@ -25,6 +26,11 @@ docker_nodes:
 #    # This url resolves to the embedding-container inside the docker-compose network
 #    trigger_url: http://athene-embedding:8000/trigger
 #    type: embedding
+
+#  - name: embedding-stand-alone
+#    # This url resolves to the embedding-container inside the docker-compose network
+#    trigger_url: http://athene-embedding-wmt:8000/trigger
+#    type: embedding-wmt
 
 #  - name: clustering-stand-alone
 #    # This url resolves to the clustering-container inside the docker-compose network

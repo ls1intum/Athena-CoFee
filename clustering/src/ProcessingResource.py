@@ -9,11 +9,13 @@ from typing import List
 import json
 import os
 import requests
+import numpy as np
 
 
 class ProcessingResource:
     __logger = getLogger(__name__)
     __clustering: Clustering = Clustering()
+    vocab_len = 42024
 
     def __default(self, o) -> int :
         if isinstance(o, int64): return int(o)
@@ -31,12 +33,18 @@ class ProcessingResource:
             raise requireTwoEmbeddings
 
         embeddings: List[Embedding] = list(map(lambda dict: Embedding.from_dict(dict), data['embeddings']))
+
         if len(embeddings) < 2:
             self.__logger.error("{} ({})".format(requireTwoEmbeddings.title, requireTwoEmbeddings.description))
             raise requireTwoEmbeddings
 
         self.__logger.info("Computing clusters of {} embeddings.".format(len(embeddings)))
         vectors: List[ElmoVector] = list(map(lambda e: e.vector, embeddings))
+
+        if data["multilingual"]:
+            vectors = list(map(lambda v: self.one_hot_encode(v), vectors))
+            embeddings: List[Embedding] = list(map(lambda e : Embedding.from_wmt_embedding(e.id, self.one_hot_encode(e.vector)), embeddings))
+
         labels, probabilities = self.__clustering.cluster(vectors)
 
         clusterLabels: List[int] = list(map(lambda i: int(i), set(labels)))
@@ -125,7 +133,7 @@ class ProcessingResource:
             headers = {
                 "Authorization": auth_secret
             }
-            task = requests.get(get_task_url, json={"taskType": "clustering"}, headers=headers, timeout=30)
+            task = requests.get(get_task_url, json={"taskType": "clustering"}, headers=headers, timeout=300)
         except Exception as e:
             self.__logger.error("getTask-API seems to be down: {}".format(str(e)))
             return None
@@ -138,3 +146,9 @@ class ProcessingResource:
         except Exception as e:
             self.__logger.error("Exception while parsing json: {}".format(str(e)))
             return None
+
+    def one_hot_encode(self, vector):
+        encoded_vector = np.zeros(self.vocab_len)
+        for count, i in enumerate(vector):
+            encoded_vector[int(i)] = 1 if i < self.vocab_len else 0
+        return encoded_vector

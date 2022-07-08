@@ -1,3 +1,5 @@
+import logging
+
 from .entities import NodeType, ComputeNode
 from logging import getLogger
 import os.path

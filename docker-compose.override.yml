@@ -4,8 +4,8 @@ version: '3'
 # By that, rebuilding the containers is not needed for code changes locally as long as no requirements change
 
 services:
-  traefik:
-    # This component does not need to be changed
+  #traefik:
+    #This component does not need to be changed
 
   load-balancer:
     volumes:
@@ -19,9 +19,17 @@ services:
 
   embedding:
     volumes:
-      - ./embedding/src:/usr/src/app/src
-      - ./text_preprocessing:/usr/src/app/src/text_preprocessing
-      - ${EMBEDDING_CLOUD_CONFIG_PATH}:/usr/src/app/src/cloud/config.py:ro
+      #- ./embedding/src:/usr/src/app/src
+      #- ./text_preprocessing:/usr/src/app/src/text_preprocessing
+      #- ${EMBEDDING_CLOUD_CONFIG_PATH}:/usr/src/app/src/cloud/config.py:ro
+      # This will keep the subdirectory as it is in the container
+      - /usr/src/app/src/resources
+
+  embedding-wmt:
+    volumes:
+      - ./embedding_wmt/src:/usr/src/app/src
+      #- ./text_preprocessing:/usr/src/app/src/text_preprocessing
+      #- ${EMBEDDING_CLOUD_CONFIG_PATH}:/usr/src/app/src/cloud/config.py:ro
       # This will keep the subdirectory as it is in the container
       - /usr/src/app/src/resources
 
@@ -33,5 +41,5 @@ services:
     volumes:
       - ./tracking/src:/usr/src/app/src
 
-  database:
+  #database:
     # This component does not need to be changed
