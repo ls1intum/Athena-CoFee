@@ -86,10 +86,8 @@ class SegmentationResult(ResultJob):
                     break
         job.status = JobStatus.embedding_queued
         logger.info("JobId {} transitioned to status {}".format(job.id, job.status))
-        # Trigger embedding nodes
+        # Triggering the right embedding nodes
         node_Type = Policy.define_embedding_type(job.multilingual)
-        logging.info(node_Type)
-        logger.info("Das ist der Node Type: " + node_Type)
         triggerNodes(node_type=node_Type)
         return {"detail": "Updated job: processed segmentation results"}
 
