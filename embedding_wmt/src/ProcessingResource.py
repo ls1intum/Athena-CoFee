@@ -48,16 +48,12 @@ class ProcessingResource:
             'embeddings': embeddings
         }
 
-        self.__logger.info("Hier sind die Embeddings")
         self.__logger.info(embeddings)
-
-        #Embedding ist fertig, es wird zurück an x geschickt
         self.__logger.info("Completed Embedding Request.")
         self.__logger.debug("-" * 80)
 
         output["jobId"] = data["jobId"]
         output["taskId"] = data["taskId"]
-        #type anpassen
         output["resultType"] = "embedding_wmt"
 
         try:
@@ -74,6 +70,7 @@ class ProcessingResource:
         headers = {
             "Authorization": auth_secret
         }
+        #hier kann man dann anstatt einer JSON ein Protobuff bauen
         response = requests.post(send_result_url, data=json.dumps(output, default=self.__default), headers=headers, timeout=30)
         if response.status_code != 200:
             self.__logger.error("Sending back failed: {}".format(response.text))
@@ -88,7 +85,6 @@ class ProcessingResource:
             headers = {
                 "Authorization": auth_secret
             }
-            #hier embedding_wmt rein
             task = requests.get(get_task_url, json={"taskType": "embedding", "chunkSize": chunk_size}, headers=headers, timeout=60)
         except Exception as e:
             self.__logger.error("getTask-API seems to be down: {}".format(str(e)))

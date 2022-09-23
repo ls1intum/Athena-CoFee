@@ -56,6 +56,8 @@ class ProcessingResource:
         headers = {
             "Authorization": auth_secret
         }
+
+        #hier kann man dann anstatt einer JSON ein Protobuff bauen
         response = requests.post(send_result_url, data=json.dumps(result), headers=headers, timeout=30)
         if response.status_code != 200:
             self.__logger.error("Sending back failed: {}".format(response.text))
