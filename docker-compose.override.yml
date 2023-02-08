@@ -4,7 +4,7 @@ version: '3'
 # By that, rebuilding the containers is not needed for code changes locally as long as no requirements change
 
 services:
-  traefik:
+  # traefik:
     # This component does not need to be changed
 
   load-balancer:
@@ -33,5 +33,5 @@ services:
     volumes:
       - ./tracking/src:/usr/src/app/src
 
-  database:
+  # database:
     # This component does not need to be changed
