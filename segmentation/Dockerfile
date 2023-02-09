@@ -1,4 +1,4 @@
-FROM python:3.7.7
+FROM python:3.10.9
 LABEL author="Anna Kovaleva <anna.kovaleva@tum.de>"
 
 COPY ./segmentation/requirements.txt /tmp/requirements.txt

@@ -1,4 +1,4 @@
-FROM python:3.7.7
+FROM python:3.10.9
 LABEL author="Jan Philip Bernius <janphilip.bernius@tum.de>"
 
 COPY ./clustering/requirements.txt /tmp/requirements.txt
