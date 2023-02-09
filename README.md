@@ -42,7 +42,7 @@ The following API-routes are available after start:
 -   [http://localhost/feedback_consistency](http://localhost/feedback_consistency) - For Artemis to access feedback_consistency functionality
 
 Traefik provides a dashboard to monitor the status of underlying components.
-This dashboard is available on [http://localhost:8081/dashboard](http://localhost:8080/dashboard) by default.
+This dashboard is available on [http://localhost:8081/dashboard](http://localhost:8081/dashboard) by default.
 
 For testing and development purposes, a single component can be re-built using e.g.
 
