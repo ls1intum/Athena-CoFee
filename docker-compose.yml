@@ -1,8 +1,8 @@
 version: '3'
 
 services:
-# http://localhost:8081/api
-# http://localhost:8081/dashboard
+# http://localhost:9081/api
+# http://localhost:9081/dashboard
   traefik:
     image: traefik:v2.2.1
     container_name: athene-traefik
