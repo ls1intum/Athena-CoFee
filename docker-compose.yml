@@ -4,7 +4,7 @@ services:
   # http://localhost:9081/api
   # http://localhost:9081/dashboard
   traefik:
-    image: traefik:v2.2.1
+    image: traefik:v2.9.6
     container_name: athene-traefik
     restart: unless-stopped
     depends_on:
