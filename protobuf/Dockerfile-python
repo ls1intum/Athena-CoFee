@@ -1,0 +1,8 @@
+FROM golang:alpine
+LABEL author="Paul Schwind <paul.schwind@tum.de>"
+
+VOLUME /in
+VOLUME /out
+
+RUN apk update && apk add --no-cache make protobuf-dev
+CMD ["protoc", "--python_out=/out", "--proto_path=/in", "/in/clustering.proto"]

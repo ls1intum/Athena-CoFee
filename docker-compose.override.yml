@@ -7,9 +7,22 @@ services:
   # traefik:
     # This component does not need to be changed
 
-  load-balancer:
+  # Build protobuf client file for load-balancer
+  # In production, this is done using GitHub Actions
+  protobuf:
+    build:
+      context: .
+      dockerfile: ./protobuf/Dockerfile-python
+    container_name: athene-protobuf
+    working_dir: /protobuf
     volumes:
-      - ./load-balance.yml:/usr/src/app/${LOAD_BALANCER_CONFIG_FILE_PATH}:ro
+      - ./protobuf:/in
+      - ./load-balancer/src:/out
+
+  load-balancer:
+    depends_on:
+      - protobuf
+    volumes:
       - ./load-balancer/src:/usr/src/app/src
 
   segmentation:
