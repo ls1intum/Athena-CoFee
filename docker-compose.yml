@@ -36,13 +36,11 @@ services:
     expose:
        - 8000
     environment:
-      - CONFIG_FILE_PATH=${LOAD_BALANCER_CONFIG_FILE_PATH}
-      - LOAD_BALANCER_AUTHORIZATION_SECRET=${LOAD_BALANCER_AUTHORIZATION_SECRET}
+      - LOAD_BALANCER_CONFIG_FILE_PATH
+      - LOAD_BALANCER_AUTHORIZATION_SECRET
     working_dir: /usr/src/app
     networks:
       - athene
-    volumes:
-      - ./load-balance.yml:/usr/src/app/${LOAD_BALANCER_CONFIG_FILE_PATH}:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.balancer.rule=Path(`/queueStatus`,`/submit`,`/getTask`,`/sendTaskResult`)
