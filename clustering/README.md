@@ -5,8 +5,9 @@ Locally, the service runs on port 8003. To start it,
 
 - first, run the following command for some preparations:
    ```bash
-   ./local-prepare.sh
+   make
     ```
+  This will create a virtual environment and install all dependencies.
 - After that, configure the used virtual environment:
     ```bash
     source venv/bin/activate
