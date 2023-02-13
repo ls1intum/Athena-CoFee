@@ -20,7 +20,7 @@ services:
       - athene
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik.yml:/etc/traefik/traefik.yml
+      - ./traefik/traefik.docker.yml:/etc/traefik/traefik.yml
 
   # http://localhost/queueStatus
   # http://localhost/submit
