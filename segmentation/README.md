@@ -1,13 +1,29 @@
-Service runs on port 8001
+# Segmentation Service
 
-```bash
-uvicorn --port 8001 --host 0.0.0.0 --reload src.main:app
-```
+## Start locally (without Docker)
+Locally, the service runs on port 8001. To start it, 
 
-Note: In Artemis 8080 is written in configs
+- first, run the following command for some preparations:
+   ```bash
+   ./local-prepare.sh
+    ```
+- After that, configure the used virtual environment:
+    ```bash
+    source venv/bin/activate
+    ```
+  If you use an IDE, you can also configure the virtual environment there.
+  In PyCharm, you can even go to `File > Open`, choose the embedding folder
+  and then choose the `Attach` option.
+- Then, you can start the embedding server using `python start.py` or using your IDE.
 
+
+## Start with Docker
+Use the `docker-compose.yml` file from the parent directory
+to start the embedding service (and all others) with Docker.
+
+##Options
 Configurable environment variables:
 
--   BALANCER\_QUEUE\_FREQUENCY
--   BALANCER\_GETTASK\_URL
--   BALANCER\_SENDRESULT\_URL
+- `BALANCER_QUEUE_FREQUENCY`
+- `BALANCER_GETTASK_URL`
+- `BALANCER_SENDRESULT_URL`
