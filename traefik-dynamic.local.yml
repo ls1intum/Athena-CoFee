@@ -1,14 +1,6 @@
 ## Dynamic configuration
 http:
   routers:
-    # http://localhost/test
-    test:
-      # catchall
-      rule: "PathPrefix(`/`)"
-      entryPoints:
-        - web
-      service: test
-      priority: 1
     # http://localhost/queueStatus
     # http://localhost/submit
     # http://localhost/getTask
@@ -18,10 +10,9 @@ http:
       entryPoints:
         - web
       service: balancer
-    # http://localhost/trigger
     # http://localhost/segment
     segmentation:
-      rule: "Path(`/trigger`,`/segment`)"
+      rule: "Path(`/segment`)"
       entryPoints:
         - web
       service: segmentation
@@ -32,12 +23,6 @@ http:
       entryPoints:
         - web
       service: embedding
-    # http://localhost/trigger
-    clustering:
-      rule: "Path(`/trigger`)"
-      entryPoints:
-        - web
-      service: clustering
     # http://localhost/tracking
     tracking:
       rule: "Path(`/tracking`)"
