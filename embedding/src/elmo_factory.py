@@ -51,7 +51,7 @@ class ELMoFactory:
 
         except owncloud.HTTPResponseError:
             del ELMoFactory.ELMo_to_status[file_name]
-            ELMoFactory.__logger.error("unable to load model {}".format(file_name))
+            ELMoFactory.__logger.warning("unable to load model {}".format(file_name))
 
     @staticmethod
     def __fetch_remote_model_update_time(file_name):
