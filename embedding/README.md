@@ -3,10 +3,11 @@
 ## Start locally (without Docker)
 Locally, the service runs on port 8002. To start it, 
 
-- first, run the following command for some preparations:
-   ```bash
-   ./local-prepare.sh
-    ```
+- First, run the following command for some preparations:
+  ```bash
+  make
+  ```
+  This will create a virtual environment, install all dependencies and download necessary ML models.
 - After that, configure the used virtual environment:
     ```bash
     source venv/bin/activate
