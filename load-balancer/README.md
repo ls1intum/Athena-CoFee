@@ -5,10 +5,11 @@ This service balances the load for incoming Artemis-requests to underlying compu
 ## Start locally (without Docker)
 Locally, the service runs on port 8000. To start it, 
 
-- first, run the following command for some preparations:
+- First, run the following command for some preparations:
    ```bash
-   ./local-prepare.sh
+   make
     ```
+  This will create a virtual environment and install all dependencies.
 - After that, configure the used virtual environment:
     ```bash
     source venv/bin/activate
