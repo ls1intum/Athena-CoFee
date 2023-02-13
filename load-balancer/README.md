@@ -1,8 +1,30 @@
-Service runs on port 8000
+# Load Balancer
 
-Balances load for incoming Artemis-requests to underlying compute nodes
+This service balances the load for incoming Artemis-requests to underlying compute nodes.
 
-the following API-routes will be available after start:
+## Start locally (without Docker)
+Locally, the service runs on port 8000. To start it, 
+
+- first, run the following command for some preparations:
+   ```bash
+   ./local-prepare.sh
+    ```
+- After that, configure the used virtual environment:
+    ```bash
+    source venv/bin/activate
+    ```
+  If you use an IDE, you can also configure the virtual environment there.
+  In PyCharm, you can even go to `File > Open`, choose the embedding folder
+  and then choose the `Attach` option.
+- Then, you can start the load balancer using `python start.py` or using your IDE.
+
+
+## Start with Docker
+Use the `docker-compose.yml` file from the parent directory
+to start the embedding service (and all others) with Docker.
+
+## API
+The following API-routes will be available after start:
 
 -   [http://localhost:8000/queueStatus](http://localhost:8000/queueStatus) (GET) to get queue statistics
 -   [http://localhost:8000/submit](http://localhost:8000/submit) (POST) for Artemis to submit a new Job
@@ -14,7 +36,7 @@ Input example JSON for POST on http://localhost:8000/submit
 ```json
 {
   "courseId": 2,
-  "callbackUrl": "http://testurl"
+  "callbackUrl": "http://testurl",
   "submissions":[
       {
          "id":1,

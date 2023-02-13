@@ -1,8 +1,8 @@
 version: '3'
 
 services:
-# http://localhost:9081/api
-# http://localhost:9081/dashboard
+  # http://localhost:9081/api
+  # http://localhost:9081/dashboard
   traefik:
     image: traefik:v2.2.1
     container_name: athene-traefik
@@ -22,10 +22,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik.yml:/etc/traefik/traefik.yml
 
-# http://localhost/queueStatus
-# http://localhost/submit
-# http://localhost/getTask
-# http://localhost/sendTaskResult
+  # http://localhost/queueStatus
+  # http://localhost/submit
+  # http://localhost/getTask
+  # http://localhost/sendTaskResult
   load-balancer:
     build:
       context: .
@@ -33,8 +33,6 @@ services:
     image: athene-load-balancer
     container_name: athene-load-balancer
     restart: unless-stopped
-#    ports:
-#      - 8000:8000
     expose:
        - 8000
     environment:
@@ -62,8 +60,6 @@ services:
     restart: unless-stopped
     depends_on:
       - load-balancer
-#    ports:
-#      - 8001:8000
     expose:
        - 8000
     environment:
@@ -77,8 +73,8 @@ services:
     labels:
       - traefik.enable=true
 
-# http://localhost/upload
-# http://localhost/feedback_consistency
+  # http://localhost/upload
+  # http://localhost/feedback_consistency
   embedding:
     build:
       context: .
@@ -89,8 +85,6 @@ services:
     depends_on:
       - load-balancer
       - database
-#    ports:
-#      - 8002:8000
     expose:
        - 8000
     environment:
@@ -127,8 +121,6 @@ services:
     depends_on:
       - load-balancer
       - database
-#    ports:
-#      - 8003:8000
     expose:
        - 8000
     environment:
@@ -147,7 +139,7 @@ services:
     labels:
       - traefik.enable=true
 
-# http://localhost/tracking
+  # http://localhost/tracking
   tracking:
     build:
       context: .
@@ -157,8 +149,6 @@ services:
     restart: unless-stopped
     depends_on:
       - database
-#    ports:
-#      - 8004:8000
     expose:
       - 8000
     environment:
