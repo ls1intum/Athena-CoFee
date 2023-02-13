@@ -35,7 +35,7 @@ def sizeof(obj):
     return size
 
 def checkAuthorization(request: Request):
-    auth_secret = str(os.environ['AUTHORIZATION_SECRET']) if "AUTHORIZATION_SECRET" in os.environ else ""
+    auth_secret = str(os.environ['LOAD_BALANCER_AUTHORIZATION_SECRET']) if "LOAD_BALANCER_AUTHORIZATION_SECRET" in os.environ else ""
     if auth_secret == "":
         logger.warning("No Authorization secret set")
         return
@@ -146,7 +146,7 @@ def sendBackResults(job: AtheneJob):
     del response;
     logger.info("Serialized Protobuf has size {}.".format(sizeof(final_result)))
     try:
-        auth_secret = str(os.environ['AUTHORIZATION_SECRET']) if "AUTHORIZATION_SECRET" in os.environ else ""
+        auth_secret = str(os.environ['LOAD_BALANCER_AUTHORIZATION_SECRET']) if "LOAD_BALANCER_AUTHORIZATION_SECRET" in os.environ else ""
         headers = {
             "Authorization": auth_secret,
             "Content-type": "application/x-protobuf"

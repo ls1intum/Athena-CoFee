@@ -69,7 +69,7 @@ class ProcessingResource:
         self.__logger.info("Send back embedding-results")
         # Get container variable for load balancer url
         send_result_url = str(os.environ['BALANCER_SENDRESULT_URL']) if "BALANCER_SENDRESULT_URL" in os.environ else "http://localhost:8000/sendTaskResult"
-        auth_secret = str(os.environ['BALANCER_AUTHORIZATION_SECRET']) if "BALANCER_AUTHORIZATION_SECRET" in os.environ else ""
+        auth_secret = str(os.environ['LOAD_BALANCER_AUTHORIZATION_SECRET']) if "LOAD_BALANCER_AUTHORIZATION_SECRET" in os.environ else ""
         headers = {
             "Authorization": auth_secret
         }
@@ -83,7 +83,7 @@ class ProcessingResource:
             # Get container variable for load balancer url
             get_task_url = str(os.environ['BALANCER_GETTASK_URL']) if "BALANCER_GETTASK_URL" in os.environ else "http://localhost:8000/getTask"
             chunk_size = int(os.environ['CHUNK_SIZE']) if "CHUNK_SIZE" in os.environ else 50
-            auth_secret = str(os.environ['BALANCER_AUTHORIZATION_SECRET']) if "BALANCER_AUTHORIZATION_SECRET" in os.environ else ""
+            auth_secret = str(os.environ['LOAD_BALANCER_AUTHORIZATION_SECRET']) if "LOAD_BALANCER_AUTHORIZATION_SECRET" in os.environ else ""
             headers = {
                 "Authorization": auth_secret
             }
