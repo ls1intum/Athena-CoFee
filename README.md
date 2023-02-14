@@ -23,26 +23,19 @@ After the job is completed, it calls back to LMS to submit the results.
 
 ## Basic Usage
 
-Using the `docker-compose.yml` file included in the root directory of the repository is the easiest way to start Athene. The execution of
+### Running with Docker
+
+Using the `docker-compose.yml` file included in the root directory of the repository is the easiest way to start Athene.
+
+The execution of
 
 ```
 docker-compose up -d
 ```
 
-will automatically build and start the Load-balancer, Segmentation, the Embedding and the Clustering component (The `-d` parameter will run containers in the background).
-By default, a traefik-container will manage API-Endpoints and expose them on port 80 (default HTTP-port).
-The following API-routes are available after start:  
+will automatically build and start the Load-balancer, Segmentation, the Embedding and the Clustering component (The `-d` parameter will run containers in the background, omit it to directly see outputs).
 
--   [http://localhost/submit](http://localhost/submit) - For Artemis to submit a job to the load-balancer
--   [http://localhost/queueStatus](http://localhost/queueStatus) - To monitor the queue status of the load balancer
--   [http://localhost/getTask](http://localhost/getTask) - For the computation components to query tasks from the load balancer
--   [http://localhost/sendTaskResult](http://localhost/sendTaskResult) - For the computation components to send back results to the load balancer
--   [http://localhost/upload](http://localhost/upload) - For Artemis to upload course material
--   [http://localhost/tracking](http://localhost/tracking) - For Artemis to access tracking functionality
--   [http://localhost/feedback_consistency](http://localhost/feedback_consistency) - For Artemis to access feedback_consistency functionality
-
-Traefik provides a dashboard to monitor the status of underlying components.
-This dashboard is available on [http://localhost:9081/dashboard](http://localhost:9081/dashboard) by default.
+The first time you start Athene, it will take a while to download all required images and build the components.
 
 For testing and development purposes, a single component can be re-built using e.g.
 
@@ -63,6 +56,48 @@ docker-compose down
 ```
 
 For further information have a look at the [Compose file reference](https://docs.docker.com/compose/compose-file/) and the [Compose command-line reference](https://docs.docker.com/compose/reference/overview/).
+
+### Running the Services Directly
+Prepare all local depencies by running
+
+```bash
+make setup -j6 # j6 is optional, but speeds up the process
+```
+in the root directory. This will call `make` in all subdirectories, which initializes virtual environments, installs dependencies and downloads required models.
+
+If you are using PyCharm, you can also start the setup using the `Prepare local execution` run configuration.
+
+After that, you can start all services at once by running
+
+```bash
+make start
+```
+
+There is one special target in the `Makefile` that will start traefik and the MongoDB database in a docker container to redirect to the services running on your local machine.
+
+If you are using PyCharm, you can also start all services by running the `All Services`-configuration. This has the added advantage that you can debug the services directly from PyCharm by running the configuration in debug mode. Note that you need to have the [EnvFile plugin](https://plugins.jetbrains.com/plugin/7861-envfile) installed so that the environment file loading can take place from the run configuration.
+
+Running the services directly has multiple advantages:
+- You can use the Debug-Mode of your IDE to debug the services
+- You can restart the services individually without restarting the whole system
+- The services will restart themselves if you change the code (the uvicorn-reloader is enabled by default)
+
+This way of running the services will use the environment variables from `.local.env`.
+
+## Basic API Overview
+By default, a traefik-container will manage API-Endpoints and expose them on port 80 (default HTTP-port).
+The following API-routes are available after start:  
+
+-   [http://localhost/submit](http://localhost/submit) - For Artemis to submit a job to the load-balancer
+-   [http://localhost/queueStatus](http://localhost/queueStatus) - To monitor the queue status of the load balancer
+-   [http://localhost/getTask](http://localhost/getTask) - For the computation components to query tasks from the load balancer
+-   [http://localhost/sendTaskResult](http://localhost/sendTaskResult) - For the computation components to send back results to the load balancer
+-   [http://localhost/upload](http://localhost/upload) - For Artemis to upload course material
+-   [http://localhost/tracking](http://localhost/tracking) - For Artemis to access tracking functionality
+-   [http://localhost/feedback_consistency](http://localhost/feedback_consistency) - For Artemis to access feedback_consistency functionality
+
+Traefik provides a dashboard to monitor the status of underlying components.
+This dashboard is available on [http://localhost:9081/dashboard](http://localhost:9081/dashboard) by default.
 
 ## Configuration
 
