@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Prepare segmentation" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" activateToolWindowBeforeRun="false">
-    <makefile filename="$PROJECT_DIR$/segmentation/Makefile" target="" workingDirectory="$PROJECT_DIR$/segmentation" arguments="">
-      <envs />
-    </makefile>
-    <method v="2" />
-  </configuration>
-</component>

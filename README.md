@@ -75,12 +75,19 @@ to redirect to the services running on your local machine.
 You can always just directly use `make` and it will automatically detect changed dependencies.
 
 ### Running the Services Using PyCharm
-If you are using PyCharm, you can also start all services by running the `All Services`-configuration.
-This has the added advantage that you can debug the services directly from PyCharm by running the configuration in debug mode.
+If you are using PyCharm, you can configure the project as follows:
 
-All the dependencies will be installed automatically when first starting the services. However, the UI for this is not very nice, so you might want to run `make setup -j6` in the root directory first.
-
-Note that you need to have the [EnvFile plugin](https://plugins.jetbrains.com/plugin/7861-envfile) installed so that the environment file loading can take place from the run configuration.
+1. Open the project in PyCharm
+2. Ensure that you have the [EnvFile plugin](https://plugins.jetbrains.com/plugin/7861-envfile) installed so that the environment file loading can take place from the run configuration.
+3. Run the setup preparations by running `make setup` in a terminal or by using the run configuration `Prepare local setup`
+4. Now, you can add the different microservices as submodules of the PyCharm project. To do so, go to `File -> Open` and open the following directories. When asked, choose to open them using the "Attach" method (in the dialog that also provides options for "This window" / "New window").
+    - `clustering`
+    - `embedding`
+    - `load-balancer`
+    - `segmentation`
+    - `tracking`
+5. Configure the virtual environment Python interpreters for the different modules: For each of the modules in the list above, go to `File -> Settings -> Project: Athene -> Project Interpreter` and select the virtual environment in the `.venv` directory of the respective module.
+6. Now, you can start the different services by running the corresponding run configurations. This has the added advantage that you can debug the services directly from PyCharm by running the configuration in debug mode. You can also start all services by running the `All Services`-configuration.
 
 ### Notes on Running the Services Without Docker
 
