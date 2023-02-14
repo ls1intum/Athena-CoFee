@@ -78,7 +78,7 @@ You can always just directly use `make` and it will automatically detect changed
 If you are using PyCharm, you can also start all services by running the `All Services`-configuration.
 This has the added advantage that you can debug the services directly from PyCharm by running the configuration in debug mode.
 
-All of the dependencies will be installed automatically when first starting the services.
+All the dependencies will be installed automatically when first starting the services.
 
 Note that you need to have the [EnvFile plugin](https://plugins.jetbrains.com/plugin/7861-envfile) installed so that the environment file loading can take place from the run configuration.
 
@@ -90,6 +90,8 @@ Running the services directly has multiple advantages:
 - The services will restart themselves if you change the code (the uvicorn-reloader is enabled by default)
 
 Using makefiles or PyCharm will use the environment variables from `.local.env`.
+
+You can remove all the setup files by running `make clean`.
 
 ## Basic API Overview
 By default, a traefik-container will manage API-Endpoints and expose them on port 80 (default HTTP-port).
