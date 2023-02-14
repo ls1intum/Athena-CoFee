@@ -1,28 +1,62 @@
-all: protobuf clustering embedding load-balancer segmentation tracking
+#!make
+include .local.env
+export
 
-protobuf:
+all: setup start
+
+setup: setup-protobuf setup-clustering setup-embedding setup-load-balancer setup-segmentation setup-tracking
+
+setup-protobuf:
 	$(info Building protobuf files)
 	cd protobuf && $(MAKE)
 
-clustering:
+setup-clustering:
 	$(info Building clustering)
 	cd clustering && $(MAKE)
 
-embedding:
+setup-embedding:
 	$(info Building embedding)
 	cd embedding && $(MAKE)
 
-load-balancer:
+setup-load-balancer:
 	$(info Building load-balancer)
 	cd load-balancer && $(MAKE)
 
-segmentation:
+setup-segmentation:
 	$(info Building segmentation)
 	cd segmentation && $(MAKE)
 
-tracking:
+setup-tracking:
 	$(info Building tracking)
 	cd tracking && $(MAKE)
+
+start-clustering:
+	$(info Starting clustering)
+	$(MAKE) -C clustering start
+
+start-embedding:
+	$(info Starting embedding)
+	$(MAKE) -C embedding start
+
+start-load-balancer:
+	$(info Starting load-balancer)
+	$(MAKE) -C load-balancer start
+
+start-segmentation:
+	$(info Starting segmentation)
+	$(MAKE) -C segmentation start
+
+start-tracking:
+	$(info Starting tracking)
+	$(MAKE) -C tracking start
+
+start-traefik-db:
+	$(info Starting traefik and db)
+	docker-compose -f docker-compose-traefik-db.yml up
+
+start:
+	$(info Starting all services)
+	$(MAKE) -j6 start-clustering start-embedding start-load-balancer start-segmentation start-tracking start-traefik-db
 
 clean:
 	cd protobuf && $(MAKE) clean
@@ -32,4 +66,4 @@ clean:
 	cd segmentation && $(MAKE) clean
 	cd tracking && $(MAKE) clean
 
-.PHONY: all protobuf clustering embedding load-balancer segmentation tracking clean
+.PHONY: all protobuf clustering embedding load-balancer segmentation tracking start clean
