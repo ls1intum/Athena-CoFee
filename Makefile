@@ -4,7 +4,10 @@ export
 
 all: | setup start
 
-setup: setup-protobuf setup-clustering setup-embedding setup-load-balancer setup-segmentation setup-tracking
+setup: .venv setup-protobuf setup-clustering setup-embedding setup-load-balancer setup-segmentation setup-tracking
+
+.venv:
+	python -m venv .venv
 
 setup-protobuf:
 	$(info Building protobuf files)
