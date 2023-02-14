@@ -11,3 +11,5 @@ start:
 
 clean:
 	rm -rf .venv
+
+.PHONY: all start clean

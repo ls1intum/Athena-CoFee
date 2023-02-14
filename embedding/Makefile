@@ -9,11 +9,11 @@ all: .venv text_preprocessing ./.venv/nltk_data models
 text_preprocessing: ../text_preprocessing
 	cp -r ../text_preprocessing ./src/
 
-./.venv/nltk_data: | .venv
+./.venv/nltk_data: .venv
 	mkdir -p ./.venv/nltk_data
 	source .venv/bin/activate; python -m nltk.downloader -d ./.venv/nltk_data stopwords wordnet punkt
 
-models:
+models: ./src/resources/models/Makefile
 	@$(MAKE) -C ./src/resources/models
 
 start:
@@ -23,3 +23,5 @@ clean:
 	rm -rf .venv
 	rm -rf ./src/text_preprocessing
 	rm -rf ./src/resources/models/elmo*
+
+.PHONY: all start clean

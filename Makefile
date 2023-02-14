@@ -2,7 +2,7 @@
 include .local.env
 export
 
-all: setup start
+all: | setup start
 
 setup: setup-protobuf setup-clustering setup-embedding setup-load-balancer setup-segmentation setup-tracking
 
@@ -18,7 +18,7 @@ setup-embedding:
 	$(info Building embedding)
 	cd embedding && $(MAKE)
 
-setup-load-balancer:
+setup-load-balancer: setup-protobuf
 	$(info Building load-balancer)
 	cd load-balancer && $(MAKE)
 
@@ -30,23 +30,23 @@ setup-tracking:
 	$(info Building tracking)
 	cd tracking && $(MAKE)
 
-start-clustering:
+start-clustering: setup-clustering
 	$(info Starting clustering)
 	$(MAKE) -C clustering start
 
-start-embedding:
+start-embedding: setup-embedding
 	$(info Starting embedding)
 	$(MAKE) -C embedding start
 
-start-load-balancer:
+start-load-balancer: setup-load-balancer
 	$(info Starting load-balancer)
 	$(MAKE) -C load-balancer start
 
-start-segmentation:
+start-segmentation: setup-segmentation
 	$(info Starting segmentation)
 	$(MAKE) -C segmentation start
 
-start-tracking:
+start-tracking: setup-tracking
 	$(info Starting tracking)
 	$(MAKE) -C tracking start
 
@@ -66,4 +66,4 @@ clean:
 	cd segmentation && $(MAKE) clean
 	cd tracking && $(MAKE) clean
 
-.PHONY: all protobuf clustering embedding load-balancer segmentation tracking start clean
+.PHONY: all setup setup-protobuf setup-clustering setup-embedding setup-load-balancer setup-segmentation setup-tracking start-clustering start-embedding start-load-balancer start-segmentation start-tracking start-traefik-db start clean
