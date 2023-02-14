@@ -9,7 +9,7 @@ all: .venv text_preprocessing ./.venv/nltk_data models
 text_preprocessing: ../text_preprocessing
 	cp -r ../text_preprocessing ./src/
 
-./.venv/nltk_data:
+./.venv/nltk_data: | .venv
 	mkdir -p ./.venv/nltk_data
 	source .venv/bin/activate; python -m nltk.downloader -d ./.venv/nltk_data stopwords wordnet punkt
 
