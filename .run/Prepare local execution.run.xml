@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Prepare local execution" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile">
+  <configuration default="false" name="Prepare local execution" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" activateToolWindowBeforeRun="false">
     <makefile filename="$PROJECT_DIR$/Makefile" target="" workingDirectory="$PROJECT_DIR$" arguments="">
       <envs />
     </makefile>

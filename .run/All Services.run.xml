@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="All Services" type="CompoundRunConfigurationType">
-    <toRun name="Traefik and DB" type="docker-deploy" />
+    <toRun name="docker-compose-traefik-db.yml: Compose Deployment" type="docker-deploy" />
     <toRun name="clustering" type="PythonConfigurationType" />
     <toRun name="embedding" type="PythonConfigurationType" />
     <toRun name="load-balancer" type="PythonConfigurationType" />
