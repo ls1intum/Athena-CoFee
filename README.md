@@ -57,32 +57,39 @@ docker-compose down
 
 For further information have a look at the [Compose file reference](https://docs.docker.com/compose/compose-file/) and the [Compose command-line reference](https://docs.docker.com/compose/reference/overview/).
 
-### Running the Services Directly
-Prepare all local depencies by running
+### Running the Services Using make
+Prepare all local dependencies and start the services by running
 
 ```bash
-make setup -j6 # j6 is optional, but speeds up the process
+make -j6 # j6 is optional, but speeds up the process
 ```
-in the root directory. This will call `make` in all subdirectories, which initializes virtual environments, installs dependencies and downloads required models.
+in the root directory. 
+This will call `make` in all subdirectories, 
+which initializes virtual environments, 
+installs dependencies and downloads required models.
+After that the services will be started automatically.
 
-If you are using PyCharm, you can also start the setup using the `Prepare local execution` run configuration.
+There is one special target in the `Makefile` that will start traefik and the MongoDB database in a docker container 
+to redirect to the services running on your local machine.
 
-After that, you can start all services at once by running
+You can always just directly use `make` and it will automatically detect changed dependencies.
 
-```bash
-make start
-```
+### Running the Services Using PyCharm
+If you are using PyCharm, you can also start all services by running the `All Services`-configuration.
+This has the added advantage that you can debug the services directly from PyCharm by running the configuration in debug mode.
 
-There is one special target in the `Makefile` that will start traefik and the MongoDB database in a docker container to redirect to the services running on your local machine.
+All of the dependencies will be installed automatically when first starting the services.
 
-If you are using PyCharm, you can also start all services by running the `All Services`-configuration. This has the added advantage that you can debug the services directly from PyCharm by running the configuration in debug mode. Note that you need to have the [EnvFile plugin](https://plugins.jetbrains.com/plugin/7861-envfile) installed so that the environment file loading can take place from the run configuration.
+Note that you need to have the [EnvFile plugin](https://plugins.jetbrains.com/plugin/7861-envfile) installed so that the environment file loading can take place from the run configuration.
+
+### Notes on Running the Services Without Docker
 
 Running the services directly has multiple advantages:
 - You can use the Debug-Mode of your IDE to debug the services
 - You can restart the services individually without restarting the whole system
 - The services will restart themselves if you change the code (the uvicorn-reloader is enabled by default)
 
-This way of running the services will use the environment variables from `.local.env`.
+Using makefiles or PyCharm will use the environment variables from `.local.env`.
 
 ## Basic API Overview
 By default, a traefik-container will manage API-Endpoints and expose them on port 80 (default HTTP-port).
