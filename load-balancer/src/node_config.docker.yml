@@ -2,9 +2,9 @@
 docker_nodes:
   # This url resolves to the API of the traefik-container inside the docker-network started via docker-compose
   - traefik_service_api: http://athene-traefik:8080/api/http/services/
-    segmentation_service_name: segmentation-athene@docker
-    embedding_service_name: embedding-athene@docker
-    clustering_service_name: clustering-athene@docker
+    segmentation_service_name: segmentation-athena@docker
+    embedding_service_name: embedding-athena@docker
+    clustering_service_name: clustering-athena@docker
     trigger_route: /trigger
 
 # To use a GPU server, uncomment the following lines and change the values to match your setup.

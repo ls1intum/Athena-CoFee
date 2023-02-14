@@ -22,6 +22,10 @@ services:
   load-balancer:
     depends_on:
       - protobuf
+    environment:
+      # This is needed to rewrite the callback URL in the load-balancer
+      # when running in Docker, if Artemis is running on the host machine
+      - REWRITE_LOCALHOST_CALLBACK_URL_TO=http://host.docker.internal
     volumes:
       - ./load-balancer/src:/usr/src/app/src
 
