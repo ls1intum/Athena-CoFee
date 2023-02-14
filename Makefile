@@ -62,6 +62,7 @@ start:
 	$(MAKE) -j6 start-clustering start-embedding start-load-balancer start-segmentation start-tracking start-traefik-db
 
 clean:
+	rm -rf .venv
 	cd protobuf && $(MAKE) clean
 	cd clustering && $(MAKE) clean
 	cd embedding && $(MAKE) clean
