@@ -10,4 +10,4 @@ python_client: clustering.proto
 
 clean:
 	rm -rf ../client/src/main/java/de/tum/in/ase/athene/protobuf/*.java
-	rm ../load-balancer/src/clustering_pb2.py
+	rm -f ../load-balancer/src/clustering_pb2.py
