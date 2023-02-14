@@ -1,15 +1,15 @@
 #!make
 
-all: venv text_preprocessing nltk
+all: .venv text_preprocessing ./.venv/nltk_data
 
-venv: requirements.txt
+.venv: requirements.txt
 	python -m venv .venv
 	source .venv/bin/activate; pip install -r requirements.txt --no-deps
 
 text_preprocessing: ../text_preprocessing
 	cp -r ../text_preprocessing ./src/
 
-nltk:
+./.venv/nltk_data:
 	mkdir -p ./.venv/nltk_data
 	source .venv/bin/activate; python -m nltk.downloader -d ./.venv/nltk_data stopwords wordnet punkt
 
