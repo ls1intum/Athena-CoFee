@@ -11,8 +11,8 @@ class Connection:
         dbhost = str(os.environ['DATABASE_HOST']) if "DATABASE_HOST" in os.environ else "database"
         dbport = int(os.environ['DATABASE_PORT']) if "DATABASE_PORT" in os.environ else 27017
         dbname = str(os.environ['DATABASE_NAME']) if "DATABASE_NAME" in os.environ else "athene_db"
-        dbuser = str(os.environ['DATABASE_USER']) if "DATABASE_USER" in os.environ else "embedding"
-        dbpwd = str(os.environ['DATABASE_PWD']) if "DATABASE_PWD" in os.environ else "embedding_password"
+        dbuser = str(os.environ['EMBEDDING_DATABASE_USER']) if "EMBEDDING_DATABASE_USER" in os.environ else "embedding"
+        dbpwd = str(os.environ['EMBEDDING_DATABASE_PWD']) if "EMBEDDING_DATABASE_PWD" in os.environ else "embedding_password"
         self.client = pymongo.MongoClient(host=dbhost, port=dbport, username=dbuser, password=dbpwd,
                                           authSource=dbname)
         self.db = self.client[dbname]
