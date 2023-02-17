@@ -3,15 +3,16 @@
 This service balances the load for incoming Artemis-requests to underlying compute nodes.
 
 ## Start locally (without Docker)
-Locally, the service runs on port 8000. To start it, 
 
-  - First, run the following command for some preparations:
+Locally, the service runs on port 8000. To start it,
+
+*   First, run the following command for some preparations:
     ```bash
     make
     ```
     This will create a virtual environment and install all dependencies.
 
-  - After that, configure the used virtual environment:
+*   After that, configure the used virtual environment:
     ```bash
     source venv/bin/activate
     ```
@@ -19,19 +20,21 @@ Locally, the service runs on port 8000. To start it,
     In PyCharm, you can even go to `File > Open`, choose the embedding folder
     and then choose the `Attach` option.
 
-  - Then, you can start the load balancer using `python start.py` or using your IDE.
+*   Then, you can start the load balancer using `python start.py` or using your IDE.
 
 ## Start with Docker
+
 Use the `docker-compose.yml` file from the parent directory
 to start the embedding service (and all others) with Docker.
 
 ## API
+
 The following API-routes will be available after start:
 
--   [http://localhost:8000/queueStatus](http://localhost:8000/queueStatus) (GET) to get queue statistics
--   [http://localhost:8000/submit](http://localhost:8000/submit) (POST) for Artemis to submit a new Job
--   [http://localhost:8000/getTask](http://localhost:8000/getTask) (GET) to get a queued task out of the queue
--   [http://localhost:8000/sendTaskResult](http://localhost:8000/sendTaskResult) (POST) to send back the result of a task to the load balancer
+*   <http://localhost:8000/queueStatus> (GET) to get queue statistics
+*   <http://localhost:8000/submit> (POST) for Artemis to submit a new Job
+*   <http://localhost:8000/getTask> (GET) to get a queued task out of the queue
+*   <http://localhost:8000/sendTaskResult> (POST) to send back the result of a task to the load balancer
 
 Input example JSON for POST on http://localhost:8000/submit
 
