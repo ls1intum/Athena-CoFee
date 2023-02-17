@@ -4,4 +4,4 @@ import spacy
 spacy.cli.download("en_core_web_sm")
 
 # Patch import
-from .patch.patch_spacy_tags import TAG_MAP
+from .patch.patch_spacy_tags import TAG_MAP  # noqa: F401

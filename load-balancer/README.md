@@ -5,20 +5,21 @@ This service balances the load for incoming Artemis-requests to underlying compu
 ## Start locally (without Docker)
 Locally, the service runs on port 8000. To start it, 
 
-- First, run the following command for some preparations:
-   ```bash
-   make
+  - First, run the following command for some preparations:
+    ```bash
+    make
     ```
-  This will create a virtual environment and install all dependencies.
-- After that, configure the used virtual environment:
+    This will create a virtual environment and install all dependencies.
+
+  - After that, configure the used virtual environment:
     ```bash
     source venv/bin/activate
     ```
-  If you use an IDE, you can also configure the virtual environment there.
-  In PyCharm, you can even go to `File > Open`, choose the embedding folder
-  and then choose the `Attach` option.
-- Then, you can start the load balancer using `python start.py` or using your IDE.
+    If you use an IDE, you can also configure the virtual environment there.
+    In PyCharm, you can even go to `File > Open`, choose the embedding folder
+    and then choose the `Attach` option.
 
+  - Then, you can start the load balancer using `python start.py` or using your IDE.
 
 ## Start with Docker
 Use the `docker-compose.yml` file from the parent directory
