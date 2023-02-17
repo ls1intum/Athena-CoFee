@@ -117,6 +117,24 @@ The following API-routes are available after start:
 Traefik provides a dashboard to monitor the status of underlying components.
 This dashboard is available on <http://localhost:9081/dashboard> by default.
 
+## Test Instructions
+
+1.  Set up a local instance of Artemis. Configure Athene exactly [like in the setup instructions](https://docs.artemis.cit.tum.de/dev/setup/#athene-service). Make sure that the Artemis `server_name` in the local configuration is set to `http://localhost:8080` so that Athene knows to call back this endpoint. Also, double-check that the *Athene* profile is enabled.
+
+2.  There are 2 paths to continue now. In the root directory:
+    1.  Run `docker-compose up --build`.
+    2.  Run `make setup -j6` and then `make start`.
+
+3.  Go to http://localhost:8080, create a course, then create a text exercise.
+
+4.  Use at least 10 test accounts to participate in the exercise. Otherwise, Athene will not start.
+
+5.  Edit the exercise settings and set the due date to be the next full minute that has not yet passed.
+
+6.  Wait a bit, then log messages should appear in the different microservices in Athene.
+
+7.  To verify that Artemis gets called back by Athene, it might be helpful to set a breakpoint in `AtheneService.java` (in Artemis) in the `processResult` method.
+
 ## Configuration
 
 For configuration of the Athene system you can make use of the `.env`-file in the repository. All variables in there are used in the `docker-compose.yml` to bring up the Athene system.
