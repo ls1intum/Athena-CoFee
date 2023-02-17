@@ -55,9 +55,9 @@ For further information have a look at the [Compose file reference](https://docs
 
 Prepare all local dependencies and start the services by running
 
-```bash
-make -j6 # j6 is optional, but speeds up the process
-```
+  ```bash
+  make -j6 # j6 is optional, but speeds up the process
+  ```
 
 in the root directory.
 This will call `make` in all subdirectories,

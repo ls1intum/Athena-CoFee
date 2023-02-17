@@ -4,4 +4,4 @@ import spacy
 spacy.cli.download("en_core_web_sm")
 
 # Patch import
-from .patch.patch_spacy_tags import TAG_MAP  # flake8: noqa
+from .patch.patch_spacy_tags import *  # flake8: noqa
