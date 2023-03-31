@@ -48,7 +48,7 @@ class TestClustering(TestCase):
         embeddings = self.embeddings_flowers + self.embeddings_software + self.embeddings_law
         clusters = self.clustering.cluster(embeddings)[0]
         clusters_flowers, clusters_software, clusters_law = np.split(clusters, [4, 8])
-        # test: there are 3 different clusters
+        print("Clusters: ", clusters)
         self.assertEqual(len(set(clusters)), 3)
         # test: all sentences with the same topic are in the same cluster
         self.assertEqual(len(set(clusters_flowers)), 1)
