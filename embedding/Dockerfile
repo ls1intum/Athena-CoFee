@@ -9,6 +9,7 @@ COPY ./embedding/src/resources src/resources
 RUN make -C src/resources/models
 RUN mkdir -p /usr/lib/nltk_data \
  && python -m nltk.downloader -d /usr/lib/nltk_data stopwords wordnet punkt
+ENV CUDA_VISIBLE_DEVICES=""
 
 COPY ./embedding/src/ src/
 COPY ./text_preprocessing src/text_preprocessing
