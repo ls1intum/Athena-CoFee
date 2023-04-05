@@ -5,6 +5,7 @@ from collections import Counter
 
 from src.clustering import Clustering
 
+# needed for compatibility with nltk, which assumes an old numpy version
 np.int = int
 np.bool = bool
 
