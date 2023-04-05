@@ -3,6 +3,9 @@ LABEL author="Jan Philip Bernius <janphilip.bernius@tum.de>"
 
 COPY ./embedding/requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt --no-cache-dir --no-deps
+# install pytorch GPU version or CPU version depending on the build context
+ARG USE_GPU=1
+RUN pip install torch==1.13.1${USE_GPU:++cpu} -f https://download.pytorch.org/whl/torch_stable.html
 
 WORKDIR /usr/src/app
 COPY ./embedding/src/resources src/resources

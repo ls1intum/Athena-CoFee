@@ -13,6 +13,7 @@ scikit-learn==1.2.1
 scipy==1.10.0
 spacy==3.5.0
 uvicorn==0.20.0
+# pytorch needs to be installed separately: it depends on whether you have a GPU or not
 
 # dependencies of dependencies,
 # needed for conflict resolving of old dependencies
@@ -100,7 +101,6 @@ thinc==8.1.7
 threadpoolctl==3.1.0
 toml==0.10.2
 tomli==2.0.1
-torch==1.13.1
 tqdm==4.64.1
 typer==0.7.0
 types-toml==0.10.8.3
