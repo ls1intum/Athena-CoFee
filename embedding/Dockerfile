@@ -2,7 +2,7 @@ FROM python:3.10.9
 LABEL author="Jan Philip Bernius <janphilip.bernius@tum.de>"
 
 COPY ./embedding/requirements.txt /tmp/requirements.txt
-RUN pip install --no-cache-dir --no-deps -qr /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt --no-cache-dir --no-deps
 
 WORKDIR /usr/src/app
 COPY ./embedding/src/resources src/resources
