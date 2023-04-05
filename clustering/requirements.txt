@@ -1,6 +1,5 @@
 docutils==0.19
 fastapi==0.90.0
-hdbscan==0.8.29
 joblib==1.1.1
 matplotlib==3.7.0
 numpy==1.24.2

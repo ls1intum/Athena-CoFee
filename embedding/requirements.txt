@@ -2,7 +2,7 @@
 
 # actual dependencies,
 # update here
-allennlp==0.9.0 # needs to be 0.9.0 because after that, Elmo is dropped from the library
+allennlp==0.8.0 # needs to be 0.9.0 because after that, Elmo is dropped from the library
 fastapi==0.90.0
 joblib==1.2.0
 nltk==3.8.1

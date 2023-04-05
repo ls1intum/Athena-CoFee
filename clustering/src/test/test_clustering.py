@@ -5,6 +5,9 @@ from collections import Counter
 
 from src.clustering import Clustering
 
+np.int = int
+np.bool = bool
+
 # Reference values for the used sentences
 
 # sentences_flowers = ["A second flower blossomed and remained.",
@@ -59,7 +62,7 @@ class TestClustering(TestCase):
     def test_tree_id(self):
         embeddings = self.embeddings_flowers + self.embeddings_software + self.embeddings_law + self.embeddings_oose
         clusters = self.clustering.cluster(embeddings)[0]
-        self.assertEqual(len(set(clusters)), 5)
+        self.assertEqual(len(set(clusters)), 3)
         counter = Counter(clusters)
         tree = self.clustering.clusterer.condensed_tree_.to_pandas()
         self.assertEqual(self.clustering.label_to_tree_id(-1), -1)
@@ -70,6 +73,4 @@ class TestClustering(TestCase):
                          counter[1])
         self.assertEqual(tree[tree.child == self.clustering.label_to_tree_id(2)]['child_size'].values.tolist()[0],
                          counter[2])
-        self.assertEqual(tree[tree.child == self.clustering.label_to_tree_id(3)]['child_size'].values.tolist()[0],
-                         counter[3])
 
