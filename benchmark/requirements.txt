@@ -8,4 +8,4 @@ websocket-client==0.44.0
 
 pyocclient==0.4
 
-nltk==3.6.5
+nltk==3.6.6
