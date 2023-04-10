@@ -1,0 +1,57 @@
+cff-version: 1.2.0
+title: Athena
+message: >-
+  If you want to reference Athena in your work, please cite
+  this article.
+type: software
+authors:
+  - given-names: Jan Philip
+    family-names: Bernius
+    email: janphilip.bernius@tum.de
+    affiliation: Technical University of Munich
+    orcid: 'https://orcid.org/0000-0001-8278-4598'
+repository-code: 'https://github.com/ls1intum/Athena'
+abstract: >-
+  The Athena system generates and suggests computer-aided
+  feedback for textual exercises based on machine learning.
+  Athena utilizes a segment-based grading concept, which
+  links feedback to text segments. Athena automates grading
+  based on topic modeling and an assessment knowledge
+  repository acquired during previous assessments. A
+  language model builds an intermediate representation of
+  the text segments. Hierarchical clustering identifies
+  groups of similar text segments to reduce the grading
+  overhead.
+keywords:
+  - Software engineering
+  - Education
+  - Interactive learning
+  - Automatic assessment
+  - Grading
+  - Assessment support system
+  - Learning
+  - Feedback
+license: MIT
+preferred-citation:
+  type: article
+  authors:
+  - given-names: Jan Philip
+    family-names: Bernius
+    email: janphilip.bernius@tum.de
+    affiliation: Technical University of Munich
+    orcid: 'https://orcid.org/0000-0001-8278-4598'
+  - given-names: Stephan
+    family-names: Krusche
+    email: krusche@in.tum.de
+    affiliation: Technical University of Munich
+    orcid: 'https://orcid.org/0000-0002-4552-644X'
+  - given-names: Bernd
+    family-names: Bruegge
+    email: bernd.bruegge@tum.de
+    affiliation: Technical University of Munich
+    orcid: 'https://orcid.org/0000-0001-8331-0490'
+  doi: "10.1016/j.caeai.2022.100081"
+  journal: "Computers and Education: Artificial Intelligence"
+  title: "Machine learning based feedback on textual student answers in large courses"
+  volume: 3
+  year: 2022
