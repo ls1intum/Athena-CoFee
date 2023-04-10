@@ -9,7 +9,7 @@ import hdbscan
 class Clustering:
 
     clusterer = hdbscan.HDBSCAN(algorithm='best', alpha=1.0, approx_min_span_tree=True,
-                                gen_min_span_tree=False, leaf_size=40, memory=Memory(cachedir=None),
+                                gen_min_span_tree=False, leaf_size=40, memory=Memory(location=None),
                                 metric='braycurtis', min_cluster_size=2, min_samples=None, p=None)
 
     def cluster(self, vectors: List[ElmoVector]) -> Tuple[array, array]:
