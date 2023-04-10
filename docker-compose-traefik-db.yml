@@ -1,0 +1,30 @@
+version: '3'
+
+# Use this docker file to only start Traefik and the database.
+# You will have to start the microservices manually, see the individual READMEs for details.
+
+services:
+  traefik:
+    image: traefik:v2.9.6
+    container_name: athene-traefik-local
+    restart: unless-stopped
+    ports:
+      - ${TRAEFIK_DASHBOARD_PORT}:8080
+      - ${TRAEFIK_HTTP_PORT}:80
+    volumes:
+      - ./traefik/traefik.local.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/traefik-dynamic.local.yml:/etc/traefik/traefik-dynamic.local.yml:ro
+
+  database:
+    image: mongo:latest
+    container_name: athene-mongodb
+    restart: unless-stopped
+    expose:
+      - 27017
+    environment:
+      - MONGO_INITDB_DATABASE=${DATABASE_NAME}
+      - MONGO_INITDB_ROOT_USERNAME=${DATABASE_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD}
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./data/db:/data/db

@@ -4,12 +4,29 @@ version: '3'
 # By that, rebuilding the containers is not needed for code changes locally as long as no requirements change
 
 services:
-  traefik:
+  # traefik:
     # This component does not need to be changed
 
-  load-balancer:
+  # Build protobuf client file for load-balancer
+  # In production, this is done using GitHub Actions
+  protobuf:
+    build:
+      context: .
+      dockerfile: ./protobuf/Dockerfile-python
+    container_name: athene-protobuf
+    working_dir: /protobuf
     volumes:
-      - ./load-balance.yml:/usr/src/app/${LOAD_BALANCER_CONFIG_FILE_PATH}:ro
+      - ./protobuf:/in
+      - ./load-balancer/src:/out
+
+  load-balancer:
+    depends_on:
+      - protobuf
+    environment:
+      # This is needed to rewrite the callback URL in the load-balancer
+      # when running in Docker, if Artemis is running on the host machine
+      - REWRITE_LOCALHOST_CALLBACK_URL_TO=http://host.docker.internal
+    volumes:
       - ./load-balancer/src:/usr/src/app/src
 
   segmentation:
@@ -33,5 +50,5 @@ services:
     volumes:
       - ./tracking/src:/usr/src/app/src
 
-  database:
+  # database:
     # This component does not need to be changed

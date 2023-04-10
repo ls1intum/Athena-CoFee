@@ -1,0 +1,55 @@
+## Dynamic configuration
+http:
+  routers:
+    # http://localhost/queueStatus
+    # http://localhost/submit
+    # http://localhost/getTask
+    # http://localhost/sendTaskResult
+    balancer:
+      rule: "Path(`/queueStatus`,`/submit`,`/getTask`,`/sendTaskResult`)"
+      entryPoints:
+        - web
+      service: balancer
+    # http://localhost/segment
+    segmentation:
+      rule: "Path(`/segment`)"
+      entryPoints:
+        - web
+      service: segmentation
+    # http://localhost/upload
+    # http://localhost/feedback_consistency
+    embedding:
+      rule: "Path(`/upload`,`/feedback_consistency`)"
+      entryPoints:
+        - web
+      service: embedding
+    # http://localhost/tracking
+    tracking:
+      rule: "Path(`/tracking`)"
+      entryPoints:
+        - web
+      service: tracking
+  services:
+    test:
+      loadBalancer:
+        servers: {}
+    balancer:
+      loadBalancer:
+        servers:
+        - url: "http://host.docker.internal:8000"
+    segmentation:
+      loadBalancer:
+        servers:
+        - url: "http://host.docker.internal:8001"
+    embedding:
+      loadBalancer:
+        servers:
+        - url: "http://host.docker.internal:8002"
+    clustering:
+      loadBalancer:
+        servers:
+        - url: "http://host.docker.internal:8003"
+    tracking:
+      loadBalancer:
+        servers:
+        - url: "http://host.docker.internal:8004"

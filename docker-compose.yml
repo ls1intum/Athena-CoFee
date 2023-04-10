@@ -1,10 +1,10 @@
 version: '3'
 
 services:
-# http://localhost:8081/api
-# http://localhost:8081/dashboard
+  # http://localhost:9081/api
+  # http://localhost:9081/dashboard
   traefik:
-    image: traefik:v2.2.1
+    image: traefik:v2.9.6
     container_name: athene-traefik
     restart: unless-stopped
     depends_on:
@@ -20,12 +20,12 @@ services:
       - athene
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik.yml:/etc/traefik/traefik.yml
+      - ./traefik/traefik.docker.yml:/etc/traefik/traefik.yml
 
-# http://localhost/queueStatus
-# http://localhost/submit
-# http://localhost/getTask
-# http://localhost/sendTaskResult
+  # http://localhost/queueStatus
+  # http://localhost/submit
+  # http://localhost/getTask
+  # http://localhost/sendTaskResult
   load-balancer:
     build:
       context: .
@@ -33,18 +33,14 @@ services:
     image: athene-load-balancer
     container_name: athene-load-balancer
     restart: unless-stopped
-#    ports:
-#      - 8000:8000
     expose:
        - 8000
     environment:
-      - CONFIG_FILE_PATH=${LOAD_BALANCER_CONFIG_FILE_PATH}
-      - AUTHORIZATION_SECRET=${LOAD_BALANCER_AUTHORIZATION_SECRET}
+      - LOAD_BALANCER_CONFIG_FILE_PATH
+      - AUTHORIZATION_SECRET
     working_dir: /usr/src/app
     networks:
       - athene
-    volumes:
-      - ./load-balance.yml:/usr/src/app/${LOAD_BALANCER_CONFIG_FILE_PATH}:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.balancer.rule=Path(`/queueStatus`,`/submit`,`/getTask`,`/sendTaskResult`)
@@ -62,23 +58,21 @@ services:
     restart: unless-stopped
     depends_on:
       - load-balancer
-#    ports:
-#      - 8001:8000
     expose:
        - 8000
     environment:
-      - BALANCER_AUTHORIZATION_SECRET=${LOAD_BALANCER_AUTHORIZATION_SECRET}
-      - BALANCER_QUEUE_FREQUENCY=${BALANCER_QUEUE_FREQUENCY}
-      - BALANCER_GETTASK_URL=${BALANCER_GETTASK_URL}
-      - BALANCER_SENDRESULT_URL=${BALANCER_SENDRESULT_URL}
+      - AUTHORIZATION_SECRET
+      - BALANCER_QUEUE_FREQUENCY
+      - BALANCER_GETTASK_URL
+      - BALANCER_SENDRESULT_URL
     working_dir: /usr/src/app
     networks:
       - athene
     labels:
       - traefik.enable=true
 
-# http://localhost/upload
-# http://localhost/feedback_consistency
+  # http://localhost/upload
+  # http://localhost/feedback_consistency
   embedding:
     build:
       context: .
@@ -89,21 +83,19 @@ services:
     depends_on:
       - load-balancer
       - database
-#    ports:
-#      - 8002:8000
     expose:
        - 8000
     environment:
-      - DATABASE_HOST=${DATABASE_HOST}
-      - DATABASE_PORT=${DATABASE_PORT}
-      - DATABASE_NAME=${DATABASE_NAME}
-      - DATABASE_USER=${EMBEDDING_DATABASE_USER}
-      - DATABASE_PWD=${EMBEDDING_DATABASE_PWD}
-      - BALANCER_AUTHORIZATION_SECRET=${LOAD_BALANCER_AUTHORIZATION_SECRET}
-      - BALANCER_QUEUE_FREQUENCY=${BALANCER_QUEUE_FREQUENCY}
-      - BALANCER_GETTASK_URL=${BALANCER_GETTASK_URL}
-      - CHUNK_SIZE=${EMBEDDING_CHUNK_SIZE}
-      - BALANCER_SENDRESULT_URL=${BALANCER_SENDRESULT_URL}
+      - DATABASE_HOST
+      - DATABASE_PORT
+      - DATABASE_NAME
+      - EMBEDDING_DATABASE_USER
+      - EMBEDDING_DATABASE_PWD
+      - AUTHORIZATION_SECRET
+      - BALANCER_QUEUE_FREQUENCY
+      - BALANCER_GETTASK_URL
+      - EMBEDDING_CHUNK_SIZE
+      - BALANCER_SENDRESULT_URL
     working_dir: /usr/src/app
     volumes:
       - ${EMBEDDING_CLOUD_CONFIG_PATH}:/usr/src/app/src/cloud/config.py:ro
@@ -127,27 +119,25 @@ services:
     depends_on:
       - load-balancer
       - database
-#    ports:
-#      - 8003:8000
     expose:
        - 8000
     environment:
-      - DATABASE_HOST=${DATABASE_HOST}
-      - DATABASE_PORT=${DATABASE_PORT}
-      - DATABASE_NAME=${DATABASE_NAME}
-      - DATABASE_USER=${CLUSTERING_DATABASE_USER}
-      - DATABASE_PWD=${CLUSTERING_DATABASE_PWD}
-      - BALANCER_AUTHORIZATION_SECRET=${LOAD_BALANCER_AUTHORIZATION_SECRET}
-      - BALANCER_QUEUE_FREQUENCY=${BALANCER_QUEUE_FREQUENCY}
-      - BALANCER_GETTASK_URL=${BALANCER_GETTASK_URL}
-      - BALANCER_SENDRESULT_URL=${BALANCER_SENDRESULT_URL}
+      - DATABASE_HOST
+      - DATABASE_PORT
+      - DATABASE_NAME
+      - CLUSTERING_DATABASE_USER
+      - CLUSTERING_DATABASE_PWD
+      - AUTHORIZATION_SECRET
+      - BALANCER_QUEUE_FREQUENCY
+      - BALANCER_GETTASK_URL
+      - BALANCER_SENDRESULT_URL
     working_dir: /usr/src/app
     networks:
       - athene
     labels:
       - traefik.enable=true
 
-# http://localhost/tracking
+  # http://localhost/tracking
   tracking:
     build:
       context: .
@@ -157,17 +147,15 @@ services:
     restart: unless-stopped
     depends_on:
       - database
-#    ports:
-#      - 8004:8000
     expose:
       - 8000
     environment:
-      - JWT_SECRET_BASE64=YWVuaXF1YWRpNWNlaXJpNmFlbTZkb283dXphaVF1b29oM3J1MWNoYWlyNHRoZWUzb2huZ2FpM211bGVlM0VpcAo=
-      - DATABASE_HOST=database
-      - DATABASE_PORT=27017
-      - DATABASE_NAME=athene_db
-      - DATABASE_USER=tracking
-      - DATABASE_PWD=tracking_password
+      - AUTHORIZATION_SECRET
+      - DATABASE_HOST
+      - DATABASE_PORT
+      - DATABASE_NAME
+      - TRACKING_DATABASE_USER
+      - TRACKING_DATABASE_PWD
     working_dir: /usr/src/app
     networks:
       - athene

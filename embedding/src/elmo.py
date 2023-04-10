@@ -1,3 +1,9 @@
+import numpy as np
+# needed for compatibility with nltk, which assumes an old numpy version
+np.int = int
+np.bool = bool
+np.float = float
+
 from logging import getLogger
 from typing import List, Tuple
 from numpy import ndarray

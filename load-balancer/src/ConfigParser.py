@@ -29,7 +29,7 @@ class ConfigParser:
     def parseConfig(self, node_type):
         # Read config.yml file
         try:
-            filepath = str(os.environ['CONFIG_FILE_PATH']) if "CONFIG_FILE_PATH" in os.environ else "src/compute_node_config.yml"
+            filepath = str(os.environ['LOAD_BALANCER_CONFIG_FILE_PATH']) if "LOAD_BALANCER_CONFIG_FILE_PATH" in os.environ else "src/node_config.docker.yml"
             with open(filepath, 'r') as stream:
                 config = yaml.safe_load(stream)
         except Exception as e:

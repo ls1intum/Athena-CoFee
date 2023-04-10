@@ -19,7 +19,7 @@ app = FastAPI()
 async def track(request: Request, response: Response):
     feedback = await request.json()
     jwt_token = request.headers.get('x-athene-tracking-authorization')
-    secret_base64 = environ['JWT_SECRET_BASE64']
+    secret_base64 = environ['AUTHORIZATION_SECRET']
     try:
         encoded_jwt_token = decode(jwt_token, base64.b64decode(secret_base64), verify=True, algorithms=['HS256'])
         if encoded_jwt_token.get('result_id') != feedback.get('participation').get('results')[0].get('id'):

@@ -1,0 +1,21 @@
+# Configure compute nodes running locally (localhost)
+
+compute_nodes:
+  - name: segmentation-stand-alone
+    trigger_url: http://localhost:8001/trigger
+    type: segmentation
+
+  - name: embedding-stand-alone
+    trigger_url: http://localhost:8002/trigger
+    type: embedding
+
+  - name: clustering-stand-alone
+    trigger_url: http://localhost:8003/trigger
+    type: clustering
+
+# To use a GPU server, uncomment the following lines and change the values to match your setup.
+#  - name: gpu-server
+#    trigger_username: athene_user
+#    trigger_password: athene_password
+#    trigger_url: https://bamboo.example.com/rest/api/latest/queue/PLAN-KEY?JOB1&ExecuteAllStages
+#    type: gpu

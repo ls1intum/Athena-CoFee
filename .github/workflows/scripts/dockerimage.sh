@@ -10,7 +10,9 @@ TAG=$(git rev-parse --short "$GITHUB_SHA")              # Tag image with short c
 
 # Build and Push image
 echo -e "INFO: Build and Push ${IMAGE}:${TAG}"
-if ! docker build . --file ${COMPONENT}/Dockerfile --tag ${IMAGE}:${TAG}; then
+# disable GPU because we don't have a GPU in the GitHub Actions runner
+if ! docker build . --file "${COMPONENT}/Dockerfile" --tag "${IMAGE}:${TAG}" --build-arg GPU=0; then
+  echo -e "ERROR: Failed to build ${IMAGE}:${TAG}"
 	exit 1
 fi
 docker push ${IMAGE}:${TAG}

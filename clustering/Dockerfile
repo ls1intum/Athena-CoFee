@@ -1,8 +1,10 @@
-FROM python:3.7.7
+FROM python:3.10.9
 LABEL author="Jan Philip Bernius <janphilip.bernius@tum.de>"
 
 COPY ./clustering/requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -qr /tmp/requirements.txt
+# additional flag needed in hdbscan 0.8.29, see https://github.com/scikit-learn-contrib/hdbscan/issues/457
+RUN pip install --no-cache-dir hdbscan==0.8.29 --no-binary :all: --use-feature=no-binary-enable-wheel-cache
 
 WORKDIR /usr/src/app
 COPY ./clustering/src/ src/

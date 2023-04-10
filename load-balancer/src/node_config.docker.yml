@@ -1,0 +1,16 @@
+# Configure compute nodes being managed by docker swarm and registered to traefik
+docker_nodes:
+  # This url resolves to the API of the traefik-container inside the docker-network started via docker-compose
+  - traefik_service_api: http://athene-traefik:8080/api/http/services/
+    segmentation_service_name: segmentation-athena@docker
+    embedding_service_name: embedding-athena@docker
+    clustering_service_name: clustering-athena@docker
+    trigger_route: /trigger
+
+# To use a GPU server, uncomment the following lines and change the values to match your setup.
+#compute_nodes:
+#  - name: gpu-server
+#    trigger_username: athene_user
+#    trigger_password: athene_password
+#    trigger_url: https://bamboo.example.com/rest/api/latest/queue/PLAN-KEY?JOB1&ExecuteAllStages
+#    type: gpu

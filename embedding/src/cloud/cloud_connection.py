@@ -17,7 +17,8 @@ class CloudConnection:
             try:
                 CloudConnection.cloud.login(nextcloud_credentials["login"], nextcloud_credentials["password"])
             except HTTPResponseError as e:
-                CloudConnection.__logger.error("connection to cloud failed. Please check your credentials.")
+                CloudConnection.__logger.warning(
+                    "(not critical) Connection to cloud failed. Please check your credentials.")
 
 
     @staticmethod

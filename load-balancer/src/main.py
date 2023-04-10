@@ -87,7 +87,16 @@ def triggerNodes(node_type: str):
             requests.post(node.url, timeout=5)
 
 
+def potentiallyRewriteCallbackUrl(url: str):
+    is_localhost_url = url.startswith("http://localhost/") or url.startswith("http://localhost:")
+    if is_localhost_url and "REWRITE_LOCALHOST_CALLBACK_URL_TO" in os.environ:
+        logger.info("Rewriting localhost callback url to {}".format(os.environ["REWRITE_LOCALHOST_CALLBACK_URL_TO"]))
+        return url.replace("http://localhost", os.environ["REWRITE_LOCALHOST_CALLBACK_URL_TO"], 1)
+    return url
+
+
 def sendBackResults(job: AtheneJob):
+    job.callback_url = potentiallyRewriteCallbackUrl(job.callback_url)
     logger.info("Sending back results for jobId {} to Artemis (URL: {})".format(job.id, job.callback_url))
     response = Protobuf.AtheneResponse()
     del job.distanceMatrix
