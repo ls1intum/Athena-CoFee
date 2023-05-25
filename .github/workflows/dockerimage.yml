@@ -7,13 +7,15 @@ jobs:
   athene-load-balancer:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: azure/docker-login@v1
+    - uses: actions/checkout@v2
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
       with:
-        login-server: docker.pkg.github.com
+        registry: ghcr.io
         username: ${GITHUB_ACTOR}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - uses: azure/docker-login@v1
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -32,13 +34,15 @@ jobs:
   athene-segmentation:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: azure/docker-login@v1
+    - uses: actions/checkout@v2
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
       with:
-        login-server: docker.pkg.github.com
+        registry: ghcr.io
         username: ${GITHUB_ACTOR}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - uses: azure/docker-login@v1
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -49,13 +53,15 @@ jobs:
   athene-embedding:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: azure/docker-login@v1
+    - uses: actions/checkout@v2
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
       with:
-        login-server: docker.pkg.github.com
+        registry: ghcr.io
         username: ${GITHUB_ACTOR}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - uses: azure/docker-login@v1
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -68,13 +74,15 @@ jobs:
   athene-clustering:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: azure/docker-login@v1
+    - uses: actions/checkout@v2
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
       with:
-        login-server: docker.pkg.github.com
+        registry: ghcr.io
         username: ${GITHUB_ACTOR}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - uses: azure/docker-login@v1
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -87,13 +95,15 @@ jobs:
   athene-tracking:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: azure/docker-login@v1
+    - uses: actions/checkout@v2
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
       with:
-        login-server: docker.pkg.github.com
+        registry: ghcr.io
         username: ${GITHUB_ACTOR}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - uses: azure/docker-login@v1
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}

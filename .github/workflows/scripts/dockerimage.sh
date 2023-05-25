@@ -4,9 +4,9 @@ COMPONENT=$1      # Parameter $1 (Component): either "load-balancer", "segmentat
 
 echo -e "INFO: Building ${COMPONENT}-component"
 
-REGISTRY=docker.pkg.github.com                          # Address of Docker Registry
-IMAGE=${REGISTRY}/ls1intum/athene/athene-${COMPONENT}   # Name of the Docker image
-TAG=$(git rev-parse --short "$GITHUB_SHA")              # Tag image with short commit hash by default
+REGISTRY=ghcr.io                                  # Address of Docker Registry
+IMAGE=${REGISTRY}/ls1intum/athena/${COMPONENT}    # Name of the Docker image
+TAG=$(git rev-parse --short "$GITHUB_SHA")        # Tag image with short commit hash by default
 
 # Build and Push image
 echo -e "INFO: Build and Push ${IMAGE}:${TAG}"
