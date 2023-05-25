@@ -66,7 +66,7 @@ pathy==0.10.1
 Pillow==9.4.0
 pluggy==1.0.0
 preshed==3.0.8
-protobuf==3.20.2
+protobuf==3.20.3
 pydantic==1.10.4
 Pygments==2.14.0
 pyocclient==0.6
