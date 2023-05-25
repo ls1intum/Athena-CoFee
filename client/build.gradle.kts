@@ -26,7 +26,7 @@ java {
 }
 
 dependencies {
-    implementation("com.google.protobuf", "protobuf-java", "3.15.8")
+    implementation("com.google.protobuf", "protobuf-java", "3.20.3")
 }
 
 publishing {
