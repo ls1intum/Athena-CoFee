@@ -69,7 +69,7 @@ jobs:
     - name: Build and Push the athene-embedding Docker image
       run: ./.github/workflows/scripts/dockerimage.sh "embedding"
     - name: Run unittests for embedding-component
-      run: docker run -i --rm --entrypoint python docker.pkg.github.com/ls1intum/athene/athene-embedding:${GITHUB_REF##*/} -m unittest discover -p test_*.py
+      run: docker run -i --rm --entrypoint python ghcr.io/ls1intum/athena/embedding:${GITHUB_REF##*/} -m unittest discover -p test_*.py
 
   athene-clustering:
     runs-on: ubuntu-latest
@@ -90,7 +90,7 @@ jobs:
     - name: Build and Push the athene-clustering Docker image
       run: ./.github/workflows/scripts/dockerimage.sh "clustering"
     - name: Run unittests for clustering-component
-      run: docker run -i --rm --entrypoint python docker.pkg.github.com/ls1intum/athene/athene-clustering:${GITHUB_REF##*/} -m unittest discover -p test_*.py
+      run: docker run -i --rm --entrypoint python ghcr.io/ls1intum/athena/clustering:${GITHUB_REF##*/} -m unittest discover -p test_*.py
 
   athene-tracking:
     runs-on: ubuntu-latest
