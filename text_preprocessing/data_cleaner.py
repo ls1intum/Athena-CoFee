@@ -1,5 +1,11 @@
 import re
 
+# needed for compatibility with sklearn, which assumes an old numpy version
+import numpy as np
+np.int = int
+np.bool = bool
+np.float = float
+
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 
