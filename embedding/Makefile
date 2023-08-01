@@ -1,6 +1,6 @@
 #!make
 
-all: .venv text_preprocessing ./.venv/nltk_data models
+all: .venv text_preprocessing ./.venv/nltk_data models spacy
 
 .venv: requirements.txt
 	python -m venv .venv
@@ -15,6 +15,9 @@ text_preprocessing: ../text_preprocessing
 
 models: ./src/resources/models/Makefile
 	@$(MAKE) -C ./src/resources/models
+
+spacy:
+	source .venv/bin/activate; python -m spacy download en_core_web_sm
 
 start:
 	source .venv/bin/activate; python start.py
