@@ -1,9 +1,8 @@
 import spacy
-try:
-    from spacy.en import English
-except ImportError:
+if not spacy.util.is_package("en_core_web_sm"):
     # Download the model so that importing it will work
     # see https://stackoverflow.com/a/47297686/4306257
+    print("Downloading the spaCy English model (not installed yet)...")
     spacy.cli.download("en_core_web_sm")
 
 # Patch import
