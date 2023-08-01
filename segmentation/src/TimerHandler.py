@@ -2,6 +2,7 @@ from logging import getLogger
 from src.ProcessingResource import ProcessingResource
 import os
 import threading
+import traceback
 
 process_lock = threading.Lock()     # Lock to prevent multiple calculations and restart during calculation
 # Interval to query task queue (in seconds)
@@ -48,6 +49,7 @@ class TimerThread(threading.Thread):
                     # Query task queue after timeout again
                     is_killed = self._kill.wait(self._interval)
             except Exception as e:
+                traceback.print_exc()
                 self.__logger.error("Exception while processing: {}".format(str(e)))
                 process_lock.release()
                 # Query task queue after timeout again
