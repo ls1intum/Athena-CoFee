@@ -21,6 +21,10 @@ RUN mkdir -p /usr/lib/nltk_data \
 # we need to upgrade numpy again for it to be detected by pytorch later
 RUN pip install --no-cache-dir numpy==1.24.1
 
+# install spacy dependencies
+COPY ./embedding/Makefile ./
+RUN make -C . spacy
+
 COPY ./embedding/src/ src/
 COPY ./text_preprocessing src/text_preprocessing
 
