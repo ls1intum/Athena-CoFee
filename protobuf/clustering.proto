@@ -2,9 +2,6 @@ syntax = "proto3";
 
 // import "job.proto";
 
-option java_multiple_files = true;
-option java_package = "de.tum.cit.ase.athena.protobuf";
-
 message Segment {
     string id = 1;
     optional int32 submissionId = 2;
