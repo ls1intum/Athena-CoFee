@@ -4,7 +4,7 @@ export
 
 all: | setup start
 
-setup: .venv setup-protobuf setup-clustering setup-embedding setup-load-balancer setup-segmentation setup-tracking
+setup: .venv setup-protobuf setup-clustering setup-embedding setup-load-balancer setup-segmentation
 
 .venv:
 	python -m venv .venv
@@ -29,10 +29,6 @@ setup-segmentation:
 	$(info Building segmentation)
 	cd segmentation && $(MAKE)
 
-setup-tracking:
-	$(info Building tracking)
-	cd tracking && $(MAKE)
-
 start-clustering: setup-clustering
 	$(info Starting clustering)
 	$(MAKE) -C clustering start
@@ -49,17 +45,13 @@ start-segmentation: setup-segmentation
 	$(info Starting segmentation)
 	$(MAKE) -C segmentation start
 
-start-tracking: setup-tracking
-	$(info Starting tracking)
-	$(MAKE) -C tracking start
-
-start-traefik-db:
-	$(info Starting traefik and db)
-	docker-compose -f docker-compose-traefik-db.yml up
+start-traefik:
+	$(info Starting traefik)
+	docker-compose -f docker-compose-traefik.yml up
 
 start:
 	$(info Starting all services)
-	$(MAKE) -j6 start-clustering start-embedding start-load-balancer start-segmentation start-tracking start-traefik-db
+	$(MAKE) -j6 start-clustering start-embedding start-load-balancer start-segmentation start-traefik
 
 clean:
 	rm -rf .venv
@@ -68,6 +60,5 @@ clean:
 	cd embedding && $(MAKE) clean
 	cd load-balancer && $(MAKE) clean
 	cd segmentation && $(MAKE) clean
-	cd tracking && $(MAKE) clean
 
-.PHONY: all setup setup-protobuf setup-clustering setup-embedding setup-load-balancer setup-segmentation setup-tracking start-clustering start-embedding start-load-balancer start-segmentation start-tracking start-traefik-db start clean
+.PHONY: all setup setup-protobuf setup-clustering setup-embedding setup-load-balancer setup-segmentation start-clustering start-embedding start-load-balancer start-segmentation start-traefik start clean

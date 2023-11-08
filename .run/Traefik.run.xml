@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="docker-compose-traefik-db.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+  <configuration default="false" name="docker-compose-traefik.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
     <deployment type="docker-compose.yml">
       <settings>
         <option name="envFilePath" value="$PROJECT_DIR$/.local.env" />
-        <option name="sourceFilePath" value="docker-compose-traefik-db.yml" />
+        <option name="sourceFilePath" value="docker-compose-traefik.yml" />
       </settings>
     </deployment>
     <method v="2" />

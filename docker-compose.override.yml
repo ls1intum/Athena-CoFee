@@ -45,10 +45,3 @@ services:
   clustering:
     volumes:
       - ./clustering/src:/usr/src/app/src
-
-  tracking:
-    volumes:
-      - ./tracking/src:/usr/src/app/src
-
-  # database:
-    # This component does not need to be changed

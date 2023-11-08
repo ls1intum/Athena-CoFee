@@ -19,7 +19,6 @@ timer_handler.startTimerThread()
 
 app = FastAPI()
 app.include_router(UploadingResource.router)
-app.include_router(FeedbackCommentRequest.router)
 
 
 @app.post("/trigger")

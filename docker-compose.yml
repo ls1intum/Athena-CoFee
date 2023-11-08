@@ -11,7 +11,6 @@ services:
       # These components have API endpoints managed by traefik
       - load-balancer
       - embedding
-      - tracking
     ports:
       - ${TRAEFIK_DASHBOARD_PORT}:8080
       - ${TRAEFIK_HTTP_PORT}:80
@@ -82,15 +81,9 @@ services:
     restart: unless-stopped
     depends_on:
       - load-balancer
-      - database
     expose:
        - 8000
     environment:
-      - DATABASE_HOST
-      - DATABASE_PORT
-      - DATABASE_NAME
-      - EMBEDDING_DATABASE_USER
-      - EMBEDDING_DATABASE_PWD
       - AUTHORIZATION_SECRET
       - BALANCER_QUEUE_FREQUENCY
       - BALANCER_GETTASK_URL
@@ -118,15 +111,9 @@ services:
     restart: unless-stopped
     depends_on:
       - load-balancer
-      - database
     expose:
        - 8000
     environment:
-      - DATABASE_HOST
-      - DATABASE_PORT
-      - DATABASE_NAME
-      - CLUSTERING_DATABASE_USER
-      - CLUSTERING_DATABASE_PWD
       - AUTHORIZATION_SECRET
       - BALANCER_QUEUE_FREQUENCY
       - BALANCER_GETTASK_URL
@@ -136,52 +123,6 @@ services:
       - athene
     labels:
       - traefik.enable=true
-
-  # http://localhost/tracking
-  tracking:
-    build:
-      context: .
-      dockerfile: ./tracking/Dockerfile
-    image: athene-tracking
-    container_name: athene-tracking
-    restart: unless-stopped
-    depends_on:
-      - database
-    expose:
-      - 8000
-    environment:
-      - AUTHORIZATION_SECRET
-      - DATABASE_HOST
-      - DATABASE_PORT
-      - DATABASE_NAME
-      - TRACKING_DATABASE_USER
-      - TRACKING_DATABASE_PWD
-    working_dir: /usr/src/app
-    networks:
-      - athene
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.tracking.rule=PathPrefix(`/tracking`)
-      - traefik.http.routers.tracking.entrypoints=web
-      - traefik.http.routers.tracking-tls.rule=PathPrefix(`/tracking`)
-      - traefik.http.routers.tracking-tls.entrypoints=websecure
-      - traefik.http.routers.tracking-tls.tls=true
-
-  database:
-    image: mongo:latest
-    container_name: athene-mongodb
-    restart: unless-stopped
-    expose:
-      - 27017
-    environment:
-      - MONGO_INITDB_DATABASE=${DATABASE_NAME}
-      - MONGO_INITDB_ROOT_USERNAME=${DATABASE_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD}
-    volumes:
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-      - ./data/db:/data/db
-    networks:
-      - athene
 
 networks:
   athene:

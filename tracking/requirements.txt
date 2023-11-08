@@ -1,9 +1,0 @@
-fastapi==0.90.0
-jaro-winkler==2.0.3
-numpy==1.24.2
-pandas==1.5.3
-PyJWT==2.6.0
-pymongo==4.3.3
-scikit-learn==1.2.1
-scipy==1.10.0
-uvicorn==0.20.0
