@@ -33,4 +33,4 @@ jobs:
           OSSRH_PASSWORD: ${{secrets.OSSRH_TOKEN}}
           GPG_KEY: ${{secrets.GPG_KEY}}
           GPG_PASSPHRASE: ${{secrets.GPG_PASSPHRASE}}
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/master'
