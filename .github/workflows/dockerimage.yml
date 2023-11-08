@@ -19,7 +19,7 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/main'
     - name: Install Protoc
       uses: arduino/setup-protoc@v1
       with:
@@ -46,7 +46,7 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/main'
     - name: Build and Push the athene-segmentation Docker image
       run: ./.github/workflows/scripts/dockerimage.sh "segmentation"
 
@@ -65,7 +65,7 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/main'
     - name: Build and Push the athene-embedding Docker image
       run: ./.github/workflows/scripts/dockerimage.sh "embedding"
     - name: Run unittests for embedding-component
@@ -86,7 +86,7 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/main'
     - name: Build and Push the athene-clustering Docker image
       run: ./.github/workflows/scripts/dockerimage.sh "clustering"
     - name: Run unittests for clustering-component
@@ -107,6 +107,6 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USER }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/main'
     - name: Build and Push the athene-tracking Docker image
       run: ./.github/workflows/scripts/dockerimage.sh "tracking"

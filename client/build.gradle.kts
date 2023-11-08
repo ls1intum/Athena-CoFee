@@ -41,7 +41,7 @@ publishing {
                 licenses {
                     license {
                         name.set("MIT License")
-                        url.set("https://github.com/ls1intum/Athena/blob/master/LICENSE.md'")
+                        url.set("https://github.com/ls1intum/Athena/blob/main/LICENSE.md'")
                     }
                 }
                 developers {
