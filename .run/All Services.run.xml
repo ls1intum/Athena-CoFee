@@ -5,7 +5,6 @@
     <toRun name="embedding" type="PythonConfigurationType" />
     <toRun name="load-balancer" type="PythonConfigurationType" />
     <toRun name="segmentation" type="PythonConfigurationType" />
-    <toRun name="tracking" type="PythonConfigurationType" />
     <method v="2" />
   </configuration>
 </component>

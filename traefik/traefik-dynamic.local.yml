@@ -23,12 +23,6 @@ http:
       entryPoints:
         - web
       service: embedding
-    # http://localhost/tracking
-    tracking:
-      rule: "Path(`/tracking`)"
-      entryPoints:
-        - web
-      service: tracking
   services:
     test:
       loadBalancer:
@@ -49,7 +43,3 @@ http:
       loadBalancer:
         servers:
         - url: "http://host.docker.internal:8003"
-    tracking:
-      loadBalancer:
-        servers:
-        - url: "http://host.docker.internal:8004"

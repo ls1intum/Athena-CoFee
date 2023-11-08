@@ -67,7 +67,7 @@ which initializes virtual environments,
 installs dependencies and downloads required models.
 After that the services will be started automatically.
 
-There is one special target in the `Makefile` that will start traefik and the MongoDB database in a docker container
+There is one special target in the `Makefile` that will start traefik in a docker container
 to redirect to the services running on your local machine.
 
 You can always just directly use `make` and it will automatically detect changed dependencies.
@@ -87,7 +87,6 @@ If you are using PyCharm, you can configure the project as follows:
     \- `embedding`
     \- `load-balancer`
     \- `segmentation`
-    \- `tracking`
 
 5.  Configure the virtual environment Python interpreters for the different modules: For each of the modules in the list above, go to `File -> Settings -> Project: Athena -> Project Interpreter` and select the virtual environment in the `.venv` directory of the respective module.
 
@@ -115,8 +114,6 @@ The following API-routes are available after start:
 *   <http://localhost/getTask> - For the computation components to query tasks from the load balancer
 *   <http://localhost/sendTaskResult> - For the computation components to send back results to the load balancer
 *   <http://localhost/upload> - For Artemis to upload course material
-*   <http://localhost/tracking> - For Artemis to access tracking functionality
-*   <http://localhost/feedback_consistency> - For Artemis to access feedback\_consistency functionality
 
 Traefik provides a dashboard to monitor the status of underlying components.
 This dashboard is available on <http://localhost:9081/dashboard> by default.
