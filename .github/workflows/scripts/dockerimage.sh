@@ -22,8 +22,8 @@ echo "INFO: Branch-tag and Push image additionally as ${IMAGE}:${GITHUB_REF##*/}
 docker tag ${IMAGE}:${TAG} ${IMAGE}:${GITHUB_REF##*/}
 docker push ${IMAGE}:${GITHUB_REF##*/}
 
-# Tag and Push as latest if building on master-branch
-if [ "${GITHUB_REF##*/}" = "master" ]; then
+# Tag and Push as latest if building on main-branch
+if [ "${GITHUB_REF##*/}" = "main" ]; then
   echo "INFO: Tag and Push image additionally as ${IMAGE}:latest"
   docker tag ${IMAGE}:${TAG} ${IMAGE}:latest
   docker push ${IMAGE}:latest
