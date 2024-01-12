@@ -39,7 +39,7 @@ exceptiongroup==1.1.0
 flaky==3.7.0
 Flask==2.2.5
 Flask-Cors==3.0.10
-fonttools==4.38.0
+fonttools==4.43.0
 ftfy==6.1.1
 gevent==23.9.1
 greenlet==2.0.2
