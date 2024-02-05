@@ -1,4 +1,4 @@
-fastapi==0.90.0
+fastapi==0.109.1
 numpy==1.24.2
 protobuf==4.21.12
 PyYAML==6.0
