@@ -1,5 +1,5 @@
 docutils==0.19
-fastapi==0.90.0
+fastapi==0.109.1
 joblib==1.2.0
 matplotlib==3.7.0
 numpy==1.24.2
