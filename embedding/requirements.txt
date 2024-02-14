@@ -95,7 +95,7 @@ sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.5
 sqlparse==0.4.4
 srsly==2.4.5
-starlette==0.27.0
+starlette==0.36.2
 tensorboardX==2.5.1
 thinc==8.1.7
 threadpoolctl==3.1.0
