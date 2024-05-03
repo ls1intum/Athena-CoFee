@@ -101,7 +101,7 @@ thinc==8.1.7
 threadpoolctl==3.1.0
 toml==0.10.2
 tomli==2.0.1
-tqdm==4.64.1
+tqdm==4.66.3
 typer==0.7.0
 types-toml==0.10.8.3
 typing_extensions==4.4.0
