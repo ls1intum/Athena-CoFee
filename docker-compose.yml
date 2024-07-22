@@ -5,6 +5,10 @@ services:
   # http://localhost:9081/dashboard
   traefik:
     image: traefik:v2.9.6
+    command:
+      - --api.insecure=true  # Enable the insecure API and dashboard
+      - --providers.docker=true
+      - --entrypoints.web.address=:80
     container_name: athene-traefik
     restart: unless-stopped
     depends_on:

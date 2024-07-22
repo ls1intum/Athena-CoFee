@@ -15,4 +15,5 @@ entryPoints:
 
 # API and dashboard configuration
 api:
+  dashboard: true
   insecure: true

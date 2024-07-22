@@ -160,7 +160,9 @@ def sendBackResults(job: AtheneJob):
             "Authorization": auth_secret,
             "Content-type": "application/x-protobuf"
         }
+        logger.error(f"DEBUGGING: BEFORE REQUEST CALLBACK TO {job.callback_url}")
         response = requests.post(job.callback_url, data=final_result, headers=headers, timeout=600)
+        logger.error(f"DEBUGGING: AFTER REQUEST CALLBACK TO {job.callback_url}")
         if response.status_code == status.HTTP_200_OK:
             logger.info("Callback successful")
             logger.info("Athene Job finished: " + str(job))
@@ -176,8 +178,9 @@ def sendBackResults(job: AtheneJob):
 # Endpoint for Artemis to submit a job
 # This will create a new job and queue up the first task (segmentation)
 @app.post("/submit")
-async def submit_job(request: Request, response: Response):
+async def submit_job(request: Request, response: Response):  #TODO ldv
     checkAuthorization(request)
+    logger.error("IN SUBMITTT")
 
     job_request = await parseJson(request)
 

@@ -1,3 +1,5 @@
+import logging
+
 from .entities import NodeType, ComputeNode
 from logging import getLogger
 import os.path
@@ -51,9 +53,13 @@ class ConfigParser:
                 try:
                     # Query traefik API
                     traefik_services = requests.get(node['traefik_service_api'] + node[node_type + '_service_name'], timeout=5).json()
+                    self.__logger.error(f"Traefik: {traefik_services}")
+                    self.__logger.error(f"Node: {node}")
                     for i, server in enumerate(traefik_services['loadBalancer']['servers']):
+                        self.__logger.error(f"{i} !!")
                         new_node = ComputeNode(name='traefik_' + node_type + '_' + str(i), type=node_type, url=str(server['url'])+str(node['trigger_route']))
                         self.addComputeNode(new_node)
+
                 except Exception as e:
                     self.__logger.error("Error during config parsing (docker nodes): " + str(e))
 

@@ -6,10 +6,14 @@ version: '3'
 services:
   traefik:
     image: traefik:v2.9.6
+    command:
+      - --api.insecure=true  # Enable the insecure API and dashboard
+      - --providers.docker=true
+      - --entrypoints.web.address=:80
     container_name: athene-traefik-local
     restart: unless-stopped
     ports:
-      - ${TRAEFIK_DASHBOARD_PORT}:8080
+      - ${TRAEFIK_DASHBOARD_PORT}:8080 #9081
       - ${TRAEFIK_HTTP_PORT}:80
     volumes:
       - ./traefik/traefik.local.yml:/etc/traefik/traefik.yml:ro
