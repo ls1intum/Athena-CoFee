@@ -93,7 +93,7 @@ sphinxcontrib-htmlhelp==2.0.1
 sphinxcontrib-jsmath==1.0.1
 sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.5
-sqlparse==0.4.4
+sqlparse==0.5.0
 srsly==2.4.5
 starlette==0.36.2
 tensorboardX==2.5.1
