@@ -45,7 +45,7 @@ gevent==23.9.1
 greenlet==2.0.2
 h11==0.14.0
 h5py==3.8.0
-idna==3.4
+idna==3.7
 imagesize==1.4.1
 iniconfig==2.0.0
 itsdangerous==2.1.2
